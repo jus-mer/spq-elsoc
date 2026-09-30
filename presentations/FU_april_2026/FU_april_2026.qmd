@@ -1,0 +1,141 @@
+---
+bibliography: "bib/jusmer.bib"
+csl: "bib/apa6.csl"
+lang: in
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      
+      knitr.graphics.auto_pdf: true
+format:
+  revealjs:
+    #logo: images/edumer.png
+    slide-number: true
+    theme: "libs/edumer.scss"
+    auto-stretch: false
+    title-slide-attributes:
+      visibility: false
+    transition: fade
+    transition-speed: slow
+# data-background-image: images/cover.jpg
+# data-background-size: cover
+    auto-play-media: true
+    mathjax: "default"
+editor_options: 
+  chunk_output_type: console
+execute:
+  cache: true
+freeze: auto
+---
+
+```{r}
+#| include: false
+library(knitr)
+knitr::opts_chunk$set(echo = F,
+                      warning = F,
+                      error = F, 
+                      message = F) 
+```
+
+```{r}
+#| include: false
+
+if (! require("pacman")) install.packages("pacman")
+
+pacman::p_load(tidyverse, 
+               here,
+               kableExtra)
+
+options(scipen=999)
+rm(list = ls())
+```
+
+
+
+::: columns
+
+
+::: {.column width="20%"}
+
+
+  </br></br>
+![](images/jusmer-logo-vert.png)
+
+
+:::
+
+::: {.column .column-right width="80%"}
+
+
+
+# Market justice, meritocracy & deservingness {style="font-size:21px; text-align:right; line-height:1.1;"}
+
+### **Agenda & work in progress**{style="font-size:35px; text-align:right; line-height:1.1; margin-top:12px;"}
+
+------------------------------------------------------------------------
+
+</br>
+**Juan Carlos Castillo, Andreas Laffert & </br> Tomás Urzúa**
+
+Project: [*Market Justice and Deservingness of Social Welfare*](https://jus-mer.github.io/web-proyecto/docs/) (ANID/FONDECYT N°1250518 2025-2028)
+
+::: {.blue2 .medium style="line-height:0.4; margin-top:0; margin-bottom:0;"}
+
+**Department of Sociology, University of Chile** </br>
+
+:::
+
+</br>
+
+### Freie Universität Berlin - April 2026 {style="color:black"}
+
+:::
+:::
+
+# Contents {data-background-color="#2f0202" style="text-align: right;"}
+
+<div style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; text-align: right;">
+
+- [The project]{style="color: #fff; font-size: 1.3em;"}
+- [Paper market justice in pensions]{style="color: #fff;font-size: 1.3em;"}
+- [Paper factorial invariance of merit scale ]{style="color: #fff;font-size: 1.3em;"}
+- [Latent Class Analysis of merit scale]{style="color: #fff;font-size: 1.3em;"}
+
+</div>
+
+
+
+# Contents {data-background-color="#2f0202" style="text-align: right;"}
+
+<div style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; text-align: right;">
+
+- [The project]{style="color: #edde06; font-size: 1.3em;"}
+- [Paper market justice in pensions]{style="color: #ab9f9f;font-size: 1.3em;"}
+- [Paper factorial invariance of merit scale ]{style="color: #ab9f9f;font-size: 1.3em;"}
+- [Latent Class Analysis of merit scale]{style="color: #ab9f9f;font-size: 1.3em;"}
+
+</div>
+
+
+{{< include 01-introduction.qmd >}}
+
+{{< include 02-methods.qmd >}}
+
+{{< include 03-mlm.qmd >}}
+
+{{< include 03-sem.qmd >}}
+
+{{< include 04-conclusion.qmd >}}
+
+{{< include merit-factorial.qmd >}}
+
+{{< include lca-berlin.qmd >}}
+
+## References
+
+::: {#refs}
+:::
+
+{{< include 05-supplementary-material.qmd >}}

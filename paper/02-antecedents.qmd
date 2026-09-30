@@ -1,0 +1,30 @@
+:::: {.justify}
+
+# Theoretical and empirical background
+
+{{< include 02-market.qmd >}}
+{{< include 02-merit.qmd >}}
+{{< include 02-class.qmd >}}
+{{< include 02-pensions.qmd >}}
+
+## This study
+
+Building on class-based accounts of distributive preferences, we expect support for pension market justice to vary systematically across the class structure. Prior research shows that higher class position is associated with lower support for redistributive policies and a stronger inclination toward market-based allocation [@koos_moral_2019; @lindh_public_2015]. In contexts where access and quality are more closely tied to purchasing power, advantaged groups face fewer constraints and risks, making market allocation both more feasible and more defensible as a distributive principle.
+
+We further argue that meritocratic perceptions provide a key normative lens through which individuals evaluate pension inequalities. Existing work suggests that perceiving society as meritocratic is positively related to market-oriented preferences in welfare domains, including pensions, both cross-sectionally and over time [@castillo_deserving_2019; @castillo_perceptions_2025]. Individuals who see effort and talent as decisive for success are more likely to view income-linked differences as legitimate outcomes of individual contribution and deservingness [@castillo_socialization_2024]. Hence, meritocratic perceptions should be associated with stronger pension market justice preferences, not only between individuals but also as people revise these beliefs over time.
+
+Finally, we examine whether class conditions the attitudinal implications of meritocracy. Because the earnings–contributions–benefits link is typically more favorable for advantaged groups, meritocratic narratives may be more congruent with their material position and experiences. We therefore expect the association between meritocracy and pension market justice preferences to be stronger among upper-class respondents. In addition, we explore whether within-person increases in meritocratic perceptions translate into larger changes in pension market justice among upper-class individuals than among those in lower classes.
+
+Based on these arguments, we propose the following hypotheses:
+
+$H1 ; (\text{Between-person}):$ Those belonging to the upper classes show, on average, higher pension market justice preferences than those belonging to the lower classes.
+
+$H2_{a} ; (\text{Between-person}):$ Individuals with stronger meritocratic perceptions show, on average, higher pension market justice preferences.
+
+$H2_{b} ; (\text{Within-person}):$ When the same individual strengthens their meritocratic perceptions over time, their pension market justice preferences increase.
+
+$H3_{a} ; (\text{Between-person}):$ The positive association between meritocracy (BE) and pension market justice preferences is stronger in upper classes.
+
+$H3_{b} ; (\text{Within-person}):$ When upper-class individuals increase their meritocratic perceptions over time (WE), their pension market justice preferences rise more than in lower classes.
+
+::::
