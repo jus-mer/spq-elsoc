@@ -108,7 +108,8 @@ elsoc_long_2016_2023 <- elsoc_long_2016_2023 %>%
          sex = m0_sexo, 
          ideo = c15,
          protest = c08_02,
-         retiro_2021 = m63_02) %>% 
+         retiro_2021 = m63_02,
+         status_subj = d01_01) %>% 
   as_tibble() %>% 
   sjlabelled::drop_labels(., drop.na = FALSE)
 ```
@@ -202,6 +203,19 @@ sjlabelled::set_label(x = elsoc_long_2016_2023$ideo,
                       label = "Political identification") 
 
 frq(elsoc_long_2016_2023$ideo)
+```
+
+```{r}
+# Subjective social status (d01_01): 0 = lowest, 10 = highest level of society
+
+frq(elsoc_long_2016_2023$status_subj)
+
+elsoc_long_2016_2023$status_subj <- as.numeric(elsoc_long_2016_2023$status_subj)
+
+elsoc_long_2016_2023$status_subj <- sjlabelled::set_label(elsoc_long_2016_2023$status_subj, 
+                        label = "Subjective social status")
+
+sjmisc::descr(elsoc_long_2016_2023$status_subj)
 ```
 
 ```{r}
@@ -421,6 +435,7 @@ df_study1_long <- elsoc_long_2016_2023 %>%
          age,
          aget,
          ideo,
+         status_subj,
          decile_eq,
          decile_eq1)
 

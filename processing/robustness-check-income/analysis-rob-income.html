@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.27">
+<meta name="generator" content="quarto-1.8.25">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<meta name="author" content="Andreas Laffert">
-<meta name="dcterms.date" content="2026-04-04">
-<title>Data analysis Income</title>
+
+<meta name="author" content="JUSMER team">
+<meta name="dcterms.date" content="2026-10-01">
+
+<title>Data analysis Income and Education</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -56,6 +59,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 </style>
 
+
 <script src="analysis-rob-income_files/libs/clipboard/clipboard.min.js"></script>
 <script src="analysis-rob-income_files/libs/quarto-html/quarto.js" type="module"></script>
 <script src="analysis-rob-income_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -64,17 +68,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="analysis-rob-income_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="analysis-rob-income_files/libs/quarto-html/anchor.min.js"></script>
 <link href="analysis-rob-income_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="analysis-rob-income_files/libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="analysis-rob-income_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="analysis-rob-income_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="analysis-rob-income_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="analysis-rob-income_files/libs/bootstrap/bootstrap-277dec0420743ddccef80cf263986099.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="analysis-rob-income_files/libs/bootstrap/bootstrap-1df3e0111b3d9679c428961fa9291280.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
 </head>
+
 <body class="quarto-light">
 
-<header id="title-block-header" class="quarto-title-block default page-columns page-full"><div class="quarto-title-banner page-columns page-full">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Data analysis Income</h1>
-            <p class="subtitle lead">Changes in the Justification of Pension Inequality in Chile (2016–2023) and its Relationship to Social Class and Beliefs in Meritocracy</p>
+      <h1 class="title">Data analysis Income and Education</h1>
+            <p class="subtitle lead">Market justice and status: a longitudinal study of Chilean population (2016-2023)</p>
                       </div>
   </div>
     
@@ -84,14 +92,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Author</div>
       <div class="quarto-title-meta-contents">
-               <p>Andreas Laffert </p>
+               <p>JUSMER team </p>
             </div>
     </div>
       
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">April 4, 2026</p>
+        <p class="date">October 1, 2026</p>
       </div>
     </div>
     
@@ -101,67 +109,80 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   
   </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-  <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2"><h2 id="toc-title">Contents</h2>
+  <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2">
+    <h2 id="toc-title">Contents</h2>
    
   <ul class="collapse">
-<li><a href="#presentation" id="toc-presentation" class="nav-link active" data-scroll-target="#presentation"><span class="header-section-number">1</span> Presentation</a></li>
+  <li><a href="#presentation" id="toc-presentation" class="nav-link active" data-scroll-target="#presentation"><span class="header-section-number">1</span> Presentation</a></li>
   <li><a href="#libraries" id="toc-libraries" class="nav-link" data-scroll-target="#libraries"><span class="header-section-number">2</span> Libraries</a></li>
   <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="header-section-number">3</span> Data</a></li>
-  <li>
-<a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis"><span class="header-section-number">4</span> Analysis</a>
+  <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis"><span class="header-section-number">4</span> Analysis</a>
   <ul class="collapse">
-<li><a href="#descriptives" id="toc-descriptives" class="nav-link" data-scroll-target="#descriptives"><span class="header-section-number">4.1</span> Descriptives</a></li>
+  <li><a href="#descriptives" id="toc-descriptives" class="nav-link" data-scroll-target="#descriptives"><span class="header-section-number">4.1</span> Descriptives</a></li>
   <li><a href="#longitudinal-multilevel-models" id="toc-longitudinal-multilevel-models" class="nav-link" data-scroll-target="#longitudinal-multilevel-models"><span class="header-section-number">4.2</span> Longitudinal multilevel models</a></li>
   <li><a href="#icc" id="toc-icc" class="nav-link" data-scroll-target="#icc"><span class="header-section-number">4.3</span> ICC</a></li>
   <li><a href="#time-effects" id="toc-time-effects" class="nav-link" data-scroll-target="#time-effects"><span class="header-section-number">4.4</span> Time effects</a></li>
   <li><a href="#we-and-be-main-effects" id="toc-we-and-be-main-effects" class="nav-link" data-scroll-target="#we-and-be-main-effects"><span class="header-section-number">4.5</span> WE and BE main effects</a></li>
   <li><a href="#interactions-with-controls-direct-effect" id="toc-interactions-with-controls-direct-effect" class="nav-link" data-scroll-target="#interactions-with-controls-direct-effect"><span class="header-section-number">4.6</span> Interactions with controls (direct effect)</a></li>
   <li><a href="#interactions-we-x-time" id="toc-interactions-we-x-time" class="nav-link" data-scroll-target="#interactions-we-x-time"><span class="header-section-number">4.7</span> Interactions WE x Time</a></li>
+  </ul></li>
   </ul>
-</li>
-  </ul></nav>
+</nav>
 </div>
-<main class="content quarto-banner-title-block" id="quarto-document-content"><section id="presentation" class="level1" data-number="1"><h1 data-number="1">
-<span class="header-section-number">1</span> Presentation</h1>
-<p>This is the analysis code for the paper “Changes in the Justification of Pension Inequality in Chile (2016–2023) and its Relationship to Social Class and Beliefs in Meritocracy”. The dataset used is <code>df_balanced_income.RData</code>.</p>
-</section><section id="libraries" class="level1" data-number="2"><h1 data-number="2">
-<span class="header-section-number">2</span> Libraries</h1>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="presentation" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Presentation</h1>
+<p>This is the analysis code for the paper “Market justice and status: a longitudinal study of Chilean population (2016-2023)”. The dataset used is <code>df_balanced_income.RData</code>.</p>
+</section>
+<section id="libraries" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Libraries</h1>
 <div class="cell">
-<details class="code-fold"><summary>Show the code</summary><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span> <span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/trinker/pacman">"pacman"</a></span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"pacman"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">pacman</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pacman/man/p_load.html">p_load</a></span><span class="op">(</span><span class="va">tidyverse</span>, </span>
-<span>               <span class="va">sjmisc</span>, </span>
-<span>               <span class="va">sjPlot</span>, </span>
-<span>               <span class="va">lme4</span>, </span>
-<span>               <span class="va">here</span>, </span>
-<span>               <span class="va">performance</span>,</span>
-<span>               <span class="va">influence.ME</span>, </span>
-<span>               <span class="va">srvyr</span>,</span>
-<span>               <span class="va">ordinal</span>,</span>
-<span>               <span class="va">texreg</span>, </span>
-<span>               <span class="va">ggdist</span>,</span>
-<span>               <span class="va">misty</span>,</span>
-<span>               <span class="va">kableExtra</span>,</span>
-<span>               <span class="va">ggalluvial</span>, </span>
-<span>               <span class="va">shadowtext</span>,</span>
-<span>               <span class="va">MetBrewer</span>,</span>
-<span>               <span class="va">patchwork</span>,</span>
-<span>               <span class="va">sjlabelled</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>scipen<span class="op">=</span><span class="fl">999</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span>list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span> <span class="fu">require</span>(<span class="st">"pacman"</span>)) <span class="fu">install.packages</span>(<span class="st">"pacman"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>               sjmisc, </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>               sjPlot, </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>               lme4, </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>               here, </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>               performance,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>               influence.ME, </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>               srvyr,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>               ordinal,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>               texreg, </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>               ggdist,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>               misty,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>               kableExtra,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>               ggalluvial, </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>               shadowtext,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>               MetBrewer,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>               patchwork,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>               sjlabelled)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen=</span><span class="dv">999</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-</section><section id="data" class="level1" data-number="3"><h1 data-number="3">
-<span class="header-section-number">3</span> Data</h1>
+</section>
+<section id="data" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Data</h1>
 <div class="cell">
-<details class="code-fold"><summary>Show the code</summary><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu">here</span><span class="op">(</span><span class="st">"input/data/rob_income/df_balanced_rob_income.RData"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">glimpse</span><span class="op">(</span><span class="va">df_balanced</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details><div class="cell-output cell-output-stdout">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"input/data/rob_income/df_balanced_rob_income.RData"</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(df_balanced)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
 <pre><code>Rows: 7,968
-Columns: 17
+Columns: 18
 $ idencuesta            &lt;dbl&gt; 1101011, 1101011, 1101011, 1101011, 1101011, 110…
 $ ola                   &lt;chr&gt; "2016", "2017", "2018", "2019", "2022", "2023", …
 $ muestra               &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
@@ -177,209 +198,228 @@ $ sex                   &lt;fct&gt; Female, Female, Female, Female, Female, Fema
 $ age                   &lt;dbl&gt; 64, 65, 66, 68, 70, 70, 60, 62, 62, 64, 67, 66, …
 $ aget                  &lt;fct&gt; 50-64, 65 or more, 65 or more, 65 or more, 65 or…
 $ ideo                  &lt;fct&gt; Does not identify, Does not identify, Right, Lef…
+$ status_subj           &lt;dbl&gt; 5, 3, 9, 0, 5, 5, 5, 4, 5, 3, 5, 8, 5, 5, 5, 5, …
 $ decile_eq             &lt;fct&gt; 3, 1, 1, 1, NA, 4, 7, 8, 8, 2, NA, 1, 9, NA, NA,…
 $ decile_eq1            &lt;fct&gt; 3, 1, 1, 1, DNA, 4, 7, 8, 8, 2, DNA, 1, 9, DNA, …</code></pre>
 </div>
-<details class="code-fold"><summary>Show the code</summary><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Generate analytical sample</span></span>
-<span></span>
-<span><span class="va">df_study1</span> <span class="op">&lt;-</span> <span class="va">df_balanced</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">muestra</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html">na.omit</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>ola <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span><span class="va">ola</span> <span class="op">==</span> <span class="st">"2016"</span> <span class="op">~</span> <span class="fl">1</span>,</span>
-<span>                         <span class="va">ola</span> <span class="op">==</span> <span class="st">"2017"</span> <span class="op">~</span> <span class="fl">2</span>, </span>
-<span>                         <span class="va">ola</span> <span class="op">==</span> <span class="st">"2018"</span> <span class="op">~</span> <span class="fl">3</span>,</span>
-<span>                         <span class="va">ola</span> <span class="op">==</span> <span class="st">"2019"</span> <span class="op">~</span> <span class="fl">4</span>,</span>
-<span>                         <span class="va">ola</span> <span class="op">==</span> <span class="st">"2022"</span> <span class="op">~</span> <span class="fl">5</span>,</span>
-<span>                         <span class="va">ola</span> <span class="op">==</span> <span class="st">"2023"</span> <span class="op">~</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>ola <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">ola</span><span class="op">)</span>,</span>
-<span>         ola_num <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">ola</span><span class="op">)</span>,</span>
-<span>         ola_2<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">ola</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">df_study1</span> <span class="op">&lt;-</span> <span class="va">df_study1</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">idencuesta</span><span class="op">)</span> <span class="op">%&gt;%</span>             <span class="co"># Agrupar por el identificador del participante</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>n_participaciones <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>  <span class="co"># Contar el número de filas (participaciones) por participante</span></span>
-<span>  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">df_study1</span> <span class="op">&lt;-</span> <span class="va">df_study1</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">n_participaciones</span><span class="op">&gt;</span><span class="fl">1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Corregir etiquetas</span></span>
-<span></span>
-<span><span class="va">df_study1</span><span class="op">$</span><span class="va">just_pension</span> <span class="op">&lt;-</span> <span class="fu">sjlabelled</span><span class="fu">::</span><span class="fu"><a href="https://strengejacke.github.io/sjlabelled/reference/set_label.html">set_label</a></span><span class="op">(</span><span class="va">df_study1</span><span class="op">$</span><span class="va">just_pension</span>, </span>
-<span>                        label <span class="op">=</span> <span class="st">"Pension distributive justice"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">df_study1</span><span class="op">$</span><span class="va">egp</span> <span class="op">&lt;-</span> <span class="fu">sjlabelled</span><span class="fu">::</span><span class="fu"><a href="https://strengejacke.github.io/sjlabelled/reference/set_label.html">set_label</a></span><span class="op">(</span><span class="va">df_study1</span><span class="op">$</span><span class="va">egp</span>, </span>
-<span>                        label <span class="op">=</span> <span class="st">"Social class"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">df_study1</span><span class="op">$</span><span class="va">merit_effort</span> <span class="op">&lt;-</span> <span class="fu">sjlabelled</span><span class="fu">::</span><span class="fu"><a href="https://strengejacke.github.io/sjlabelled/reference/set_label.html">set_label</a></span><span class="op">(</span><span class="va">df_study1</span><span class="op">$</span><span class="va">merit_effort</span>, </span>
-<span>                        label <span class="op">=</span> <span class="st">"People are rewarded for their efforts"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">df_study1</span><span class="op">$</span><span class="va">merit_talent</span> <span class="op">&lt;-</span> <span class="fu">sjlabelled</span><span class="fu">::</span><span class="fu"><a href="https://strengejacke.github.io/sjlabelled/reference/set_label.html">set_label</a></span><span class="op">(</span><span class="va">df_study1</span><span class="op">$</span><span class="va">merit_talent</span>, </span>
-<span>                        label <span class="op">=</span> <span class="st">"People are rewarded for their intelligence"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate analytical sample</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df_study1 <span class="ot">&lt;-</span> df_balanced <span class="sc">%&gt;%</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>muestra) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ola =</span> <span class="fu">case_when</span>(ola <span class="sc">==</span> <span class="st">"2016"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="st">"2017"</span> <span class="sc">~</span> <span class="dv">2</span>, </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="st">"2018"</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="st">"2019"</span> <span class="sc">~</span> <span class="dv">4</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="st">"2022"</span> <span class="sc">~</span> <span class="dv">5</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="st">"2023"</span> <span class="sc">~</span> <span class="dv">6</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ola =</span> <span class="fu">as.factor</span>(ola),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">ola_num =</span> <span class="fu">as.numeric</span>(ola),</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">ola_2=</span><span class="fu">as.numeric</span>(ola)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>df_study1 <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(idencuesta) <span class="sc">%&gt;%</span>             <span class="co"># Agrupar por el identificador del participante</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n_participaciones =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span>  <span class="co"># Contar el número de filas (participaciones) por participante</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>df_study1 <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n_participaciones<span class="sc">&gt;</span><span class="dv">1</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Corregir etiquetas</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>just_pension <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(df_study1<span class="sc">$</span>just_pension, </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"Pension distributive justice"</span>)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>egp <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(df_study1<span class="sc">$</span>egp, </span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"Social class"</span>)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>merit_effort <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(df_study1<span class="sc">$</span>merit_effort, </span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"People are rewarded for their efforts"</span>)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>merit_talent <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(df_study1<span class="sc">$</span>merit_talent, </span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"People are rewarded for their intelligence"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-</section><section id="analysis" class="level1" data-number="4"><h1 data-number="4">
-<span class="header-section-number">4</span> Analysis</h1>
-<section id="descriptives" class="level2" data-number="4.1"><h2 data-number="4.1" class="anchored" data-anchor-id="descriptives">
-<span class="header-section-number">4.1</span> Descriptives</h2>
+</section>
+<section id="analysis" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Analysis</h1>
+<section id="descriptives" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="descriptives"><span class="header-section-number">4.1</span> Descriptives</h2>
 <div class="cell fig-cap-location-top">
-<details class="code-fold"><summary>Show the code</summary><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-cap-location="top"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">datos.pension</span> <span class="op">&lt;-</span> <span class="va">df_study1</span> <span class="op">%&gt;%</span> </span>
-<span>   <span class="fu">mutate</span><span class="op">(</span>just_pension <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">just_pension</span>, </span>
-<span>                              levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Strongly agree"</span>,</span>
-<span>                                         <span class="st">"Agree"</span>,</span>
-<span>                                         <span class="st">"Neither agree nor disagree"</span>,</span>
-<span>                                         <span class="st">"Disagree"</span>,</span>
-<span>                                         <span class="st">"Strongly disagree"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">idencuesta</span>, <span class="va">ola</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">count</span><span class="op">(</span><span class="va">just_pension</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">ola</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>porcentaje<span class="op">=</span><span class="va">n</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html">na.omit</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>wave <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span><span class="va">ola</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"2016"</span>,</span>
-<span>                          <span class="va">ola</span> <span class="op">==</span> <span class="fl">2</span> <span class="op">~</span> <span class="st">"2017"</span>,</span>
-<span>                          <span class="va">ola</span> <span class="op">==</span> <span class="fl">3</span> <span class="op">~</span> <span class="st">"2018"</span>,</span>
-<span>                          <span class="va">ola</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"2019"</span>,</span>
-<span>                          <span class="va">ola</span> <span class="op">==</span> <span class="fl">5</span> <span class="op">~</span> <span class="st">"2022"</span>,</span>
-<span>                          <span class="va">ola</span> <span class="op">==</span> <span class="fl">6</span> <span class="op">~</span> <span class="st">"2023"</span><span class="op">)</span>,</span>
-<span>         wave <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">wave</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"2016"</span>,</span>
-<span>                                        <span class="st">"2017"</span>,</span>
-<span>                                        <span class="st">"2018"</span>,</span>
-<span>                                        <span class="st">"2019"</span>,</span>
-<span>                                        <span class="st">"2022"</span>,</span>
-<span>                                        <span class="st">"2023"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span></span>
-<span><span class="va">etiquetas.pension</span> <span class="op">&lt;-</span> <span class="va">df_study1</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>just_pension <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">just_pension</span>, </span>
-<span>                              levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Strongly agree"</span>,</span>
-<span>                                         <span class="st">"Agree"</span>,</span>
-<span>                                         <span class="st">"Neither agree nor disagree"</span>,</span>
-<span>                                         <span class="st">"Disagree"</span>,</span>
-<span>                                         <span class="st">"Strongly disagree"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">ola</span>, <span class="va">just_pension</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">summarise</span><span class="op">(</span>count <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">ola</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>porcentaje <span class="op">=</span> <span class="va">count</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html">na.omit</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>idencuesta <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>         wave <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span><span class="va">ola</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"2016"</span>,</span>
-<span>                          <span class="va">ola</span> <span class="op">==</span> <span class="fl">2</span> <span class="op">~</span> <span class="st">"2017"</span>,</span>
-<span>                          <span class="va">ola</span> <span class="op">==</span> <span class="fl">3</span> <span class="op">~</span> <span class="st">"2018"</span>,</span>
-<span>                          <span class="va">ola</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"2019"</span>,</span>
-<span>                          <span class="va">ola</span> <span class="op">==</span> <span class="fl">5</span> <span class="op">~</span> <span class="st">"2022"</span>,</span>
-<span>                          <span class="va">ola</span> <span class="op">==</span> <span class="fl">6</span> <span class="op">~</span> <span class="st">"2023"</span><span class="op">)</span>,</span>
-<span>         wave <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">wave</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"2016"</span>,</span>
-<span>                                        <span class="st">"2017"</span>,</span>
-<span>                                        <span class="st">"2018"</span>,</span>
-<span>                                        <span class="st">"2019"</span>,</span>
-<span>                                        <span class="st">"2022"</span>,</span>
-<span>                                        <span class="st">"2023"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="va">datos.pension</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">wave</span>, fill <span class="op">=</span> <span class="va">just_pension</span>, stratum <span class="op">=</span> <span class="va">just_pension</span>,</span>
-<span>             alluvium <span class="op">=</span> <span class="va">idencuesta</span>, y <span class="op">=</span> <span class="va">porcentaje</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggalluvial</span><span class="fu">::</span><span class="fu"><a href="http://corybrunson.github.io/ggalluvial/reference/geom_flow.html">geom_flow</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">.4</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">ggalluvial</span><span class="fu">::</span><span class="fu"><a href="http://corybrunson.github.io/ggalluvial/reference/geom_stratum.html">geom_stratum</a></span><span class="op">(</span>linetype <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/percent_format.html">percent</a></span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">scale_fill_manual</span><span class="op">(</span>values <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"#0571B0"</span>,<span class="st">"#92C5DE"</span>,<span class="st">"#b3b3b3ff"</span>,<span class="st">"#F4A582"</span>,<span class="st">"#CA0020"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_shadowtext</span><span class="op">(</span>data <span class="op">=</span> <span class="va">etiquetas.pension</span>,</span>
-<span>                  <span class="fu">aes</span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">porcentaje</span> <span class="op">&gt;</span> <span class="fl">0</span> , <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/percent_format.html">percent</a></span><span class="op">(</span><span class="va">porcentaje</span>, accuracy <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span>,<span class="st">""</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                  position <span class="op">=</span> <span class="fu">position_stack</span><span class="op">(</span>vjust <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span>,</span>
-<span>                  show.legend <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                  size <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>                  color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">'white'</span><span class="op">)</span>,</span>
-<span>                  bg.colour<span class="op">=</span><span class="st">'grey30'</span><span class="op">)</span><span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>y <span class="op">=</span> <span class="st">"%"</span>,</span>
-<span>       x <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>       fill <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>       title <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme_ggdist</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details><div class="cell-output-display">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" data-cap-location="top"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>datos.pension <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">just_pension =</span> <span class="fu">factor</span>(just_pension, </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Strongly agree"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Agree"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Neither agree nor disagree"</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Disagree"</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Strongly disagree"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(idencuesta, ola) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(just_pension) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ola) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">porcentaje=</span>n<span class="sc">/</span><span class="fu">sum</span>(n)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wave =</span> <span class="fu">case_when</span>(ola <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"2016"</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                          ola <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"2017"</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                          ola <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"2018"</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                          ola <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">"2019"</span>,</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                          ola <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">"2022"</span>,</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                          ola <span class="sc">==</span> <span class="dv">6</span> <span class="sc">~</span> <span class="st">"2023"</span>),</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">wave =</span> <span class="fu">factor</span>(wave, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"2016"</span>,</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2017"</span>,</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2018"</span>,</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2019"</span>,</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2022"</span>,</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2023"</span>)))</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>etiquetas.pension <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">just_pension =</span> <span class="fu">factor</span>(just_pension, </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>                              <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Strongly agree"</span>,</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Agree"</span>,</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Neither agree nor disagree"</span>,</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Disagree"</span>,</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Strongly disagree"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ola, just_pension) <span class="sc">%&gt;%</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ola) <span class="sc">%&gt;%</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">porcentaje =</span> count <span class="sc">/</span> <span class="fu">sum</span>(count)) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">idencuesta =</span> <span class="dv">1</span>,</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>         <span class="at">wave =</span> <span class="fu">case_when</span>(ola <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"2016"</span>,</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>                          ola <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"2017"</span>,</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>                          ola <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"2018"</span>,</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>                          ola <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">"2019"</span>,</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>                          ola <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">"2022"</span>,</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>                          ola <span class="sc">==</span> <span class="dv">6</span> <span class="sc">~</span> <span class="st">"2023"</span>),</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>         <span class="at">wave =</span> <span class="fu">factor</span>(wave, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"2016"</span>,</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2017"</span>,</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2018"</span>,</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2019"</span>,</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2022"</span>,</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2023"</span>)))</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>datos.pension <span class="sc">%&gt;%</span> </span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> wave, <span class="at">fill =</span> just_pension, <span class="at">stratum =</span> just_pension,</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>             <span class="at">alluvium =</span> idencuesta, <span class="at">y =</span> porcentaje)) <span class="sc">+</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>  ggalluvial<span class="sc">::</span><span class="fu">geom_flow</span>(<span class="at">alpha =</span> .<span class="dv">4</span>) <span class="sc">+</span> </span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>  ggalluvial<span class="sc">::</span><span class="fu">geom_stratum</span>(<span class="at">linetype =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span> </span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span>  <span class="fu">c</span>(<span class="st">"#0571B0"</span>,<span class="st">"#92C5DE"</span>,<span class="st">"#b3b3b3ff"</span>,<span class="st">"#F4A582"</span>,<span class="st">"#CA0020"</span>)) <span class="sc">+</span></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_shadowtext</span>(<span class="at">data =</span> etiquetas.pension,</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(porcentaje <span class="sc">&gt;</span> <span class="dv">0</span> , scales<span class="sc">::</span><span class="fu">percent</span>(porcentaje, <span class="at">accuracy =</span> .<span class="dv">1</span>),<span class="st">""</span>)),</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>                  <span class="at">position =</span> <span class="fu">position_stack</span>(<span class="at">vjust =</span> .<span class="dv">5</span>),</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>                  <span class="at">show.legend =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>                  <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>                  <span class="at">color =</span> <span class="fu">rep</span>(<span class="st">'white'</span>),</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>                  <span class="at">bg.colour=</span><span class="st">'grey30'</span>)<span class="sc">+</span></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"%"</span>,</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="cn">NULL</span>,</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_ggdist</span>() <span class="sc">+</span></span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
 <div id="fig-alluvial" class="quarto-float quarto-figure quarto-figure-center anchored" data-cap-location="top">
-<figure class="quarto-float quarto-float-fig figure"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-alluvial-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-alluvial-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: Changes in the justification of inequality in pensions over time (2016-2023)
-</figcaption><div aria-describedby="fig-alluvial-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+</figcaption>
+<div aria-describedby="fig-alluvial-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="analysis-rob-income_files/figure-html/fig-alluvial-1.png" class="img-fluid figure-img" style="width:100.0%">
 </div>
 </figure>
 </div>
 </div>
 </div>
-</section><section id="longitudinal-multilevel-models" class="level2" data-number="4.2"><h2 data-number="4.2" class="anchored" data-anchor-id="longitudinal-multilevel-models">
-<span class="header-section-number">4.2</span> Longitudinal multilevel models</h2>
-</section><section id="icc" class="level2" data-number="4.3"><h2 data-number="4.3" class="anchored" data-anchor-id="icc">
-<span class="header-section-number">4.3</span> ICC</h2>
+</section>
+<section id="longitudinal-multilevel-models" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="longitudinal-multilevel-models"><span class="header-section-number">4.2</span> Longitudinal multilevel models</h2>
+</section>
+<section id="icc" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="icc"><span class="header-section-number">4.3</span> ICC</h2>
 <div class="cell">
-<details class="code-fold"><summary>Show the code</summary><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">m0</span> <span class="op">&lt;-</span> <span class="fu">clmm</span><span class="op">(</span><span class="va">just_pension</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">idencuesta</span><span class="op">)</span>, </span>
-<span>           link <span class="op">=</span> <span class="st">"logit"</span>,</span>
-<span>  Hess <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># calcula explícitamente la matriz varianza-covarianza de estimadores</span></span>
-<span>                data <span class="op">=</span> <span class="va">df_study1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">performance</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/performance/reference/icc.html">icc</a></span><span class="op">(</span><span class="va">m0</span>, by_group <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="co"># 0.23 es between, 0.77 within</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details><div class="cell-output cell-output-stdout">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>m0 <span class="ot">&lt;-</span> <span class="fu">clmm</span>(just_pension <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> idencuesta), </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">link =</span> <span class="st">"logit"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="co"># calcula explícitamente la matriz varianza-covarianza de estimadores</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> df_study1)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>performance<span class="sc">::</span><span class="fu">icc</span>(m0, <span class="at">by_group =</span> T) <span class="co"># 0.23 es between, 0.77 within</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
 <pre><code># ICC by Group
 
 Group      |   ICC
 ------------------
-idencuesta | 0.226</code></pre>
+idencuesta | 0.225</code></pre>
 </div>
 </div>
-</section><section id="time-effects" class="level2" data-number="4.4"><h2 data-number="4.4" class="anchored" data-anchor-id="time-effects">
-<span class="header-section-number">4.4</span> Time effects</h2>
-<details class="code-fold"><summary>Show the code</summary><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">#m1.1 &lt;- clmm(just_pension ~ 1 + ola + (1 | idencuesta),</span></span>
-<span><span class="co">#                link = "logit",</span></span>
-<span><span class="co">#  Hess = TRUE,</span></span>
-<span><span class="co">#  data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m1.2 &lt;- clmm(just_pension ~ 1 + ola_num + (1 | idencuesta),</span></span>
-<span><span class="co">#                link = "logit",</span></span>
-<span><span class="co">#  Hess = TRUE, data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m1.3 &lt;- clmm(just_pension ~ 1 + ola_num + ola_2 + (1| idencuesta),</span></span>
-<span><span class="co">#                link = "logit",</span></span>
-<span><span class="co">#  Hess = TRUE, data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m1.4 &lt;- clmm(just_pension ~ 1 + ola_num + ola_2 + (1 + ola_num | #idencuesta),</span></span>
-<span><span class="co">#               link = "logit",</span></span>
-<span><span class="co"># Hess = TRUE, data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">##save(m1.1,m1.2,m1.3,m1.4, file = here("output/rob_income/time_effects.RData"))</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu">here</span><span class="op">(</span><span class="st">"output/rob_income/time_effects.RData"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">ccoef</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
-<span>  <span class="st">"Strongly disagree|Disagree"</span> <span class="op">=</span> <span class="st">"Strongly disagree|Disagree"</span>,</span>
-<span>  <span class="st">"Disagree|Neither agree nor disagree"</span> <span class="op">=</span> <span class="st">"Disagree|Neither agree nor disagree"</span>, </span>
-<span>  <span class="st">"Neither agree nor disagree|Agree"</span> <span class="op">=</span> <span class="st">"Neither agree nor disagree|Agree"</span>, </span>
-<span>  <span class="st">"Agree|Strongly agree"</span> <span class="op">=</span> <span class="st">"Agree|Strongly agree"</span>, </span>
-<span>  <span class="st">"ola2017"</span> <span class="op">=</span> <span class="st">"Wave 2017"</span>,</span>
-<span>  <span class="st">"ola2018"</span> <span class="op">=</span> <span class="st">"Wave 2018"</span>,</span>
-<span>  <span class="st">"ola2019"</span> <span class="op">=</span> <span class="st">"Wave 2019"</span>,</span>
-<span>  <span class="st">"ola2022"</span> <span class="op">=</span> <span class="st">"Wave 2022"</span>,</span>
-<span>  <span class="st">"ola2023"</span> <span class="op">=</span> <span class="st">"Wave 2023"</span>,</span>
-<span>  ola_num <span class="op">=</span> <span class="st">"Wave"</span>,</span>
-<span>  ola_2 <span class="op">=</span> <span class="st">"Wave^2"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">texreg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/texreg/man/htmlreg.html">htmlreg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">m1.1</span>,<span class="va">m1.2</span>,<span class="va">m1.3</span>,<span class="va">m1.4</span><span class="op">)</span>,</span>
-<span>               caption.above <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>               caption <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>               stars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span><span class="op">)</span>,</span>
-<span>               custom.coef.map <span class="op">=</span> <span class="va">ccoef</span>,</span>
-<span>               digits <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>               groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"Wave (Ref.= 2016)"</span> <span class="op">=</span> <span class="fl">5</span><span class="op">:</span><span class="fl">9</span><span class="op">)</span>,</span>
-<span>               custom.note <span class="op">=</span> <span class="st">"Note: Cells contain regression coefficients with standard errors in parentheses. %stars."</span>,</span>
-<span>               leading.zero <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>               use.packages <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>               booktabs <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>               scalebox <span class="op">=</span> <span class="fl">0.80</span>,</span>
-<span>               include.loglik <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>               include.aic <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>               center <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details><table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;color: #000000;border-top: 2px solid #000000;">
-<thead><tr>
+</section>
+<section id="time-effects" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="time-effects"><span class="header-section-number">4.4</span> Time effects</h2>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#m1.1 &lt;- clmm(just_pension ~ 1 + ola + (1 | idencuesta),</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#                link = "logit",</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#  Hess = TRUE,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#  data = df_study1)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#m1.2 &lt;- clmm(just_pension ~ 1 + ola_num + (1 | idencuesta),</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#                link = "logit",</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#  Hess = TRUE, data = df_study1)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#m1.3 &lt;- clmm(just_pension ~ 1 + ola_num + ola_2 + (1| idencuesta),</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#                link = "logit",</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#  Hess = TRUE, data = df_study1)</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#m1.4 &lt;- clmm(just_pension ~ 1 + ola_num + ola_2 + (1 + ola_num | #idencuesta),</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#               link = "logit",</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Hess = TRUE, data = df_study1)</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="do">##save(m1.1,m1.2,m1.3,m1.4, file = here("output/rob_income/time_effects.RData"))</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"output/rob_income/time_effects.RData"</span>))</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>ccoef <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Strongly disagree|Disagree"</span> <span class="ot">=</span> <span class="st">"Strongly disagree|Disagree"</span>,</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Disagree|Neither agree nor disagree"</span> <span class="ot">=</span> <span class="st">"Disagree|Neither agree nor disagree"</span>, </span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Neither agree nor disagree|Agree"</span> <span class="ot">=</span> <span class="st">"Neither agree nor disagree|Agree"</span>, </span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Agree|Strongly agree"</span> <span class="ot">=</span> <span class="st">"Agree|Strongly agree"</span>, </span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ola2017"</span> <span class="ot">=</span> <span class="st">"Wave 2017"</span>,</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ola2018"</span> <span class="ot">=</span> <span class="st">"Wave 2018"</span>,</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ola2019"</span> <span class="ot">=</span> <span class="st">"Wave 2019"</span>,</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ola2022"</span> <span class="ot">=</span> <span class="st">"Wave 2022"</span>,</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ola2023"</span> <span class="ot">=</span> <span class="st">"Wave 2023"</span>,</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">ola_num =</span> <span class="st">"Wave"</span>,</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">ola_2 =</span> <span class="st">"Wave^2"</span>)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>texreg<span class="sc">::</span><span class="fu">htmlreg</span>(<span class="fu">list</span>(m1<span class="fl">.1</span>,m1<span class="fl">.2</span>,m1<span class="fl">.3</span>,m1<span class="fl">.4</span>),</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>               <span class="at">caption.above =</span> T,</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>               <span class="at">caption =</span> <span class="cn">NULL</span>,</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>               <span class="at">stars =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>),</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>               <span class="at">custom.coef.map =</span> ccoef,</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>               <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>               <span class="at">groups =</span> <span class="fu">list</span>(<span class="st">"Wave (Ref.= 2016)"</span> <span class="ot">=</span> <span class="dv">5</span><span class="sc">:</span><span class="dv">9</span>),</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>               <span class="at">custom.note =</span> <span class="st">"Note: Cells contain regression coefficients with standard errors in parentheses. %stars."</span>,</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>               <span class="at">leading.zero =</span> T,</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>               <span class="at">use.packages =</span> F,</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>               <span class="at">booktabs =</span> F,</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>               <span class="at">scalebox =</span> <span class="fl">0.80</span>,</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>               <span class="at">include.loglik =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>               <span class="at">include.aic =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>               <span class="at">center =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;color: #000000;border-top: 2px solid #000000;">
+<thead>
+<tr>
 <th style="padding-left: 5px;padding-right: 5px;">
 &nbsp;
 </th>
@@ -395,7 +435,8 @@ Model 3
 <th style="padding-left: 5px;padding-right: 5px;">
 Model 4
 </th>
-</tr></thead>
+</tr>
+</thead>
 <tbody>
 <tr style="border-top: 1px solid #000000;">
 <td style="padding-left: 5px;padding-right: 5px;">
@@ -857,17 +898,22 @@ Variance: idencuesta: ola_num
 </td>
 </tr>
 </tbody>
-<tfoot><tr>
+<tfoot>
+<tr>
 <td style="font-size: 0.8em;" colspan="5">
 Note: Cells contain regression coefficients with standard errors in parentheses. <sup>***</sup>p &lt; 0.001; <sup>**</sup>p &lt; 0.01; <sup>*</sup>p &lt; 0.05.
 </td>
-</tr></tfoot>
+</tr>
+</tfoot>
 </table>
-<section id="anova" class="level3" data-number="4.4.1"><h3 data-number="4.4.1" class="anchored" data-anchor-id="anova">
-<span class="header-section-number">4.4.1</span> Anova</h3>
+<section id="anova" class="level3" data-number="4.4.1">
+<h3 data-number="4.4.1" class="anchored" data-anchor-id="anova"><span class="header-section-number">4.4.1</span> Anova</h3>
 <div class="cell">
-<details class="code-fold"><summary>Show the code</summary><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">m1.3</span>, <span class="va">m1.4</span><span class="op">)</span> <span class="co"># quedarse con tiempo continua y con pendiente aleatoria</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details><div class="cell-output cell-output-stdout">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(m1<span class="fl">.3</span>, m1<span class="fl">.4</span>) <span class="co"># quedarse con tiempo continua y con pendiente aleatoria</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
 <pre><code>Likelihood ratio tests of cumulative link models:
  
      formula:                                                        link:
@@ -882,14 +928,19 @@ m1.3      7 15471 -7728.3
 m1.4      9 15474 -7727.9  0.7511  2     0.6869</code></pre>
 </div>
 </div>
-</section></section><section id="we-and-be-main-effects" class="level2" data-number="4.5"><h2 data-number="4.5" class="anchored" data-anchor-id="we-and-be-main-effects">
-<span class="header-section-number">4.5</span> WE and BE main effects</h2>
+</section>
+</section>
+<section id="we-and-be-main-effects" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="we-and-be-main-effects"><span class="header-section-number">4.5</span> WE and BE main effects</h2>
 <div id="tbl-modelos" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-tbl-cap-location="top">
-<figure class="quarto-float quarto-float-tbl figure"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-modelos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-modelos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;1: Cumulative link longitudinal multilevel models for pension market justice preferences
-</figcaption><div aria-describedby="tbl-modelos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+</figcaption>
+<div aria-describedby="tbl-modelos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;color: #000000;border-top: 2px solid #000000;">
-<thead><tr>
+<thead>
+<tr>
 <th style="padding-left: 5px;padding-right: 5px;">
 &nbsp;
 </th>
@@ -914,7 +965,8 @@ Model 6
 <th style="padding-left: 5px;padding-right: 5px;">
 Model 7
 </th>
-</tr></thead>
+</tr>
+</thead>
 <tbody>
 <tr style="border-top: 1px solid #000000;">
 <td style="padding-left: 5px;padding-right: 5px;">
@@ -1135,19 +1187,19 @@ Wave
 -0.653<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.675<sup>***</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 -0.678<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.680<sup>***</sup>
+-0.684<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.681<sup>***</sup>
+-0.690<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.685<sup>***</sup>
+-0.693<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.677<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1173,7 +1225,7 @@ Wave
 (0.090)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.090)
+(0.091)
 </td>
 </tr>
 <tr>
@@ -1193,13 +1245,13 @@ Wave^2
 0.148<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.148<sup>***</sup>
+0.149<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.148<sup>***</sup>
+0.150<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.148<sup>***</sup>
+0.147<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1242,16 +1294,16 @@ Merit: Effort (WE)
 0.145<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.147<sup>***</sup>
+0.141<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.148<sup>***</sup>
+0.143<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.148<sup>***</sup>
+0.146<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.142<sup>***</sup>
+0.136<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1271,13 +1323,13 @@ Merit: Effort (WE)
 (0.039)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.039)
+(0.040)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.039)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.039)
+(0.040)
 </td>
 </tr>
 <tr>
@@ -1291,19 +1343,19 @@ Merit: Talent (WE)
 &nbsp;
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.071
+0.069
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.071
+0.069
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.070
+0.069
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.070
+0.068
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.066
+0.064
 </td>
 </tr>
 <tr>
@@ -1346,16 +1398,16 @@ Merit: Effort (BE)
 &nbsp;
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+0.302<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.312<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 0.333<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.358<sup>***</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.351<sup>***</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.335<sup>***</sup>
+0.295<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1375,7 +1427,7 @@ Merit: Effort (BE)
 (0.090)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.089)
+(0.088)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.088)
@@ -1398,16 +1450,16 @@ Merit: Talent (BE)
 &nbsp;
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.089
+0.076
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.088
+0.064
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.112
+0.106
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.066
+0.054
 </td>
 </tr>
 <tr>
@@ -1424,16 +1476,68 @@ Merit: Talent (BE)
 &nbsp;
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.092)
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-(0.090)
+(0.091)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.089)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.087)
+(0.089)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.088)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Subjective social status
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+&nbsp;
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+&nbsp;
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+&nbsp;
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.049<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.025
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.024
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.010
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+&nbsp;
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+&nbsp;
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+&nbsp;
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+&nbsp;
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.018)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.019)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.019)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.019)
 </td>
 </tr>
 <tr>
@@ -1453,13 +1557,13 @@ Decile 10 (BE)
 &nbsp;
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.707<sup>***</sup>
+0.645<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.537<sup>***</sup>
+0.514<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.478<sup>***</sup>
+0.430<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1479,13 +1583,13 @@ Decile 10 (BE)
 &nbsp;
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.096)
+(0.097)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.104)
+(0.105)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.102)
+(0.103)
 </td>
 </tr>
 <tr>
@@ -1508,10 +1612,10 @@ Universitary education (BE)
 &nbsp;
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.385<sup>***</sup>
+0.391<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.344<sup>***</sup>
+0.321<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -1537,7 +1641,7 @@ Universitary education (BE)
 (0.096)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.097)
+(0.098)
 </td>
 </tr>
 <tr style="border-top: 1px solid #000000;">
@@ -1577,19 +1681,19 @@ BIC
 15534.327
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15510.926
+15466.055
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15479.716
+15438.210
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15434.695
+15402.242
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15427.404
+15390.371
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15399.703
+15380.021
 </td>
 </tr>
 <tr>
@@ -1603,19 +1707,19 @@ Numb. obs.
 6123
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-6123
+6107
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-6123
+6107
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-6123
+6107
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-6123
+6107
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-6123
+6107
 </td>
 </tr>
 <tr>
@@ -1629,19 +1733,19 @@ Num. groups: individuals
 1327
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-1327
+1326
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-1327
+1326
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-1327
+1326
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-1327
+1326
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-1327
+1326
 </td>
 </tr>
 <tr>
@@ -1655,19 +1759,19 @@ Var: individuals (Intercept)
 0.939
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.962
+0.942
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.832
+0.879
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.726
+0.860
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.704
+0.743
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.656
+0.905
 </td>
 </tr>
 <tr style="border-bottom: 2px solid #000000;">
@@ -1684,131 +1788,138 @@ Var: individuals, wave
 0.000
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.001
+0.011
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.001
+0.019
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.001
+0.009
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.001
+0.050
 </td>
 </tr>
 </tbody>
-<tfoot><tr>
+<tfoot>
+<tr>
 <td style="font-size: 0.8em;" colspan="8">
 Note: Cells contain regression coefficients with standard errors in parentheses. <sup>***</sup>p &lt; 0.001; <sup>**</sup>p &lt; 0.01; <sup>*</sup>p &lt; 0.05.
 </td>
-</tr></tfoot>
+</tr>
+</tfoot>
 </table>
 </div>
 </figure>
 </div>
-</section><section id="interactions-with-controls-direct-effect" class="level2" data-number="4.6"><h2 data-number="4.6" class="anchored" data-anchor-id="interactions-with-controls-direct-effect">
-<span class="header-section-number">4.6</span> Interactions with controls (direct effect)</h2>
-<details class="code-fold"><summary>Show the code</summary><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span> <span class="co">## WE and BE Interactions with controls</span></span>
-<span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">## income</span></span>
-<span><span class="co">#m11 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
-<span><span class="co">#               merit_effort_cwc + merit_talent_cwc + </span></span>
-<span><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
-<span><span class="co">#               dummy_decile10_mean*merit_effort_cwc + </span></span>
-<span><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
-<span><span class="co">#               (1 + ola_num + merit_effort_cwc| idencuesta), </span></span>
-<span><span class="co">#            link = "logit",</span></span>
-<span><span class="co">#  Hess = TRUE,</span></span>
-<span><span class="co">#           data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m12 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
-<span><span class="co">#               merit_effort_cwc + merit_talent_cwc + </span></span>
-<span><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
-<span><span class="co">#               dummy_decile10_mean*merit_effort_mean + </span></span>
-<span><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
-<span><span class="co">#               (1 + ola_num + merit_effort_mean| idencuesta), </span></span>
-<span><span class="co">#            link = "logit",</span></span>
-<span><span class="co">#  Hess = TRUE,</span></span>
-<span><span class="co">#           data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m13 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
-<span><span class="co">#               merit_effort_cwc + merit_talent_cwc + </span></span>
-<span><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
-<span><span class="co">#               dummy_decile10_mean*merit_talent_cwc + </span></span>
-<span><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
-<span><span class="co">#               (1 + ola_num + merit_talent_cwc| idencuesta), </span></span>
-<span><span class="co">#            link = "logit",</span></span>
-<span><span class="co">#  Hess = TRUE,</span></span>
-<span><span class="co">#           data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m14 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
-<span><span class="co">#               merit_effort_cwc + merit_talent_cwc + </span></span>
-<span><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
-<span><span class="co">#               dummy_decile10_mean*merit_talent_mean + </span></span>
-<span><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
-<span><span class="co">#               (1 + ola_num + merit_talent_mean| idencuesta), </span></span>
-<span><span class="co">#            link = "logit",</span></span>
-<span><span class="co">#  Hess = TRUE,</span></span>
-<span><span class="co">#           data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">## educ</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m15 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
-<span><span class="co">#              merit_effort_cwc + merit_talent_cwc + </span></span>
-<span><span class="co">#              merit_effort_mean + merit_talent_mean + </span></span>
-<span><span class="co">#              dummy_educ_mean*merit_effort_cwc + </span></span>
-<span><span class="co">#              dummy_decile10_mean + ideo + sex + age + </span></span>
-<span><span class="co">#              (1 + ola_num + merit_effort_cwc| idencuesta), </span></span>
-<span><span class="co">#            link = "logit",</span></span>
-<span><span class="co">#            Hess = TRUE,</span></span>
-<span><span class="co">#            data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m16 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
-<span><span class="co">#              merit_effort_cwc + merit_talent_cwc + </span></span>
-<span><span class="co">#              merit_effort_mean + merit_talent_mean + </span></span>
-<span><span class="co">#              dummy_educ_mean*merit_effort_mean + </span></span>
-<span><span class="co">#              dummy_decile10_mean + ideo + sex + age + </span></span>
-<span><span class="co">#              (1 + ola_num + merit_effort_mean| idencuesta), </span></span>
-<span><span class="co">#            link = "logit",</span></span>
-<span><span class="co">#            Hess = TRUE,</span></span>
-<span><span class="co">#            data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m17 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
-<span><span class="co">#              merit_effort_cwc + merit_talent_cwc + </span></span>
-<span><span class="co">#              merit_effort_mean + merit_talent_mean + </span></span>
-<span><span class="co">#              dummy_educ_mean*merit_talent_cwc + </span></span>
-<span><span class="co">#              dummy_decile10_mean + ideo + sex + age + </span></span>
-<span><span class="co">#              (1 + ola_num + merit_talent_cwc| idencuesta), </span></span>
-<span><span class="co">#            link = "logit",</span></span>
-<span><span class="co">#            Hess = TRUE,</span></span>
-<span><span class="co">#            data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m18 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
-<span><span class="co">#              merit_effort_cwc + merit_talent_cwc + </span></span>
-<span><span class="co">#              merit_effort_mean + merit_talent_mean + </span></span>
-<span><span class="co">#              dummy_educ_mean*merit_talent_mean + </span></span>
-<span><span class="co">#              dummy_decile10_mean + ideo + sex + age + </span></span>
-<span><span class="co">#              (1 + ola_num + merit_talent_mean| idencuesta), </span></span>
-<span><span class="co">#            link = "logit",</span></span>
-<span><span class="co">#            Hess = TRUE,</span></span>
-<span><span class="co">#            data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#save(m11,m12,m13,m14,m15,m16,m17,m18,file = #here("output/rob_income/interactions_direct.RData"))</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu">here</span><span class="op">(</span><span class="st">"output/rob_income/interactions_direct.RData"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">htmlreg</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">m11</span>,<span class="va">m12</span>,<span class="va">m13</span>,<span class="va">m14</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details><table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
+</section>
+<section id="interactions-with-controls-direct-effect" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="interactions-with-controls-direct-effect"><span class="header-section-number">4.6</span> Interactions with controls (direct effect)</h2>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a> <span class="do">## WE and BE Interactions with controls</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="do">## income</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#m11 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#               merit_effort_cwc + merit_talent_cwc + </span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_decile10_mean*merit_effort_cwc + </span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#               (1 + ola_num + merit_effort_cwc| idencuesta), </span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#            link = "logit",</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#  Hess = TRUE,</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co">#           data = df_study1)</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">#m12 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">#               merit_effort_cwc + merit_talent_cwc + </span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_decile10_mean*merit_effort_mean + </span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#               (1 + ola_num + merit_effort_mean| idencuesta), </span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">#            link = "logit",</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co">#  Hess = TRUE,</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co">#           data = df_study1)</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co">#m13 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co">#               merit_effort_cwc + merit_talent_cwc + </span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_decile10_mean*merit_talent_cwc + </span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="co">#               (1 + ola_num + merit_talent_cwc| idencuesta), </span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="co">#            link = "logit",</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="co">#  Hess = TRUE,</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="co">#           data = df_study1)</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="co">#m14 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="co">#               merit_effort_cwc + merit_talent_cwc + </span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_decile10_mean*merit_talent_mean + </span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="co">#               (1 + ola_num + merit_talent_mean| idencuesta), </span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="co">#            link = "logit",</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="co">#  Hess = TRUE,</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="co">#           data = df_study1)</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="do">## educ</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a><span class="co">#m15 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a><span class="co">#              merit_effort_cwc + merit_talent_cwc + </span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a><span class="co">#              merit_effort_mean + merit_talent_mean + </span></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a><span class="co">#              dummy_educ_mean*merit_effort_cwc + </span></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a><span class="co">#              dummy_decile10_mean + ideo + sex + age + </span></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a><span class="co">#              (1 + ola_num + merit_effort_cwc| idencuesta), </span></span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a><span class="co">#            link = "logit",</span></span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a><span class="co">#            Hess = TRUE,</span></span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a><span class="co">#            data = df_study1)</span></span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a><span class="co">#m16 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a><span class="co">#              merit_effort_cwc + merit_talent_cwc + </span></span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a><span class="co">#              merit_effort_mean + merit_talent_mean + </span></span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a><span class="co">#              dummy_educ_mean*merit_effort_mean + </span></span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a><span class="co">#              dummy_decile10_mean + ideo + sex + age + </span></span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a><span class="co">#              (1 + ola_num + merit_effort_mean| idencuesta), </span></span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a><span class="co">#            link = "logit",</span></span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a><span class="co">#            Hess = TRUE,</span></span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a><span class="co">#            data = df_study1)</span></span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a><span class="co">#m17 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a><span class="co">#              merit_effort_cwc + merit_talent_cwc + </span></span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a><span class="co">#              merit_effort_mean + merit_talent_mean + </span></span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a><span class="co">#              dummy_educ_mean*merit_talent_cwc + </span></span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a><span class="co">#              dummy_decile10_mean + ideo + sex + age + </span></span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a><span class="co">#              (1 + ola_num + merit_talent_cwc| idencuesta), </span></span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a><span class="co">#            link = "logit",</span></span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a><span class="co">#            Hess = TRUE,</span></span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a><span class="co">#            data = df_study1)</span></span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a><span class="co">#m18 &lt;- clmm(just_pension ~ 1 + ola_num +  ola_2 + </span></span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a><span class="co">#              merit_effort_cwc + merit_talent_cwc + </span></span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a><span class="co">#              merit_effort_mean + merit_talent_mean + </span></span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a><span class="co">#              dummy_educ_mean*merit_talent_mean + </span></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a><span class="co">#              dummy_decile10_mean + ideo + sex + age + </span></span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a><span class="co">#              (1 + ola_num + merit_talent_mean| idencuesta), </span></span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a><span class="co">#            link = "logit",</span></span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a><span class="co">#            Hess = TRUE,</span></span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a><span class="co">#            data = df_study1)</span></span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a><span class="co">#save(m11,m12,m13,m14,m15,m16,m17,m18,file = #here("output/rob_income/interactions_direct.RData"))</span></span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"output/rob_income/interactions_direct.RData"</span>))</span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a><span class="fu">htmlreg</span>(<span class="fu">list</span>(m11,m12,m13,m14))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
 <caption>
 Statistical models
 </caption>
-<thead><tr>
+<thead>
+<tr>
 <th style="padding-left: 5px;padding-right: 5px;">
 &nbsp;
 </th>
@@ -1824,7 +1935,8 @@ Model 3
 <th style="padding-left: 5px;padding-right: 5px;">
 Model 4
 </th>
-</tr></thead>
+</tr>
+</thead>
 <tbody>
 <tr style="border-top: 1px solid #000000;">
 <td style="padding-left: 5px;padding-right: 5px;">
@@ -2728,18 +2840,24 @@ Variance: idencuesta: merit_talent_mean
 </td>
 </tr>
 </tbody>
-<tfoot><tr>
+<tfoot>
+<tr>
 <td style="font-size: 0.8em;" colspan="5">
 <sup>***</sup>p &lt; 0.001; <sup>**</sup>p &lt; 0.01; <sup>*</sup>p &lt; 0.05
 </td>
-</tr></tfoot>
+</tr>
+</tfoot>
 </table>
-<details class="code-fold"><summary>Show the code</summary><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">htmlreg</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">m15</span>,<span class="va">m16</span>,<span class="va">m17</span>,<span class="va">m18</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details><table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">htmlreg</span>(<span class="fu">list</span>(m15,m16,m17,m18))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
 <caption>
 Statistical models
 </caption>
-<thead><tr>
+<thead>
+<tr>
 <th style="padding-left: 5px;padding-right: 5px;">
 &nbsp;
 </th>
@@ -2755,7 +2873,8 @@ Model 3
 <th style="padding-left: 5px;padding-right: 5px;">
 Model 4
 </th>
-</tr></thead>
+</tr>
+</thead>
 <tbody>
 <tr style="border-top: 1px solid #000000;">
 <td style="padding-left: 5px;padding-right: 5px;">
@@ -3659,80 +3778,88 @@ Variance: idencuesta: merit_talent_mean
 </td>
 </tr>
 </tbody>
-<tfoot><tr>
+<tfoot>
+<tr>
 <td style="font-size: 0.8em;" colspan="5">
 <sup>***</sup>p &lt; 0.001; <sup>**</sup>p &lt; 0.01; <sup>*</sup>p &lt; 0.05
 </td>
-</tr></tfoot>
-</table></section><section id="interactions-we-x-time" class="level2" data-number="4.7"><h2 data-number="4.7" class="anchored" data-anchor-id="interactions-we-x-time">
-<span class="header-section-number">4.7</span> Interactions WE x Time</h2>
-<details class="code-fold"><summary>Show the code</summary><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># ## WE and BE Interactions with controls</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#df_study1 &lt;- df_study1 |&gt;</span></span>
-<span><span class="co">#  mutate(</span></span>
-<span><span class="co">#    time  = ola_num - min(ola_num),</span></span>
-<span><span class="co">#    time2 = time^2</span></span>
-<span><span class="co">#  )</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m19 &lt;- clmm(just_pension ~ 1 + time*merit_effort_cwc +  </span></span>
-<span><span class="co">#              time2 + merit_talent_cwc + </span></span>
-<span><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
-<span><span class="co">#               dummy_decile10_mean + </span></span>
-<span><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
-<span><span class="co">#               (1 + time + merit_effort_cwc| idencuesta), </span></span>
-<span><span class="co">#            link = "logit",</span></span>
-<span><span class="co">#  Hess = TRUE,</span></span>
-<span><span class="co">#           data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m20 &lt;- clmm(just_pension ~ 1 + time*merit_talent_cwc +  </span></span>
-<span><span class="co">#              time2 +  merit_effort_cwc + </span></span>
-<span><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
-<span><span class="co">#               dummy_decile10_mean + </span></span>
-<span><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
-<span><span class="co">#               (1 + time + merit_talent_cwc| idencuesta), </span></span>
-<span><span class="co">#            link = "logit",</span></span>
-<span><span class="co">#  Hess = TRUE,</span></span>
-<span><span class="co">#           data = df_study1)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#screenreg(list(m19, m20))</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m19_flex &lt;- clmm(</span></span>
-<span><span class="co">#  just_pension ~ 1 + factor(ola_num)*merit_effort_cwc +</span></span>
-<span><span class="co">#    merit_talent_cwc +</span></span>
-<span><span class="co">#    merit_effort_mean + merit_talent_mean +</span></span>
-<span><span class="co">#    dummy_decile10_mean + dummy_educ_mean +</span></span>
-<span><span class="co">#    ideo + sex + age +</span></span>
-<span><span class="co">#    (1 + merit_effort_cwc | idencuesta),</span></span>
-<span><span class="co">#  link = "logit",</span></span>
-<span><span class="co">#  Hess = TRUE,</span></span>
-<span><span class="co">#  data = df_study1</span></span>
-<span><span class="co">#)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#m20_flex &lt;- clmm(</span></span>
-<span><span class="co">#  just_pension ~ 1 + factor(ola_num)*merit_talent_cwc + </span></span>
-<span><span class="co">#    merit_effort_cwc +</span></span>
-<span><span class="co">#    merit_effort_mean + merit_talent_mean +</span></span>
-<span><span class="co">#    dummy_decile10_mean + dummy_educ_mean +</span></span>
-<span><span class="co">#    ideo + sex + age +</span></span>
-<span><span class="co">#    (1 + merit_talent_cwc | idencuesta),</span></span>
-<span><span class="co">#  link = "logit",</span></span>
-<span><span class="co">#  Hess = TRUE,</span></span>
-<span><span class="co">#  data = df_study1</span></span>
-<span><span class="co">#)</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#screenreg(list(m19_flex, m20_flex))</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co">#save(m19,m20, m19_flex, m20_flex, file = #here("output/rob_income/interactions_withinxtime.RData"))</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu">here</span><span class="op">(</span><span class="st">"output/rob_income/interactions_withinxtime.RData"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">htmlreg</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">m19</span>, <span class="va">m20</span>, <span class="va">m19_flex</span>, <span class="va">m20_flex</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details><table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
+</tr>
+</tfoot>
+</table>
+</section>
+<section id="interactions-we-x-time" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="interactions-we-x-time"><span class="header-section-number">4.7</span> Interactions WE x Time</h2>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ## WE and BE Interactions with controls</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#df_study1 &lt;- df_study1 |&gt;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#  mutate(</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#    time  = ola_num - min(ola_num),</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#    time2 = time^2</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#  )</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#m19 &lt;- clmm(just_pension ~ 1 + time*merit_effort_cwc +  </span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#              time2 + merit_talent_cwc + </span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_decile10_mean + </span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#               (1 + time + merit_effort_cwc| idencuesta), </span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#            link = "logit",</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#  Hess = TRUE,</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#           data = df_study1)</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#m20 &lt;- clmm(just_pension ~ 1 + time*merit_talent_cwc +  </span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co">#              time2 +  merit_effort_cwc + </span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">#               merit_effort_mean + merit_talent_mean + </span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_decile10_mean + </span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">#               dummy_educ_mean + ideo + sex + age + </span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co">#               (1 + time + merit_talent_cwc| idencuesta), </span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co">#            link = "logit",</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="co">#  Hess = TRUE,</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="co">#           data = df_study1)</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="co">#screenreg(list(m19, m20))</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="co">#m19_flex &lt;- clmm(</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="co">#  just_pension ~ 1 + factor(ola_num)*merit_effort_cwc +</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="co">#    merit_talent_cwc +</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a><span class="co">#    merit_effort_mean + merit_talent_mean +</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="co">#    dummy_decile10_mean + dummy_educ_mean +</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a><span class="co">#    ideo + sex + age +</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="co">#    (1 + merit_effort_cwc | idencuesta),</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="co">#  link = "logit",</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="co">#  Hess = TRUE,</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="co">#  data = df_study1</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="co">#)</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a><span class="co">#m20_flex &lt;- clmm(</span></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a><span class="co">#  just_pension ~ 1 + factor(ola_num)*merit_talent_cwc + </span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a><span class="co">#    merit_effort_cwc +</span></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a><span class="co">#    merit_effort_mean + merit_talent_mean +</span></span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a><span class="co">#    dummy_decile10_mean + dummy_educ_mean +</span></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a><span class="co">#    ideo + sex + age +</span></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a><span class="co">#    (1 + merit_talent_cwc | idencuesta),</span></span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a><span class="co">#  link = "logit",</span></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a><span class="co">#  Hess = TRUE,</span></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a><span class="co">#  data = df_study1</span></span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a><span class="co">#)</span></span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a><span class="co">#screenreg(list(m19_flex, m20_flex))</span></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a><span class="co">#save(m19,m20, m19_flex, m20_flex, file = #here("output/rob_income/interactions_withinxtime.RData"))</span></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"output/rob_income/interactions_withinxtime.RData"</span>))</span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a><span class="fu">htmlreg</span>(<span class="fu">list</span>(m19, m20, m19_flex, m20_flex))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
 <caption>
 Statistical models
 </caption>
-<thead><tr>
+<thead>
+<tr>
 <th style="padding-left: 5px;padding-right: 5px;">
 &nbsp;
 </th>
@@ -3748,7 +3875,8 @@ Model 3
 <th style="padding-left: 5px;padding-right: 5px;">
 Model 4
 </th>
-</tr></thead>
+</tr>
+</thead>
 <tbody>
 <tr style="border-top: 1px solid #000000;">
 <td style="padding-left: 5px;padding-right: 5px;">
@@ -4958,12 +5086,20 @@ Variance: idencuesta: merit_talent_cwc
 </td>
 </tr>
 </tbody>
-<tfoot><tr>
+<tfoot>
+<tr>
 <td style="font-size: 0.8em;" colspan="5">
 <sup>***</sup>p &lt; 0.001; <sup>**</sup>p &lt; 0.01; <sup>*</sup>p &lt; 0.05
 </td>
-</tr></tfoot>
-</table></section></section></main><!-- /main column --><script id="quarto-html-after-body" type="application/javascript">
+</tr>
+</tfoot>
+</table>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
     const anchorJS = new window.AnchorJS();
@@ -5364,6 +5500,7 @@ Variance: idencuesta: merit_talent_cwc
   });
   </script>
 </div> <!-- /content -->
+
 
 
 

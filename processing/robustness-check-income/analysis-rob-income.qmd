@@ -1,7 +1,7 @@
 ---
-title: "Data analysis Income"
-subtitle: "Changes in the Justification of Pension Inequality in Chile (2016–2023) and its Relationship to Social Class and Beliefs in Meritocracy"
-author: "Andreas Laffert"
+title: "Data analysis Income and Education"
+subtitle: "Market justice and status: a longitudinal study of Chilean population (2016-2023)"
+author: "JUSMER team"
 date: today
 lang: en
 fontsize: 12pt
@@ -27,7 +27,7 @@ editor_options:
 
 # Presentation
 
-This is the analysis code for the paper "Changes in the Justification of Pension Inequality in Chile (2016–2023) and its Relationship to Social Class and Beliefs in Meritocracy". The dataset used is `df_balanced_income.RData`.
+This is the analysis code for the paper "Market justice and status: a longitudinal study of Chilean population (2016-2023)". The dataset used is `df_balanced_income.RData`.
 
 ```{r}
 #| label: set
@@ -360,50 +360,54 @@ anova(m1.3, m1.4) # quedarse con tiempo continua y con pendiente aleatoria
 #| results: asis
 ## WE and BE main effects
 
-#m3 <- clmm(just_pension ~ 1 + ola_num + ola_2 +   
+# m3 <- clmm(just_pension ~ 1 + ola_num + ola_2 +   
 #             merit_effort_cwc + merit_talent_cwc + (1 + ola_num | idencuesta), 
 #            link = "logit",
 #           Hess = TRUE,
 #           data = df_study1)
-#
-#m4 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+
+# m4 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
 #             merit_effort_cwc + merit_talent_cwc + 
 #             merit_effort_mean + merit_talent_mean + 
+#             status_subj + 
 #             (1 + ola_num| idencuesta), 
 #            link = "logit",
 #           Hess = TRUE,
 #           data = df_study1)
-#
-#m5 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+
+# m5 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
 #              merit_effort_cwc + merit_talent_cwc + 
 #              merit_effort_mean + merit_talent_mean + 
+#             status_subj + 
 #              dummy_decile10_mean +
 #              (1 + ola_num| idencuesta), 
 #            link = "logit",
 #            Hess = TRUE,
 #           data = df_study1)
-#
-#m6 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+
+# m6 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
 #              merit_effort_cwc + merit_talent_cwc + 
 #              merit_effort_mean + merit_talent_mean + 
+#             status_subj + 
 #              dummy_decile10_mean +
 #             dummy_educ_mean +
 #              (1 + ola_num| idencuesta), 
 #            link = "logit",
 #            Hess = TRUE,
 #           data = df_study1)
-#
-#m7 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+
+# m7 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
 #              merit_effort_cwc + merit_talent_cwc + 
 #              merit_effort_mean + merit_talent_mean + 
+#             status_subj + 
 #              dummy_decile10_mean +
 #             dummy_educ_mean + ideo + sex + age + 
 #              (1 + ola_num| idencuesta), 
 #            link = "logit",
 #            Hess = TRUE,
 #           data = df_study1)
-#
-#save(m3,m4,m5,m6,m7, file = here("output/rob_income/main_effects.RData"))
+
+# save(m3,m4,m5,m6,m7, file = here("output/rob_income/main_effects.RData"))
 
 load(file = here("output/rob_income/main_effects.RData"))
 
@@ -435,6 +439,7 @@ ccoef <- list(
   merit_talent_cwc = "Merit: Talent (WE)",
   merit_effort_mean = "Merit: Effort (BE)",
   merit_talent_mean = "Merit: Talent (BE)",
+  status_subj = "Subjective social status",
   dummy_decile10_mean = "Decile 10 (BE)",
   dummy_educ_mean = "Universitary education (BE)"
   )
