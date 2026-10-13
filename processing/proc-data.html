@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Andreas Laffert">
+<meta name="dcterms.date" content="2026-10-13">
+
+<title>Data preparation for robustness check Income</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="proc-data-rob-income_files/libs/clipboard/clipboard.min.js"></script>
+<script src="proc-data-rob-income_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="proc-data-rob-income_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="proc-data-rob-income_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="proc-data-rob-income_files/libs/quarto-html/popper.min.js"></script>
+<script src="proc-data-rob-income_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="proc-data-rob-income_files/libs/quarto-html/anchor.min.js"></script>
+<link href="proc-data-rob-income_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="proc-data-rob-income_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="proc-data-rob-income_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="proc-data-rob-income_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="proc-data-rob-income_files/libs/bootstrap/bootstrap-1df3e0111b3d9679c428961fa9291280.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Data preparation for robustness check Income</h1>
+            <p class="subtitle lead">Changes in the Justification of Pension Inequality in Chile (2016–2023) and its Relationship to Social Class and Beliefs in Meritocracy</p>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Andreas Laffert </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">October 13, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#presentation" id="toc-presentation" class="nav-link active" data-scroll-target="#presentation"><span class="header-section-number">1</span> Presentation</a></li>
+  <li><a href="#libraries" id="toc-libraries" class="nav-link" data-scroll-target="#libraries"><span class="header-section-number">2</span> Libraries</a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="header-section-number">3</span> Data</a></li>
+  <li><a href="#processing" id="toc-processing" class="nav-link" data-scroll-target="#processing"><span class="header-section-number">4</span> Processing</a></li>
+  <li><a href="#save-and-export" id="toc-save-and-export" class="nav-link" data-scroll-target="#save-and-export"><span class="header-section-number">5</span> Save and export</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="../../proc-data-rob-income.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="presentation" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Presentation</h1>
+<p>This is the data preparation code for the paper “Changes in the Justification of Pension Inequality in Chile (2016–2023) and its Relationship to Social Class and Beliefs in Meritocracy”. The prepared dataset is <code>ELSOC_Long_2016_2023_1.00.RData</code>.</p>
+</section>
+<section id="libraries" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Libraries</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span> <span class="fu">require</span>(<span class="st">"pacman"</span>)) <span class="fu">install.packages</span>(<span class="st">"pacman"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>               car,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>               sjmisc, </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>               here,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>               sjlabelled,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>               SciViews,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>               naniar,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>               readxl,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>               sjPlot,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>               DIGCLASS)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen=</span><span class="dv">999</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="data" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Data</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="fu">url</span>(<span class="st">"https://dataverse.harvard.edu/api/access/datafile/10797987"</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(elsoc_long_2016_2023)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="processing" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Processing</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023[elsoc_long_2016_2023 <span class="sc">==-</span><span class="dv">999</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023[elsoc_long_2016_2023 <span class="sc">==-</span><span class="dv">888</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023[elsoc_long_2016_2023 <span class="sc">==-</span><span class="dv">777</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023[elsoc_long_2016_2023 <span class="sc">==-</span><span class="dv">666</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023 <span class="ot">&lt;-</span> elsoc_long_2016_2023 <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">just_pension =</span> d02_01,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">just_educ =</span> d02_02,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">just_salud =</span> d02_03, </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">merit_effort =</span> c18_09,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">merit_talent =</span> c18_10, </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">age =</span> m0_edad, m01, </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">sex =</span> m0_sexo, </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">ideo =</span> c15,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">protest =</span> c08_02,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">retiro_2021 =</span> m63_02,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">ess =</span> d01_01,</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">ess_og =</span> d01_02,</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">ess_hijos =</span> d01_03) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  sjlabelled<span class="sc">::</span><span class="fu">drop_labels</span>(., <span class="at">drop.na =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Market Justice Preferences</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Average index (1-5) of pension, education and healthcare market justice.</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Computed on the numeric items, before they are recoded to factors.</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>mjp_index <span class="ot">&lt;-</span> <span class="fu">rowMeans</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  elsoc_long_2016_2023[, <span class="fu">c</span>(<span class="st">"just_pension"</span>, <span class="st">"just_educ"</span>, <span class="st">"just_salud"</span>)],</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">na.rm =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>mjp_index <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(elsoc_long_2016_2023<span class="sc">$</span>mjp_index,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"Market justice preferences index"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">descr</span>(elsoc_long_2016_2023<span class="sc">$</span>mjp_index)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+## Basic descriptive statistics
+
+ var    type                            label     n NA.prc mean   sd   se md
+  dd numeric Market justice preferences index 17947  13.55    2 0.85 0.01  2
+ trimmed   range iqr skew
+     1.9 4 (1-5)   1 0.88</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>just_pension <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(elsoc_long_2016_2023<span class="sc">$</span>just_pension, </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="at">recodes =</span> <span class="fu">c</span>(<span class="st">"1='Strongly disagree'; 2='Disagree'; 3='Neither agree nor disagree'; 4='Agree'; 5='Strongly agree'"</span>), </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Strongly disagree"</span>, <span class="st">"Disagree"</span>, <span class="st">"Neither agree nor disagree"</span>, <span class="st">"Agree"</span>, <span class="st">"Strongly agree"</span>),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">as.factor =</span> T)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                                                 </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>just_pension <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(elsoc_long_2016_2023<span class="sc">$</span>just_pension, </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"Pension market justice"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>just_educ <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(elsoc_long_2016_2023<span class="sc">$</span>just_educ, </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="at">recodes =</span> <span class="fu">c</span>(<span class="st">"1='Strongly disagree'; 2='Disagree'; 3='Neither agree nor disagree'; 4='Agree'; 5='Strongly agree'"</span>), </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Strongly disagree"</span>, <span class="st">"Disagree"</span>, <span class="st">"Neither agree nor disagree"</span>, <span class="st">"Agree"</span>, <span class="st">"Strongly agree"</span>),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="at">as.factor =</span> T)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>                                                 </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>just_educ <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(elsoc_long_2016_2023<span class="sc">$</span>just_educ, </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"Education market justice"</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>just_salud <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(elsoc_long_2016_2023<span class="sc">$</span>just_salud, </span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="at">recodes =</span> <span class="fu">c</span>(<span class="st">"1='Strongly disagree'; 2='Disagree'; 3='Neither agree nor disagree'; 4='Agree'; 5='Strongly agree'"</span>), </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Strongly disagree"</span>, <span class="st">"Disagree"</span>, <span class="st">"Neither agree nor disagree"</span>, <span class="st">"Agree"</span>, <span class="st">"Strongly agree"</span>),</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="at">as.factor =</span> T)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>                                                 </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>just_salud <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(elsoc_long_2016_2023<span class="sc">$</span>just_salud, </span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"Healthcare market justice"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Meritocracy</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>merit_effort)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Grado de acuerdo: Las personas son recompensadas por sus esfuerzos (x) &lt;numeric&gt; 
+# total N=20761 valid N=20629 mean=2.60 sd=1.02
+
+Value |                          Label |    N | Raw % | Valid % | Cum. %
+------------------------------------------------------------------------
+    1 |       Totalmente en desacuerdo | 2173 | 10.47 |   10.53 |  10.53
+    2 |                  En desacuerdo | 9442 | 45.48 |   45.77 |  56.30
+    3 | Ni en desacuerdo ni de acuerdo | 4037 | 19.45 |   19.57 |  75.87
+    4 |                     De acuerdo | 4379 | 21.09 |   21.23 |  97.10
+    5 |          Totalmente de acuerdo |  598 |  2.88 |    2.90 | 100.00
+ &lt;NA&gt; |                           &lt;NA&gt; |  132 |  0.64 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>merit_talent)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Grado de acuerdo: Las personas son recompensada por su inteligencia (x) &lt;numeric&gt; 
+# total N=20761 valid N=20631 mean=2.77 sd=1.03
+
+Value |                          Label |    N | Raw % | Valid % | Cum. %
+------------------------------------------------------------------------
+    1 |       Totalmente en desacuerdo | 1766 |  8.51 |    8.56 |   8.56
+    2 |                  En desacuerdo | 8108 | 39.05 |   39.30 |  47.86
+    3 | Ni en desacuerdo ni de acuerdo | 4571 | 22.02 |   22.16 |  70.02
+    4 |                     De acuerdo | 5577 | 26.86 |   27.03 |  97.05
+    5 |          Totalmente de acuerdo |  609 |  2.93 |    2.95 | 100.00
+ &lt;NA&gt; |                           &lt;NA&gt; |  130 |  0.63 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023 <span class="ot">&lt;-</span> elsoc_long_2016_2023 <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">.cols =</span> <span class="fu">c</span>(merit_effort, merit_talent),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">.fns =</span> <span class="sc">~</span> car<span class="sc">::</span><span class="fu">recode</span>(., <span class="at">recodes =</span> <span class="fu">c</span>(<span class="st">"1='Strongly disagree'; 2='Disagree';</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="st">                                          3='Neither agree nor disagree'; 4='Agree';</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="st">                                          5='Strongly agree'"</span>), </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Strongly disagree"</span>, <span class="st">"Disagree"</span>, <span class="st">"Neither agree nor disagree"</span>, <span class="st">"Agree"</span>, <span class="st">"Strongly agree"</span>),</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                           <span class="at">as.factor =</span> T)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>merit_effort <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(elsoc_long_2016_2023<span class="sc">$</span>merit_effort, </span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"People are rewarded for their efforts"</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>merit_talent <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(elsoc_long_2016_2023<span class="sc">$</span>merit_talent, </span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"People are rewarded for their intelligence"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Controls</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sex</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>sex <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(elsoc_long_2016_2023<span class="sc">$</span>sex, </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">recodes =</span> <span class="fu">c</span>(<span class="st">"1='Male'; 2='Female'"</span>), </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                           <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                           <span class="at">as.factor =</span> T)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>sex <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(elsoc_long_2016_2023<span class="sc">$</span>sex, </span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"Gender"</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co"># age</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>age)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Edad del entrevistado (x) &lt;numeric&gt; 
+# total N=20761 valid N=20761 mean=48.84 sd=15.43
+
+Value |   N | Raw % | Valid % | Cum. %
+--------------------------------------
+   18 |  34 |  0.16 |    0.16 |   0.16
+   19 |  72 |  0.35 |    0.35 |   0.51
+   20 | 113 |  0.54 |    0.54 |   1.05
+   21 | 156 |  0.75 |    0.75 |   1.81
+   22 | 187 |  0.90 |    0.90 |   2.71
+   23 | 231 |  1.11 |    1.11 |   3.82
+   24 | 262 |  1.26 |    1.26 |   5.08
+   25 | 324 |  1.56 |    1.56 |   6.64
+   26 | 318 |  1.53 |    1.53 |   8.17
+   27 | 312 |  1.50 |    1.50 |   9.68
+   28 | 361 |  1.74 |    1.74 |  11.42
+   29 | 345 |  1.66 |    1.66 |  13.08
+   30 | 365 |  1.76 |    1.76 |  14.84
+   31 | 364 |  1.75 |    1.75 |  16.59
+   32 | 369 |  1.78 |    1.78 |  18.37
+   33 | 377 |  1.82 |    1.82 |  20.18
+   34 | 384 |  1.85 |    1.85 |  22.03
+   35 | 373 |  1.80 |    1.80 |  23.83
+   36 | 444 |  2.14 |    2.14 |  25.97
+   37 | 373 |  1.80 |    1.80 |  27.76
+   38 | 411 |  1.98 |    1.98 |  29.74
+   39 | 365 |  1.76 |    1.76 |  31.50
+   40 | 386 |  1.86 |    1.86 |  33.36
+   41 | 391 |  1.88 |    1.88 |  35.24
+   42 | 395 |  1.90 |    1.90 |  37.15
+   43 | 379 |  1.83 |    1.83 |  38.97
+   44 | 361 |  1.74 |    1.74 |  40.71
+   45 | 370 |  1.78 |    1.78 |  42.49
+   46 | 410 |  1.97 |    1.97 |  44.47
+   47 | 411 |  1.98 |    1.98 |  46.45
+   48 | 405 |  1.95 |    1.95 |  48.40
+   49 | 403 |  1.94 |    1.94 |  50.34
+   50 | 451 |  2.17 |    2.17 |  52.51
+   51 | 417 |  2.01 |    2.01 |  54.52
+   52 | 462 |  2.23 |    2.23 |  56.75
+   53 | 413 |  1.99 |    1.99 |  58.74
+   54 | 463 |  2.23 |    2.23 |  60.97
+   55 | 495 |  2.38 |    2.38 |  63.35
+   56 | 498 |  2.40 |    2.40 |  65.75
+   57 | 449 |  2.16 |    2.16 |  67.91
+   58 | 468 |  2.25 |    2.25 |  70.17
+   59 | 461 |  2.22 |    2.22 |  72.39
+   60 | 481 |  2.32 |    2.32 |  74.70
+   61 | 397 |  1.91 |    1.91 |  76.61
+   62 | 393 |  1.89 |    1.89 |  78.51
+   63 | 386 |  1.86 |    1.86 |  80.37
+   64 | 355 |  1.71 |    1.71 |  82.08
+   65 | 362 |  1.74 |    1.74 |  83.82
+   66 | 316 |  1.52 |    1.52 |  85.34
+   67 | 335 |  1.61 |    1.61 |  86.96
+   68 | 253 |  1.22 |    1.22 |  88.17
+   69 | 260 |  1.25 |    1.25 |  89.43
+   70 | 282 |  1.36 |    1.36 |  90.79
+   71 | 268 |  1.29 |    1.29 |  92.08
+   72 | 230 |  1.11 |    1.11 |  93.18
+   73 | 235 |  1.13 |    1.13 |  94.32
+   74 | 241 |  1.16 |    1.16 |  95.48
+   75 | 245 |  1.18 |    1.18 |  96.66
+   76 | 180 |  0.87 |    0.87 |  97.52
+   77 | 152 |  0.73 |    0.73 |  98.26
+   78 | 105 |  0.51 |    0.51 |  98.76
+   79 |  98 |  0.47 |    0.47 |  99.23
+   80 |  62 |  0.30 |    0.30 |  99.53
+   81 |  40 |  0.19 |    0.19 |  99.73
+   82 |  19 |  0.09 |    0.09 |  99.82
+   83 |   9 |  0.04 |    0.04 |  99.86
+   84 |  11 |  0.05 |    0.05 |  99.91
+   85 |   4 |  0.02 |    0.02 |  99.93
+   86 |   2 |  0.01 |    0.01 |  99.94
+   87 |   2 |  0.01 |    0.01 |  99.95
+   88 |   3 |  0.01 |    0.01 |  99.97
+   89 |   3 |  0.01 |    0.01 |  99.98
+   90 |   2 |  0.01 |    0.01 |  99.99
+   91 |   1 |  0.00 |    0.00 | 100.00
+   92 |   1 |  0.00 |    0.00 | 100.00
+ &lt;NA&gt; |   0 |  0.00 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>aget <span class="ot">&lt;-</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">factor</span>(car<span class="sc">::</span><span class="fu">recode</span>(elsoc_long_2016_2023<span class="sc">$</span>age, </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"18:29=1;30:49=2;50:64=3;65:150=4"</span>),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">'18-29'</span>, <span class="st">'30-49'</span>, <span class="st">'50-64'</span>, <span class="st">'65 or more'</span>))</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>aget <span class="ot">&lt;-</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(elsoc_long_2016_2023<span class="sc">$</span>aget, </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="fu">c</span>(<span class="st">"Age groups"</span>)) </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co"># political indentification</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>ideo)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Autoubicacion escala izquierda-derecha (x) &lt;numeric&gt; 
+# total N=20761 valid N=20443 mean=7.39 sd=3.96
+
+Value |            Label |    N | Raw % | Valid % | Cum. %
+----------------------------------------------------------
+    0 |      0 Izquierda | 1146 |  5.52 |    5.61 |   5.61
+    1 |                1 |  386 |  1.86 |    1.89 |   7.49
+    2 |                2 |  625 |  3.01 |    3.06 |  10.55
+    3 |                3 | 1007 |  4.85 |    4.93 |  15.48
+    4 |                4 | 1193 |  5.75 |    5.84 |  21.31
+    5 |         5 Centro | 5360 | 25.82 |   26.22 |  47.53
+    6 |                6 |  749 |  3.61 |    3.66 |  51.20
+    7 |                7 |  707 |  3.41 |    3.46 |  54.65
+    8 |                8 |  601 |  2.89 |    2.94 |  57.59
+    9 |                9 |  177 |  0.85 |    0.87 |  58.46
+   10 |       10 Derecha | 1135 |  5.47 |    5.55 |  64.01
+   11 | 11 Independiente |  727 |  3.50 |    3.56 |  67.57
+   12 |       12 Ninguno | 6630 | 31.93 |   32.43 | 100.00
+ &lt;NA&gt; |             &lt;NA&gt; |  318 |  1.53 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>ideo<span class="ot">&lt;-</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">factor</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  car<span class="sc">::</span><span class="fu">recode</span>(</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    elsoc_long_2016_2023<span class="sc">$</span>ideo,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"c(11,12,-888,-999)='Does not identify';c(0,1,2,3,4)='Left';</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="st">     c(5)='Center';c(6,7,8,9,10)='Right'"</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Left'</span>, <span class="st">'Center'</span>, <span class="st">'Right'</span>, <span class="st">'Does not identify'</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>ideo<span class="ot">&lt;-</span> <span class="fu">factor</span>(elsoc_long_2016_2023<span class="sc">$</span>ideo,<span class="at">levels =</span> <span class="fu">levels</span>(elsoc_long_2016_2023<span class="sc">$</span>ideo))</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>ideo <span class="ot">&lt;-</span> </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(<span class="at">x =</span> elsoc_long_2016_2023<span class="sc">$</span>ideo, </span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>                      <span class="at">label =</span> <span class="st">"Political identification"</span>) </span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>ideo)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Political identification (x) &lt;categorical&gt; 
+# total N=20761 valid N=20443 mean=2.67 sd=1.17
+
+Value             |    N | Raw % | Valid % | Cum. %
+---------------------------------------------------
+Left              | 4357 | 20.99 |   21.31 |  21.31
+Center            | 5360 | 25.82 |   26.22 |  47.53
+Right             | 3369 | 16.23 |   16.48 |  64.01
+Does not identify | 7357 | 35.44 |   35.99 | 100.00
+&lt;NA&gt;              |  318 |  1.53 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subjective social status</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>ess)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Estatus Social Subjetivo: Donde se ubicaria ud. en la sociedad chilena (x) &lt;numeric&gt; 
+# total N=20761 valid N=20635 mean=4.44 sd=1.61
+
+Value |                Label |    N | Raw % | Valid % | Cum. %
+--------------------------------------------------------------
+    0 |  0 El nivel mas bajo |  451 |  2.17 |    2.19 |   2.19
+    1 |                    1 |  529 |  2.55 |    2.56 |   4.75
+    2 |                    2 | 1097 |  5.28 |    5.32 |  10.07
+    3 |                    3 | 2644 | 12.74 |   12.81 |  22.88
+    4 |                    4 | 4566 | 21.99 |   22.13 |  45.01
+    5 |                    5 | 7933 | 38.21 |   38.44 |  83.45
+    6 |                    6 | 1964 |  9.46 |    9.52 |  92.97
+    7 |                    7 |  684 |  3.29 |    3.31 |  96.28
+    8 |                    8 |  522 |  2.51 |    2.53 |  98.81
+    9 |                    9 |   72 |  0.35 |    0.35 |  99.16
+   10 | 10 El nivel mas alto |  173 |  0.83 |    0.84 | 100.00
+ &lt;NA&gt; |                 &lt;NA&gt; |  126 |  0.61 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>ess <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(elsoc_long_2016_2023<span class="sc">$</span>ess)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>ess <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(elsoc_long_2016_2023<span class="sc">$</span>ess,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"Subjective social status"</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>ess_og <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(elsoc_long_2016_2023<span class="sc">$</span>ess_og)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>ess_og <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(elsoc_long_2016_2023<span class="sc">$</span>ess_og,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"Family subjective social status"</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>ess_hijos <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(elsoc_long_2016_2023<span class="sc">$</span>ess_hijos)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>ess_hijos <span class="ot">&lt;-</span> sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(elsoc_long_2016_2023<span class="sc">$</span>ess_hijos,</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label =</span> <span class="st">"Son's subjective social status"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Socioeconomic_________________________________________________________________</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Education_______________________________________</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>educ <span class="ot">&lt;-</span> </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  car<span class="sc">::</span><span class="fu">recode</span>(elsoc_long_2016_2023<span class="sc">$</span>m01,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">"c(1,2,3,4,5,6,7)=1;c(8,9,10)=2; c(-888,-999)=NA"</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>educ <span class="ot">&lt;-</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">factor</span>(elsoc_long_2016_2023<span class="sc">$</span>educ,</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Less than Universitary"</span>,<span class="st">"Universitary"</span>))</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co">#reverse education, reference level is the highest level</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="co">#elsoc_long_2016_2023$educ &lt;- forcats::fct_rev(elsoc_long_2016_2023$educ)</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>educ <span class="ot">&lt;-</span> </span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(<span class="at">x =</span> elsoc_long_2016_2023<span class="sc">$</span>educ,</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>                      <span class="at">label =</span> <span class="st">"Education"</span>)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>educ)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Education (x) &lt;categorical&gt; 
+# total N=20761 valid N=20746 mean=1.19 sd=0.39
+
+Value                  |     N | Raw % | Valid % | Cum. %
+---------------------------------------------------------
+Less than Universitary | 16786 | 80.85 |   80.91 |  80.91
+Universitary           |  3960 | 19.07 |   19.09 | 100.00
+&lt;NA&gt;                   |    15 |  0.07 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Recoding of education to years based on casen 2017.</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>educyear<span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  car<span class="sc">::</span><span class="fu">recode</span>(elsoc_long_2016_2023<span class="sc">$</span>m01, </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">"1=0;2=4.3;3=7.5;4=9.8;5=12.02;6=13.9;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="st">               7=14.8;8=14.9;9=16.9;10=19.07;c(-888,-999)=NA"</span>, </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">as.numeric =</span> T))</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>educyear <span class="ot">&lt;-</span> </span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>sjlabelled<span class="sc">::</span><span class="fu">set_label</span>(<span class="at">x =</span> elsoc_long_2016_2023<span class="sc">$</span>educyear,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>                      <span class="at">label =</span> <span class="st">"Education in years"</span>)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(elsoc_long_2016_2023<span class="sc">$</span>educyear)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "numeric"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>educyear)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Education in years (x) &lt;numeric&gt; 
+# total N=20761 valid N=20746 mean=11.56 sd=3.99
+
+Value |    N | Raw % | Valid % | Cum. %
+---------------------------------------
+ 0.00 |  200 |  0.96 |    0.96 |   0.96
+ 4.30 | 2412 | 11.62 |   11.63 |  12.59
+ 7.50 | 1992 |  9.59 |    9.60 |  22.19
+ 9.80 | 2692 | 12.97 |   12.98 |  35.17
+12.02 | 6122 | 29.49 |   29.51 |  64.68
+13.90 |  749 |  3.61 |    3.61 |  68.29
+14.80 | 2619 | 12.61 |   12.62 |  80.91
+14.90 | 1197 |  5.77 |    5.77 |  86.68
+16.90 | 2413 | 11.62 |   11.63 |  98.31
+19.07 |  350 |  1.69 |    1.69 | 100.00
+ &lt;NA&gt; |   15 |  0.07 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023 <span class="ot">&lt;-</span> elsoc_long_2016_2023 <span class="sc">%&gt;%</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">mutate</span>(<span class="at">ola =</span> <span class="fu">case_when</span>(ola <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="dv">2016</span>,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                        ola <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="dv">2017</span>,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                        ola <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="dv">2018</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                        ola <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="dv">2019</span>,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                        ola <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="dv">2021</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                        ola <span class="sc">==</span> <span class="dv">6</span> <span class="sc">~</span> <span class="dv">2022</span>,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>                        ola <span class="sc">==</span> <span class="dv">7</span> <span class="sc">~</span> <span class="dv">2023</span>))</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Impute midpoint of income ranges</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>m30_rec <span class="ot">&lt;-</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.numeric</span>(car<span class="sc">::</span><span class="fu">recode</span>(</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    elsoc_long_2016_2023<span class="sc">$</span>m30,</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1=110000;2=251000;3=305000;4=355000;5=400000;</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="st">     6=445000;7=490000;8=535000;9=585000;10=640000;11=700000;12=765000;</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="st">     13=845000;14=935000;15=1040000;16=1180000;17=1375000;18=1670000;</span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="st">     19=2275000;20=2700000;NA=NA;c(-888,-999)=NA"</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Impute midpoint of income ranges (2021)</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>m30b_rec <span class="ot">&lt;-</span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.numeric</span>(car<span class="sc">::</span><span class="fu">recode</span>(</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>    elsoc_long_2016_2023<span class="sc">$</span>m30b,</span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1=125000;2=300000;3=400000;4=575000;5=700000;NA=NA;c(-888,-999)=NA"</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>m30_rec)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x &lt;numeric&gt; 
+# total N=20761 valid N=4180 mean=784316.75 sd=633419.24
+
+  Value |     N | Raw % | Valid % | Cum. %
+------------------------------------------
+ 110000 |   332 |  1.60 |    7.94 |   7.94
+ 251000 |   259 |  1.25 |    6.20 |  14.14
+ 305000 |   267 |  1.29 |    6.39 |  20.53
+ 355000 |   219 |  1.05 |    5.24 |  25.77
+ 400000 |   296 |  1.43 |    7.08 |  32.85
+ 445000 |   225 |  1.08 |    5.38 |  38.23
+ 490000 |   326 |  1.57 |    7.80 |  46.03
+ 535000 |   145 |  0.70 |    3.47 |  49.50
+ 585000 |   253 |  1.22 |    6.05 |  55.55
+ 640000 |   125 |  0.60 |    2.99 |  58.54
+ 700000 |   184 |  0.89 |    4.40 |  62.94
+ 765000 |   196 |  0.94 |    4.69 |  67.63
+ 845000 |   129 |  0.62 |    3.09 |  70.72
+ 935000 |   118 |  0.57 |    2.82 |  73.54
+1040000 |   249 |  1.20 |    5.96 |  79.50
+1180000 |   175 |  0.84 |    4.19 |  83.68
+1375000 |   124 |  0.60 |    2.97 |  86.65
+1670000 |   219 |  1.05 |    5.24 |  91.89
+2275000 |   191 |  0.92 |    4.57 |  96.46
+2700000 |   148 |  0.71 |    3.54 | 100.00
+   &lt;NA&gt; | 16581 | 79.87 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>m30b_rec)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x &lt;numeric&gt; 
+# total N=20761 valid N=187 mean=350802.14 sd=198987.76
+
+ Value |     N | Raw % | Valid % | Cum. %
+-----------------------------------------
+125000 |    58 |  0.28 |   31.02 |  31.02
+300000 |    45 |  0.22 |   24.06 |  55.08
+400000 |    39 |  0.19 |   20.86 |  75.94
+575000 |    18 |  0.09 |    9.63 |  85.56
+700000 |    27 |  0.13 |   14.44 | 100.00
+  &lt;NA&gt; | 20574 | 99.10 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Recode DK/DA of income to NA</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>m29_rec <span class="ot">&lt;-</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.numeric</span>(car<span class="sc">::</span><span class="fu">recode</span>(elsoc_long_2016_2023<span class="sc">$</span>m29, <span class="st">"c(-888,-999)=NA"</span>))</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace missing continuous income with imputed midpoints</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>m29_imp <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(elsoc_long_2016_2023<span class="sc">$</span>m29_rec), elsoc_long_2016_2023<span class="sc">$</span>m29_rec, elsoc_long_2016_2023<span class="sc">$</span>m30_rec)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(elsoc_long_2016_2023<span class="sc">$</span>m29_imp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Min.    1st Qu.     Median       Mean    3rd Qu.       Max.       NA's 
+         0     300000     500000     960976     800000 4000000000        882 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>m29_imp <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(elsoc_long_2016_2023<span class="sc">$</span>m29_imp), elsoc_long_2016_2023<span class="sc">$</span>m30b_rec, elsoc_long_2016_2023<span class="sc">$</span>m29_imp)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(elsoc_long_2016_2023<span class="sc">$</span>m29_imp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Min.    1st Qu.     Median       Mean    3rd Qu.       Max.       NA's 
+         0     300000     500000     955290     800000 4000000000        695 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Deflate to constant prices --------------------------------------------------</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rvest)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">"https://si3.bcentral.cl/Siete/ES/Siete/Cuadro/CAP_PRECIOS/MN_CAP_PRECIOS/IPC_EMP_2023/638415285164039007?cbFechaInicio=2016&amp;cbFechaTermino=2025&amp;cbFrecuencia=MONTHLY&amp;cbCalculo=NONE&amp;cbFechaBase="</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>ipc <span class="ot">&lt;-</span> url <span class="sc">%&gt;%</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_html</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_node</span>(<span class="st">"table"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_table</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_with</span>(., <span class="sc">~</span> <span class="fu">tolower</span>(<span class="fu">gsub</span>(<span class="st">"."</span>, <span class="st">"_"</span>, .x, <span class="at">fixed =</span> <span class="cn">TRUE</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(serie <span class="sc">==</span> <span class="st">"Índice IPC General"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">.cols =</span> <span class="fu">c</span>(<span class="fu">everything</span>(), <span class="sc">-</span>serie),</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">.fns =</span> <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">str_replace</span>(., <span class="st">","</span>, <span class="st">"."</span>))</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sel_) <span class="sc">%&gt;%</span></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="sc">-</span>serie,</span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"ano_mes"</span>,</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"ipc"</span></span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">separate</span>(<span class="at">col =</span> <span class="st">"ano_mes"</span>, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"mes"</span>, <span class="st">"ano"</span>))</span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>ipc <span class="ot">&lt;-</span> ipc <span class="sc">%&gt;%</span></span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mes <span class="sc">==</span> <span class="st">"dic"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ano, ipc) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">8</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ano <span class="sc">!=</span> <span class="st">"2020"</span>)</span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>ola <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(elsoc_long_2016_2023<span class="sc">$</span>ola)</span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023 <span class="ot">&lt;-</span> <span class="fu">left_join</span>(elsoc_long_2016_2023, ipc, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"ola"</span> <span class="ot">=</span> <span class="st">"ano"</span>))</span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>ipc)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x &lt;numeric&gt; 
+# total N=20761 valid N=20761 mean=82.97 sd=10.48
+
+ Value |    N | Raw % | Valid % | Cum. %
+----------------------------------------
+ 72.29 | 2927 | 14.10 |   14.10 |  14.10
+ 73.93 | 2473 | 11.91 |   11.91 |  26.01
+ 75.83 | 3748 | 18.05 |   18.05 |  44.06
+ 78.10 | 3417 | 16.46 |   16.46 |  60.52
+ 86.20 | 2740 | 13.20 |   13.20 |  73.72
+ 97.21 | 2730 | 13.15 |   13.15 |  86.87
+101.04 | 2726 | 13.13 |   13.13 | 100.00
+  &lt;NA&gt; |    0 |  0.00 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build household size -----------------------------------</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023 <span class="ot">&lt;-</span> elsoc_long_2016_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_hogar =</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>      ola <span class="sc">==</span> <span class="st">"2016"</span> <span class="sc">~</span> nhogar1,</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>      ola <span class="sc">==</span> <span class="st">"2017"</span> <span class="sc">~</span> m46_nhogar,</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>      ola <span class="sc">==</span> <span class="st">"2018"</span> <span class="sc">~</span> m54,</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>      ola <span class="sc">==</span> <span class="st">"2019"</span> <span class="sc">~</span> m54,</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>      ola <span class="sc">==</span> <span class="st">"2021"</span> <span class="sc">~</span> m54,</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>      ola <span class="sc">==</span> <span class="st">"2022"</span> <span class="sc">~</span> m54,</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>      ola <span class="sc">==</span> <span class="st">"2023"</span> <span class="sc">~</span> m54,</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_real_</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Household size (m54) was not asked in 2022: carry it over from the same</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a><span class="co"># respondent's adjacent waves (2021, otherwise 2023). Without this, equivalised</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a><span class="co"># income and its deciles are NA for the whole 2022 wave and na.omit() drops it.</span></span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023 <span class="ot">&lt;-</span> elsoc_long_2016_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(idencuesta) <span class="sc">%&gt;%</span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_hogar =</span> <span class="fu">if_else</span>(</span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>      ola <span class="sc">==</span> <span class="st">"2022"</span> <span class="sc">&amp;</span> <span class="fu">is.na</span>(n_hogar),</span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">coalesce</span>(n_hogar[ola <span class="sc">==</span> <span class="st">"2021"</span>][<span class="dv">1</span>], n_hogar[ola <span class="sc">==</span> <span class="st">"2023"</span>][<span class="dv">1</span>]),</span>
+<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>      n_hogar</span>
+<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>n_hogar)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x &lt;numeric&gt; 
+# total N=20761 valid N=20278 mean=3.14 sd=1.58
+
+Value |    N | Raw % | Valid % | Cum. %
+---------------------------------------
+    1 | 2894 | 13.94 |   14.27 |  14.27
+    2 | 5017 | 24.17 |   24.74 |  39.01
+    3 | 4737 | 22.82 |   23.36 |  62.37
+    4 | 4129 | 19.89 |   20.36 |  82.73
+    5 | 2068 |  9.96 |   10.20 |  92.93
+    6 |  836 |  4.03 |    4.12 |  97.06
+    7 |  337 |  1.62 |    1.66 |  98.72
+    8 |  158 |  0.76 |    0.78 |  99.50
+    9 |   48 |  0.23 |    0.24 |  99.73
+   10 |   30 |  0.14 |    0.15 |  99.88
+   11 |   10 |  0.05 |    0.05 |  99.93
+   12 |    8 |  0.04 |    0.04 |  99.97
+   13 |    2 |  0.01 |    0.01 |  99.98
+   14 |    2 |  0.01 |    0.01 |  99.99
+   15 |    2 |  0.01 |    0.01 | 100.00
+ &lt;NA&gt; |  483 |  2.33 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Recode DK/DA of household size to NA</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>n_hogar_r <span class="ot">&lt;-</span> car<span class="sc">::</span><span class="fu">recode</span>(elsoc_long_2016_2023<span class="sc">$</span>n_hogar, <span class="st">"c(-888,-999)=NA"</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>n_hogar_r)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x &lt;numeric&gt; 
+# total N=20761 valid N=20278 mean=3.14 sd=1.58
+
+Value |    N | Raw % | Valid % | Cum. %
+---------------------------------------
+    1 | 2894 | 13.94 |   14.27 |  14.27
+    2 | 5017 | 24.17 |   24.74 |  39.01
+    3 | 4737 | 22.82 |   23.36 |  62.37
+    4 | 4129 | 19.89 |   20.36 |  82.73
+    5 | 2068 |  9.96 |   10.20 |  92.93
+    6 |  836 |  4.03 |    4.12 |  97.06
+    7 |  337 |  1.62 |    1.66 |  98.72
+    8 |  158 |  0.76 |    0.78 |  99.50
+    9 |   48 |  0.23 |    0.24 |  99.73
+   10 |   30 |  0.14 |    0.15 |  99.88
+   11 |   10 |  0.05 |    0.05 |  99.93
+   12 |    8 |  0.04 |    0.04 |  99.97
+   13 |    2 |  0.01 |    0.01 |  99.98
+   14 |    2 |  0.01 |    0.01 |  99.99
+   15 |    2 |  0.01 |    0.01 | 100.00
+ &lt;NA&gt; |  483 |  2.33 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Equivalised income (square-root scale) --------------------------------------</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Select a reference IPC (e.g., December 2023 as base)</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>ipc_ref <span class="ot">&lt;-</span> elsoc_long_2016_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ola <span class="sc">==</span> <span class="st">"2023"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">ipc_ref =</span> <span class="fu">median</span>(ipc, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(ipc_ref)</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023 <span class="ot">&lt;-</span> elsoc_long_2016_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Deflate household income to constant prices (base = 2023 Dec)</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">inc_hh_real =</span> m29_imp <span class="sc">*</span> (ipc_ref <span class="sc">/</span> ipc),</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Equivalence scale: square-root of household size</span></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">eq_size_sqrt =</span> <span class="fu">if_else</span>(<span class="sc">!</span><span class="fu">is.na</span>(n_hogar_r) <span class="sc">&amp;</span> n_hogar_r <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">sqrt</span>(<span class="fu">as.numeric</span>(n_hogar_r)),</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>                           <span class="cn">NA_real_</span>),</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Equivalised household income</span></span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">inc_eq_real_sqrt =</span> inc_hh_real <span class="sc">/</span> eq_size_sqrt,</span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Log equivalised income (for modelling)</span></span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">ln_inc_eq_real_sqrt =</span> <span class="fu">if_else</span>(<span class="sc">!</span><span class="fu">is.na</span>(inc_eq_real_sqrt) <span class="sc">&amp;</span> inc_eq_real_sqrt <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">log</span>(inc_eq_real_sqrt),</span>
+<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>                                  <span class="cn">NA_real_</span>)</span>
+<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb41-27"><a href="#cb41-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-28"><a href="#cb41-28" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">descr</span>(elsoc_long_2016_2023<span class="sc">$</span>m29_imp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+## Basic descriptive statistics
+
+ var    type label     n NA.prc     mean       sd       se     md  trimmed
+  dd numeric    dd 20066   3.35 955289.7 28330720 199998.7 500000 576741.8
+                     range    iqr   skew
+ 4000000000 (0-4000000000) 500000 140.23</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">descr</span>(elsoc_long_2016_2023<span class="sc">$</span>inc_eq_real_sqrt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+## Basic descriptive statistics
+
+ var    type label     n NA.prc     mean       sd       se     md  trimmed
+  dd numeric    dd 19611   5.54 761225.2 28308283 202145.3 369713 423402.6
+                           range      iqr   skew
+ 3953303038.93 (0-3953303038.93) 379551.1 138.86</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">descr</span>(elsoc_long_2016_2023<span class="sc">$</span>ln_inc_eq_real_sqrt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+## Basic descriptive statistics
+
+ var    type label     n NA.prc  mean   sd   se    md trimmed             range
+  dd numeric    dd 19515      6 12.87 0.78 0.01 12.83   12.84 12.92 (9.18-22.1)
+       iqr skew
+ 0.9644817 0.44</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Original per-capita measure for comparison -------------</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>ing_pc <span class="ot">&lt;-</span> elsoc_long_2016_2023<span class="sc">$</span>m29_imp <span class="sc">/</span> elsoc_long_2016_2023<span class="sc">$</span>n_hogar_r</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">descr</span>(elsoc_long_2016_2023<span class="sc">$</span>ing_pc)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+## Basic descriptive statistics
+
+ var    type label     n NA.prc     mean       sd       se     md  trimmed
+  dd numeric    dd 19611   5.54 398714.1 14326811 102305.7 180000 215328.7
+                     range      iqr  skew
+ 2000000000 (0-2000000000) 229666.7 138.7</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Income deciles (within-wave, based on equivalised income) -------------------</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023 <span class="ot">&lt;-</span> elsoc_long_2016_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ola) <span class="sc">%&gt;%</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">decile_eq =</span> <span class="fu">ntile</span>(inc_eq_real_sqrt, <span class="dv">10</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>decile_eq)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x &lt;integer&gt; 
+# total N=20761 valid N=19611 mean=5.50 sd=2.87
+
+Value |    N | Raw % | Valid % | Cum. %
+---------------------------------------
+    1 | 1965 |  9.46 |   10.02 |  10.02
+    2 | 1963 |  9.46 |   10.01 |  20.03
+    3 | 1962 |  9.45 |   10.00 |  30.03
+    4 | 1962 |  9.45 |   10.00 |  40.04
+    5 | 1962 |  9.45 |   10.00 |  50.04
+    6 | 1961 |  9.45 |   10.00 |  60.04
+    7 | 1960 |  9.44 |    9.99 |  70.04
+    8 | 1960 |  9.44 |    9.99 |  80.03
+    9 | 1958 |  9.43 |    9.98 |  90.02
+   10 | 1958 |  9.43 |    9.98 | 100.00
+ &lt;NA&gt; | 1150 |  5.54 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Include missing cases for income groups</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>decile_eq1 <span class="ot">&lt;-</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(elsoc_long_2016_2023<span class="sc">$</span>decile_eq), <span class="st">"DNA"</span>, <span class="fu">as.character</span>(elsoc_long_2016_2023<span class="sc">$</span>decile_eq))</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023<span class="sc">$</span>decile_eq1 <span class="ot">&lt;-</span> <span class="fu">factor</span>(elsoc_long_2016_2023<span class="sc">$</span>decile_eq1, <span class="at">levels =</span> <span class="fu">c</span>(<span class="fu">as.character</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>), <span class="st">"DNA"</span>))</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>sjmisc<span class="sc">::</span><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>decile_eq1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x &lt;categorical&gt; 
+# total N=20761 valid N=20761 mean=5.80 sd=3.06
+
+Value |    N | Raw % | Valid % | Cum. %
+---------------------------------------
+1     | 1965 |  9.46 |    9.46 |   9.46
+2     | 1963 |  9.46 |    9.46 |  18.92
+3     | 1962 |  9.45 |    9.45 |  28.37
+4     | 1962 |  9.45 |    9.45 |  37.82
+5     | 1962 |  9.45 |    9.45 |  47.27
+6     | 1961 |  9.45 |    9.45 |  56.72
+7     | 1960 |  9.44 |    9.44 |  66.16
+8     | 1960 |  9.44 |    9.44 |  75.60
+9     | 1958 |  9.43 |    9.43 |  85.03
+10    | 1958 |  9.43 |    9.43 |  94.46
+DNA   | 1150 |  5.54 |    5.54 | 100.00
+&lt;NA&gt;  |    0 |  0.00 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">frq</span>(elsoc_long_2016_2023<span class="sc">$</span>ola)  <span class="co"># ok</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x &lt;character&gt; 
+# total N=20761 valid N=20761 mean=2019.34 sd=2.37
+
+Value |    N | Raw % | Valid % | Cum. %
+---------------------------------------
+ 2016 | 2927 | 14.10 |   14.10 |  14.10
+ 2017 | 2473 | 11.91 |   11.91 |  26.01
+ 2018 | 3748 | 18.05 |   18.05 |  44.06
+ 2019 | 3417 | 16.46 |   16.46 |  60.52
+ 2021 | 2740 | 13.20 |   13.20 |  73.72
+ 2022 | 2730 | 13.15 |   13.15 |  86.87
+ 2023 | 2726 | 13.13 |   13.13 | 100.00
+ &lt;NA&gt; |    0 |  0.00 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>elsoc_long_2016_2023 <span class="ot">&lt;-</span> elsoc_long_2016_2023 <span class="sc">%&gt;%</span> </span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">.cols =</span> <span class="fu">c</span>(decile_eq, decile_eq1),</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">.fns =</span> <span class="sc">~</span> <span class="fu">as.factor</span>(.)</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape long to wide</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>df_study1_long <span class="ot">&lt;-</span> elsoc_long_2016_2023 <span class="sc">%&gt;%</span> </span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(idencuesta,</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>         ola,</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>         muestra,</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>         ponderador_long_total, </span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>         segmento, </span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>         estrato,</span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>         just_pension,</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>         just_educ,</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>         just_salud,</span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>         mjp_index,</span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>         merit_effort,</span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>         merit_talent,</span>
+<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a>         educ,</span>
+<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a>         educyear,</span>
+<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a>         sex,</span>
+<span id="cb56-19"><a href="#cb56-19" aria-hidden="true" tabindex="-1"></a>         age,</span>
+<span id="cb56-20"><a href="#cb56-20" aria-hidden="true" tabindex="-1"></a>         aget,</span>
+<span id="cb56-21"><a href="#cb56-21" aria-hidden="true" tabindex="-1"></a>         ideo,</span>
+<span id="cb56-22"><a href="#cb56-22" aria-hidden="true" tabindex="-1"></a>         ess_og,</span>
+<span id="cb56-23"><a href="#cb56-23" aria-hidden="true" tabindex="-1"></a>         ess_hijos,</span>
+<span id="cb56-24"><a href="#cb56-24" aria-hidden="true" tabindex="-1"></a>         ess,</span>
+<span id="cb56-25"><a href="#cb56-25" aria-hidden="true" tabindex="-1"></a>         decile_eq,</span>
+<span id="cb56-26"><a href="#cb56-26" aria-hidden="true" tabindex="-1"></a>         decile_eq1)</span>
+<span id="cb56-27"><a href="#cb56-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-28"><a href="#cb56-28" aria-hidden="true" tabindex="-1"></a>vars_invariantes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"aget"</span>,</span>
+<span id="cb56-29"><a href="#cb56-29" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"sex"</span>,</span>
+<span id="cb56-30"><a href="#cb56-30" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"ideo"</span>)</span>
+<span id="cb56-31"><a href="#cb56-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-32"><a href="#cb56-32" aria-hidden="true" tabindex="-1"></a>df_study1_long_fix <span class="ot">&lt;-</span> df_study1_long <span class="sc">%&gt;%</span> </span>
+<span id="cb56-33"><a href="#cb56-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(idencuesta, muestra, ola) <span class="sc">%&gt;%</span>         </span>
+<span id="cb56-34"><a href="#cb56-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(idencuesta, muestra) <span class="sc">%&gt;%</span></span>
+<span id="cb56-35"><a href="#cb56-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb56-36"><a href="#cb56-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
+<span id="cb56-37"><a href="#cb56-37" aria-hidden="true" tabindex="-1"></a>      <span class="fu">all_of</span>(vars_invariantes),</span>
+<span id="cb56-38"><a href="#cb56-38" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> {</span>
+<span id="cb56-39"><a href="#cb56-39" aria-hidden="true" tabindex="-1"></a>        v1 <span class="ot">&lt;-</span> .x[ola <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(.x)]</span>
+<span id="cb56-40"><a href="#cb56-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">length</span>(v1) <span class="sc">&gt;</span> <span class="dv">0</span>) v1[<span class="dv">1</span>] <span class="cf">else</span> .x</span>
+<span id="cb56-41"><a href="#cb56-41" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb56-42"><a href="#cb56-42" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb56-43"><a href="#cb56-43" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb56-44"><a href="#cb56-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb56-45"><a href="#cb56-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-46"><a href="#cb56-46" aria-hidden="true" tabindex="-1"></a><span class="fu">frq</span>(df_study1_long_fix<span class="sc">$</span>ola) <span class="co"># ok</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x &lt;character&gt; 
+# total N=20761 valid N=20761 mean=2019.34 sd=2.37
+
+Value |    N | Raw % | Valid % | Cum. %
+---------------------------------------
+ 2016 | 2927 | 14.10 |   14.10 |  14.10
+ 2017 | 2473 | 11.91 |   11.91 |  26.01
+ 2018 | 3748 | 18.05 |   18.05 |  44.06
+ 2019 | 3417 | 16.46 |   16.46 |  60.52
+ 2021 | 2740 | 13.20 |   13.20 |  73.72
+ 2022 | 2730 | 13.15 |   13.15 |  86.87
+ 2023 | 2726 | 13.13 |   13.13 | 100.00
+ &lt;NA&gt; |    0 |  0.00 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>waves_use <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"2016"</span>,<span class="st">"2017"</span>,<span class="st">"2018"</span>,<span class="st">"2019"</span>,<span class="st">"2022"</span>,<span class="st">"2023"</span>)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>df_study1_long_fix <span class="ot">&lt;-</span> df_study1_long_fix <span class="sc">%&gt;%</span> </span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ola <span class="sc">%in%</span> waves_use)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>df_unbalanced <span class="ot">&lt;-</span> df_study1_long_fix</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>ids_t7 <span class="ot">&lt;-</span> df_study1_long_fix <span class="sc">%&gt;%</span></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ola <span class="sc">==</span> <span class="st">"2023"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(idencuesta) <span class="sc">%&gt;%</span></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(idencuesta)</span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>df_t7 <span class="ot">&lt;-</span> df_study1_long_fix <span class="sc">%&gt;%</span></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(idencuesta <span class="sc">%in%</span> ids_t7)</span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>df_ids_balanced <span class="ot">&lt;-</span> df_t7 <span class="sc">%&gt;%</span></span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(idencuesta) <span class="sc">%&gt;%</span></span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_olas_distintas =</span> <span class="fu">n_distinct</span>(ola),</span>
+<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb59-17"><a href="#cb59-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n_olas_distintas <span class="sc">==</span> <span class="fu">length</span>(waves_use)) <span class="sc">%&gt;%</span>   <span class="co"># tiene las 6 olas</span></span>
+<span id="cb59-18"><a href="#cb59-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(idencuesta)</span>
+<span id="cb59-19"><a href="#cb59-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-20"><a href="#cb59-20" aria-hidden="true" tabindex="-1"></a>df_balanced <span class="ot">&lt;-</span> df_t7 <span class="sc">%&gt;%</span></span>
+<span id="cb59-21"><a href="#cb59-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(idencuesta <span class="sc">%in%</span> df_ids_balanced)</span>
+<span id="cb59-22"><a href="#cb59-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-23"><a href="#cb59-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Número de individuos</span></span>
+<span id="cb59-24"><a href="#cb59-24" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(df_unbalanced<span class="sc">$</span>idencuesta)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4447</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(df_balanced<span class="sc">$</span>idencuesta)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1328</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Distribución por ola</span></span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>df_unbalanced <span class="sc">%&gt;%</span> <span class="fu">count</span>(ola)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+  ola       n
+  &lt;chr&gt; &lt;int&gt;
+1 2016   2927
+2 2017   2473
+3 2018   3748
+4 2019   3417
+5 2022   2730
+6 2023   2726</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>df_balanced   <span class="sc">%&gt;%</span> <span class="fu">count</span>(ola)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+  ola       n
+  &lt;chr&gt; &lt;int&gt;
+1 2016   1328
+2 2017   1328
+3 2018   1328
+4 2019   1328
+5 2022   1328
+6 2023   1328</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>df_study1 <span class="ot">&lt;-</span> df_balanced <span class="sc">%&gt;%</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>muestra) <span class="sc">%&gt;%</span> </span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ola =</span> <span class="fu">case_when</span>(ola <span class="sc">==</span> <span class="st">"2016"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="st">"2017"</span> <span class="sc">~</span> <span class="dv">2</span>, </span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="st">"2018"</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="st">"2019"</span> <span class="sc">~</span> <span class="dv">4</span>,</span>
+<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="st">"2022"</span> <span class="sc">~</span> <span class="dv">5</span>,</span>
+<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="st">"2023"</span> <span class="sc">~</span> <span class="dv">6</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ola =</span> <span class="fu">as.factor</span>(ola),</span>
+<span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">ola_num =</span> <span class="fu">as.numeric</span>(ola),</span>
+<span id="cb67-12"><a href="#cb67-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">ola_2=</span><span class="fu">as.numeric</span>(ola)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb67-13"><a href="#cb67-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-14"><a href="#cb67-14" aria-hidden="true" tabindex="-1"></a>df_study1 <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span></span>
+<span id="cb67-15"><a href="#cb67-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(idencuesta) <span class="sc">%&gt;%</span>             <span class="co"># Agrupar por el identificador del participante</span></span>
+<span id="cb67-16"><a href="#cb67-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n_participaciones =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span>  <span class="co"># Contar el número de filas (participaciones) por participante</span></span>
+<span id="cb67-17"><a href="#cb67-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb67-18"><a href="#cb67-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-19"><a href="#cb67-19" aria-hidden="true" tabindex="-1"></a>df_study1 <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n_participaciones<span class="sc">&gt;</span><span class="dv">1</span>)</span>
+<span id="cb67-20"><a href="#cb67-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-21"><a href="#cb67-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-22"><a href="#cb67-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-23"><a href="#cb67-23" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>merit_effort <span class="ot">&lt;-</span> <span class="fu">as_numeric</span>(df_study1<span class="sc">$</span>merit_effort)</span>
+<span id="cb67-24"><a href="#cb67-24" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>merit_talent <span class="ot">&lt;-</span> <span class="fu">as_numeric</span>(df_study1<span class="sc">$</span>merit_talent)</span>
+<span id="cb67-25"><a href="#cb67-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-26"><a href="#cb67-26" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>decile_eq <span class="ot">&lt;-</span> <span class="fu">as_numeric</span>(df_study1<span class="sc">$</span>decile_eq)</span>
+<span id="cb67-27"><a href="#cb67-27" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>dummy_decile10 <span class="ot">&lt;-</span> <span class="fu">if_else</span>(df_study1<span class="sc">$</span>decile_eq <span class="sc">&gt;=</span> <span class="dv">10</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb67-28"><a href="#cb67-28" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>dummy_educ <span class="ot">&lt;-</span> <span class="fu">if_else</span>(df_study1<span class="sc">$</span>educ <span class="sc">==</span> <span class="st">"Universitary"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb67-29"><a href="#cb67-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-30"><a href="#cb67-30" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>age_2 <span class="ot">&lt;-</span> (df_study1<span class="sc">$</span>age)<span class="sc">^</span><span class="dv">2</span> </span>
+<span id="cb67-31"><a href="#cb67-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-32"><a href="#cb67-32" aria-hidden="true" tabindex="-1"></a>df_study1 <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span> </span>
+<span id="cb67-33"><a href="#cb67-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ola =</span> <span class="fu">case_when</span>(ola <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"2016"</span>,</span>
+<span id="cb67-34"><a href="#cb67-34" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"2017"</span>,</span>
+<span id="cb67-35"><a href="#cb67-35" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"2018"</span>,</span>
+<span id="cb67-36"><a href="#cb67-36" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">"2019"</span>,</span>
+<span id="cb67-37"><a href="#cb67-37" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">"2022"</span>,</span>
+<span id="cb67-38"><a href="#cb67-38" aria-hidden="true" tabindex="-1"></a>                         ola <span class="sc">==</span> <span class="dv">6</span> <span class="sc">~</span> <span class="st">"2023"</span>),</span>
+<span id="cb67-39"><a href="#cb67-39" aria-hidden="true" tabindex="-1"></a>         <span class="at">ola =</span> <span class="fu">factor</span>(ola, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"2016"</span>,</span>
+<span id="cb67-40"><a href="#cb67-40" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2017"</span>,</span>
+<span id="cb67-41"><a href="#cb67-41" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2018"</span>,</span>
+<span id="cb67-42"><a href="#cb67-42" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2019"</span>,</span>
+<span id="cb67-43"><a href="#cb67-43" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2022"</span>,</span>
+<span id="cb67-44"><a href="#cb67-44" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"2023"</span>)))</span>
+<span id="cb67-45"><a href="#cb67-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-46"><a href="#cb67-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-47"><a href="#cb67-47" aria-hidden="true" tabindex="-1"></a>df_study1 <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span> </span>
+<span id="cb67-48"><a href="#cb67-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(idencuesta) <span class="sc">%&gt;%</span> </span>
+<span id="cb67-49"><a href="#cb67-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">merit_effort_mean =</span> <span class="fu">mean</span>(merit_effort, <span class="at">na.rm =</span> T),</span>
+<span id="cb67-50"><a href="#cb67-50" aria-hidden="true" tabindex="-1"></a>         <span class="at">merit_effort_cwc =</span> merit_effort <span class="sc">-</span> merit_effort_mean,</span>
+<span id="cb67-51"><a href="#cb67-51" aria-hidden="true" tabindex="-1"></a>         <span class="at">merit_talent_mean =</span> <span class="fu">mean</span>(merit_talent, <span class="at">na.rm =</span> T),</span>
+<span id="cb67-52"><a href="#cb67-52" aria-hidden="true" tabindex="-1"></a>         <span class="at">merit_talent_cwc =</span> merit_talent <span class="sc">-</span> merit_talent_mean,</span>
+<span id="cb67-53"><a href="#cb67-53" aria-hidden="true" tabindex="-1"></a>         <span class="at">ess_mean =</span> <span class="fu">mean</span>(ess, <span class="at">na.rm =</span> T),</span>
+<span id="cb67-54"><a href="#cb67-54" aria-hidden="true" tabindex="-1"></a>         <span class="at">ess_cwc =</span> ess <span class="sc">-</span> ess_mean,</span>
+<span id="cb67-55"><a href="#cb67-55" aria-hidden="true" tabindex="-1"></a>         <span class="at">ess_og_mean =</span> <span class="fu">mean</span>(ess_og, <span class="at">na.rm =</span> T),</span>
+<span id="cb67-56"><a href="#cb67-56" aria-hidden="true" tabindex="-1"></a>         <span class="at">ess_og_cwc =</span> ess_og <span class="sc">-</span> ess_og_mean,</span>
+<span id="cb67-57"><a href="#cb67-57" aria-hidden="true" tabindex="-1"></a>         <span class="at">ess_hijos_mean =</span> <span class="fu">mean</span>(ess_hijos, <span class="at">na.rm =</span> T),</span>
+<span id="cb67-58"><a href="#cb67-58" aria-hidden="true" tabindex="-1"></a>         <span class="at">ess_hijos_cwc =</span> ess_hijos <span class="sc">-</span> ess_hijos_mean,       </span>
+<span id="cb67-59"><a href="#cb67-59" aria-hidden="true" tabindex="-1"></a>        <span class="at">dummy_educ_mean =</span> <span class="fu">mean</span>(dummy_educ, <span class="at">na.rm =</span> T),</span>
+<span id="cb67-60"><a href="#cb67-60" aria-hidden="true" tabindex="-1"></a>        <span class="at">dummy_educ_cwc =</span> dummy_educ <span class="sc">-</span> dummy_educ_mean,       </span>
+<span id="cb67-61"><a href="#cb67-61" aria-hidden="true" tabindex="-1"></a>        <span class="at">dummy_decile10_mean =</span> <span class="fu">mean</span>(dummy_decile10, <span class="at">na.rm =</span> T),</span>
+<span id="cb67-62"><a href="#cb67-62" aria-hidden="true" tabindex="-1"></a>        <span class="at">dummy_decile10_cwc =</span> dummy_decile10 <span class="sc">-</span> dummy_decile10_mean,</span>
+<span id="cb67-63"><a href="#cb67-63" aria-hidden="true" tabindex="-1"></a>         ) <span class="sc">%&gt;%</span> </span>
+<span id="cb67-64"><a href="#cb67-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb67-65"><a href="#cb67-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-66"><a href="#cb67-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-67"><a href="#cb67-67" aria-hidden="true" tabindex="-1"></a>df_study1 <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span></span>
+<span id="cb67-68"><a href="#cb67-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(idencuesta) <span class="sc">%&gt;%</span></span>
+<span id="cb67-69"><a href="#cb67-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dummy_decile10_mean =</span> <span class="fu">as.integer</span>(<span class="fu">any</span>(dummy_decile10 <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb67-70"><a href="#cb67-70" aria-hidden="true" tabindex="-1"></a>         <span class="at">dummy_educ_mean =</span> <span class="fu">as.integer</span>(<span class="fu">any</span>(dummy_educ <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb67-71"><a href="#cb67-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb67-72"><a href="#cb67-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-73"><a href="#cb67-73" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>just_pension <span class="ot">&lt;-</span> <span class="fu">as_factor</span>(df_study1<span class="sc">$</span>just_pension)</span>
+<span id="cb67-74"><a href="#cb67-74" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>just_educ <span class="ot">&lt;-</span> <span class="fu">as_factor</span>(df_study1<span class="sc">$</span>just_educ)</span>
+<span id="cb67-75"><a href="#cb67-75" aria-hidden="true" tabindex="-1"></a>df_study1<span class="sc">$</span>just_salud <span class="ot">&lt;-</span> <span class="fu">as_factor</span>(df_study1<span class="sc">$</span>just_salud)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="save-and-export" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Save and export</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df_study1_long,<span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"input/data/rob_income/df_study1_long_vf_rob_income.RData"</span>)) <span class="co"># original</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df_study1_long_fix,<span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"input/data/rob_income/df_study1_long_fix_vf_rob_income.RData"</span>)) <span class="co"># fix orginal</span></span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df_unbalanced,<span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"input/data/rob_income/df_unbalanced_rob_income.RData"</span>)) <span class="co"># Filter data by the idencuesta of t7</span></span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df_balanced,<span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"input/data/rob_income/df_balanced_rob_income.RData"</span>)) </span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df_study1, <span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"input/data/proc/df_final.RData"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

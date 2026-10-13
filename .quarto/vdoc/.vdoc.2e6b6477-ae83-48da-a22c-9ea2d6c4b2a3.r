@@ -1,0 +1,726 @@
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#| label: set
+#| echo: false
+#| message: false
+#| warning: false
+
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE, include = TRUE, warning = FALSE, message = FALSE)
+
+table_format <- if(is_html_output()) {
+  "html"
+} else if(is_latex_output()) {
+  "latex"
+}
+table_format2 <- if(is_html_output()) {
+  T
+} else if(is_latex_output()) {
+  F
+}
+
+options(kableExtra.html.bsTable = T)
+options(knitr.kable.NA = "")
+#
+#
+#
+#
+#
+#
+#| label: packages
+#| include: true
+
+if (! require("pacman")) install.packages("pacman")
+
+pacman::p_load(tidyverse, 
+               sjmisc, 
+               sjPlot, 
+               lme4, 
+               here, 
+               performance,
+               influence.ME, 
+               srvyr,
+               ordinal,
+               texreg, 
+               ggdist,
+               misty,
+               kableExtra,
+               ggalluvial, 
+               shadowtext,
+               MetBrewer,
+               patchwork,
+               sjlabelled)
+
+
+options(scipen=999)
+rm(list = ls())
+#
+#
+#
+#
+#
+#| label: data
+#| echo: true
+
+load(file = here("input/data/rob_income/df_balanced_rob_income.RData"))
+
+glimpse(df_balanced)
+
+# Generate analytical sample
+
+df_study1 <- df_balanced %>%
+  select(-muestra) %>% 
+  na.omit() %>% 
+  mutate(ola = case_when(ola == "2016" ~ 1,
+                         ola == "2017" ~ 2, 
+                         ola == "2018" ~ 3,
+                         ola == "2019" ~ 4,
+                         ola == "2022" ~ 5,
+                         ola == "2023" ~ 6)) %>% 
+  mutate(ola = as.factor(ola),
+         ola_num = as.numeric(ola),
+         ola_2=as.numeric(ola)^2)
+
+df_study1 <- df_study1 %>%
+  group_by(idencuesta) %>%             # Agrupar por el identificador del participante
+  mutate(n_participaciones = n()) %>%  # Contar el número de filas (participaciones) por participante
+  ungroup()
+
+df_study1 <- df_study1 %>% filter(n_participaciones>1)
+
+# Corregir etiquetas
+
+df_study1$just_pension <- sjlabelled::set_label(df_study1$just_pension, 
+                        label = "Pension distributive justice")
+
+df_study1$egp <- sjlabelled::set_label(df_study1$egp, 
+                        label = "Social class")
+
+df_study1$merit_effort <- sjlabelled::set_label(df_study1$merit_effort, 
+                        label = "People are rewarded for their efforts")
+
+df_study1$merit_talent <- sjlabelled::set_label(df_study1$merit_talent, 
+                        label = "People are rewarded for their intelligence")
+
+
+#
+#
+#
+#
+#
+#
+#
+#| label: fig-alluvial
+#| out-width: '100%'
+#| fig-asp: 1
+#| fig-cap: "Changes in the justification of inequality in pensions over time (2016-2023)"
+#| fig-cap-location: top
+
+datos.pension <- df_study1 %>% 
+   mutate(just_pension = factor(just_pension, 
+                              levels = c("Strongly agree",
+                                         "Agree",
+                                         "Neither agree nor disagree",
+                                         "Disagree",
+                                         "Strongly disagree"))) %>% 
+  group_by(idencuesta, ola) %>% 
+  count(just_pension) %>% 
+  group_by(ola) %>% 
+  mutate(porcentaje=n/sum(n)) %>% 
+  ungroup() %>% 
+  na.omit() %>% 
+  mutate(wave = case_when(ola == 1 ~ "2016",
+                          ola == 2 ~ "2017",
+                          ola == 3 ~ "2018",
+                          ola == 4 ~ "2019",
+                          ola == 5 ~ "2022",
+                          ola == 6 ~ "2023"),
+         wave = factor(wave, levels = c("2016",
+                                        "2017",
+                                        "2018",
+                                        "2019",
+                                        "2022",
+                                        "2023")))
+
+
+
+etiquetas.pension <- df_study1 %>%
+  mutate(just_pension = factor(just_pension, 
+                              levels = c("Strongly agree",
+                                         "Agree",
+                                         "Neither agree nor disagree",
+                                         "Disagree",
+                                         "Strongly disagree"))) %>% 
+  group_by(ola, just_pension) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(ola) %>%
+  mutate(porcentaje = count / sum(count)) %>% 
+  na.omit() %>% 
+  mutate(idencuesta = 1,
+         wave = case_when(ola == 1 ~ "2016",
+                          ola == 2 ~ "2017",
+                          ola == 3 ~ "2018",
+                          ola == 4 ~ "2019",
+                          ola == 5 ~ "2022",
+                          ola == 6 ~ "2023"),
+         wave = factor(wave, levels = c("2016",
+                                        "2017",
+                                        "2018",
+                                        "2019",
+                                        "2022",
+                                        "2023")))
+
+
+datos.pension %>% 
+  ggplot(aes(x = wave, fill = just_pension, stratum = just_pension,
+             alluvium = idencuesta, y = porcentaje)) +
+  ggalluvial::geom_flow(alpha = .4) + 
+  ggalluvial::geom_stratum(linetype = 0) +
+  scale_y_continuous(labels = scales::percent) + 
+  scale_fill_manual(values =  c("#0571B0","#92C5DE","#b3b3b3ff","#F4A582","#CA0020")) +
+  geom_shadowtext(data = etiquetas.pension,
+                  aes(label = ifelse(porcentaje > 0 , scales::percent(porcentaje, accuracy = .1),"")),
+                  position = position_stack(vjust = .5),
+                  show.legend = FALSE,
+                  size = 3,
+                  color = rep('white'),
+                  bg.colour='grey30')+
+  labs(y = "%",
+       x = NULL,
+       fill = NULL,
+       title = NULL) +
+  theme_ggdist() +
+  theme(legend.position = "bottom") 
+
+#
+#
+#
+#
+#
+#
+#| include: false
+
+df_study1$merit_effort <- as_numeric(df_study1$merit_effort)
+df_study1$merit_talent <- as_numeric(df_study1$merit_talent)
+
+df_study1$decile_eq <- as_numeric(df_study1$decile_eq)
+df_study1$dummy_decile10 <- if_else(df_study1$decile_eq >= 10, 1, 0)
+df_study1$dummy_educ <- if_else(df_study1$educ == "Universitary", 1, 0)
+
+df_study1$age_2 <- (df_study1$age)^2 
+
+df_study1 <- df_study1 %>% 
+  mutate(ola = case_when(ola == 1 ~ "2016",
+                         ola == 2 ~ "2017",
+                         ola == 3 ~ "2018",
+                         ola == 4 ~ "2019",
+                         ola == 5 ~ "2022",
+                         ola == 6 ~ "2023"),
+         ola = factor(ola, levels = c("2016",
+                                        "2017",
+                                        "2018",
+                                        "2019",
+                                        "2022",
+                                        "2023")))
+
+
+df_study1 <- df_study1 %>% 
+  group_by(idencuesta) %>% 
+  mutate(merit_effort_mean = mean(merit_effort, na.rm = T),
+         merit_effort_cwc = merit_effort - merit_effort_mean,
+         merit_talent_mean = mean(merit_talent, na.rm = T),
+         merit_talent_cwc = merit_talent - merit_talent_mean,
+        #
+        #dummy_educ_mean = mean(dummy_educ, na.rm = T),
+        #dummy_educ_cwc = dummy_educ - dummy_educ_mean,
+        #
+        #dummy_decile10_mean = mean(dummy_decile10, na.rm = T),
+        #dummy_decile10_cwc = dummy_decile10 - dummy_decile10_mean,
+         ) %>% 
+  ungroup()
+
+df_study1 <- df_study1 %>% 
+  group_by(idencuesta) %>% 
+  mutate(status_subj_mean = mean(status_subj, na.rm = T),
+         status_subj_cwc = status_subj - status_subj_mean,
+         status_subj_mean = mean(status_subj, na.rm = T),
+         status_subj_cwc = status_subj - status_subj_mean,
+        #
+        #dummy_educ_mean = mean(dummy_educ, na.rm = T),
+        #dummy_educ_cwc = dummy_educ - dummy_educ_mean,
+        #
+        #dummy_decile10_mean = mean(dummy_decile10, na.rm = T),
+        #dummy_decile10_cwc = dummy_decile10 - dummy_decile10_mean,
+         ) %>% 
+  ungroup()
+
+
+df_study1 <- df_study1 %>%
+  group_by(idencuesta) %>%
+  mutate(dummy_decile10_mean = as.integer(any(dummy_decile10 == 1, na.rm = TRUE)),
+         dummy_educ_mean = as.integer(any(dummy_educ == 1, na.rm = TRUE))) %>%
+  ungroup()
+
+df_study1$just_pension <- as_factor(df_study1$just_pension)
+
+#
+#
+#
+#
+m0 <- clmm(just_pension ~ 1 + (1 | idencuesta), 
+           link = "logit",
+  Hess = TRUE, # calcula explícitamente la matriz varianza-covarianza de estimadores
+                data = df_study1)
+
+performance::icc(m0, by_group = T) # 0.23 es between, 0.77 within
+#
+#
+#
+#
+#
+#| results: asis
+
+#m1.1 <- clmm(just_pension ~ 1 + ola + (1 | idencuesta),
+#                link = "logit",
+#  Hess = TRUE,
+#  data = df_study1)
+#
+#m1.2 <- clmm(just_pension ~ 1 + ola_num + (1 | idencuesta),
+#                link = "logit",
+#  Hess = TRUE, data = df_study1)
+#
+#m1.3 <- clmm(just_pension ~ 1 + ola_num + ola_2 + (1| idencuesta),
+#                link = "logit",
+#  Hess = TRUE, data = df_study1)
+#
+#m1.4 <- clmm(just_pension ~ 1 + ola_num + ola_2 + (1 + ola_num | #idencuesta),
+#               link = "logit",
+# Hess = TRUE, data = df_study1)
+#
+##save(m1.1,m1.2,m1.3,m1.4, file = here("output/rob_income/time_effects.RData"))
+
+load(file = here("output/rob_income/time_effects.RData"))
+
+ccoef <- list(
+  "Strongly disagree|Disagree" = "Strongly disagree|Disagree",
+  "Disagree|Neither agree nor disagree" = "Disagree|Neither agree nor disagree", 
+  "Neither agree nor disagree|Agree" = "Neither agree nor disagree|Agree", 
+  "Agree|Strongly agree" = "Agree|Strongly agree", 
+  "ola2017" = "Wave 2017",
+  "ola2018" = "Wave 2018",
+  "ola2019" = "Wave 2019",
+  "ola2022" = "Wave 2022",
+  "ola2023" = "Wave 2023",
+  ola_num = "Wave",
+  ola_2 = "Wave^2")
+
+texreg::htmlreg(list(m1.1,m1.2,m1.3,m1.4),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               custom.coef.map = ccoef,
+               digits = 3,
+               groups = list("Wave (Ref.= 2016)" = 5:9),
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T)
+               
+#
+#
+#
+#
+#
+anova(m1.3, m1.4) # quedarse con tiempo continua y con pendiente aleatoria
+#
+#
+#
+#
+#
+#
+#| include: false
+#| results: asis
+## WE and BE main effects
+https://github.com/cursos-metodos-facso/datos-ejemplos/raw/main/subset_lapop2023.rdata
+
+# m3 <- clmm(just_pension ~ 1 + ola_num + ola_2 +   
+#             merit_effort_cwc + merit_talent_cwc + (1 + ola_num | idencuesta), 
+#            link = "logit",
+#           Hess = TRUE,
+#           data = df_study1)
+
+# m4 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+#             merit_effort_cwc + merit_talent_cwc + 
+#             merit_effort_mean + merit_talent_mean + 
+#             status_subj + 
+#             (1 + ola_num| idencuesta), 
+#            link = "logit",
+#           Hess = TRUE,
+#           data = df_study1)
+
+# m5 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+#              merit_effort_cwc + merit_talent_cwc + 
+#              merit_effort_mean + merit_talent_mean + 
+#             status_subj + 
+#              dummy_decile10_mean +
+#              (1 + ola_num| idencuesta), 
+#            link = "logit",
+#            Hess = TRUE,
+#           data = df_study1)
+
+# m6 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+#              merit_effort_cwc + merit_talent_cwc + 
+#              merit_effort_mean + merit_talent_mean + 
+#             status_subj + 
+#              dummy_decile10_mean +
+#             dummy_educ_mean +
+#              (1 + ola_num| idencuesta), 
+#            link = "logit",
+#            Hess = TRUE,
+#           data = df_study1)
+
+m7 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+             merit_effort_cwc + merit_talent_cwc + 
+             merit_effort_mean + merit_talent_mean + 
+             status_subj_cwc + status_subj_mean +
+             dummy_decile10_mean +
+            dummy_educ_mean + ideo + sex + age + 
+             (1 + ola_num| idencuesta), 
+           link = "logit",
+           Hess = TRUE,
+          data = df_study1)
+
+m70 <- lmer((as.numeric(just_pension)) ~ 1 + ola_num +  ola_2 + 
+             merit_effort_cwc + merit_talent_cwc + 
+             merit_effort_mean + merit_talent_mean + 
+             status_subj_cwc + status_subj_mean +
+             #dummy_decile10_mean +
+            dummy_educ_mean + 
+            ideo + sex + age + 
+             (1 + ola_num| idencuesta), 
+          data = df_study1)
+
+# save(m3,m4,m5,m6,m7, file = here("output/rob_income/main_effects.RData"))
+
+load(file = here("output/rob_income/main_effects.RData"))
+
+screenreg(m70)
+
+names(df_study1)
+#
+#
+#
+#
+#| label: tbl-modelos
+#| tbl-cap: "Cumulative link longitudinal multilevel models for pension market justice preferences"
+#| tbl-cap-location: top
+
+omit <- "(ideo)|(sex)|(age)"
+
+ccoef <- list(
+  #"Strongly disagree|Disagree" = "Strongly disagree|Disagree",
+  #"Disagree|Neither agree nor disagree" = "Disagree|Neither agree nor disagree",
+  #"Neither agree nor disagree|Agree" = "Neither agree nor disagree|Agree",
+  #"Agree|Strongly agree" = "Agree|Strongly agree",
+  "ola2017" = "Wave 2017",
+  "ola2018" = "Wave 2018",
+  "ola2019" = "Wave 2019",
+  "ola2022" = "Wave 2022",
+  "ola2023" = "Wave 2023",
+  ola_num = "Wave",
+  ola_2 = "Wave^2",
+  merit_effort_cwc = "Merit: Effort (WE)",
+  merit_talent_cwc = "Merit: Talent (WE)",
+  merit_effort_mean = "Merit: Effort (BE)",
+  merit_talent_mean = "Merit: Talent (BE)",
+  status_subj = "Subjective social status",
+  dummy_decile10_mean = "Decile 10 (BE)",
+  dummy_educ_mean = "Universitary education (BE)"
+  )
+
+htmlreg(list(m1.1, m1.4, m3, m4, m5, m6, m7),
+               custom.model.names = c(paste0("Model ", seq(1:7))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = ccoef,
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave"),
+               custom.gof.rows = list("Controls"=c(rep("No",6), "Yes")))
+               
+
+#
+#
+#
+#| eval: false
+#| include: false
+sjPlot::plot_model(
+  m7,
+  type = "est",
+  terms = c("ola_num",
+            "ola_2",
+            "merit_effort_cwc",
+            "merit_talent_cwc", 
+            "merit_effort_mean",
+            "merit_talent_mean",
+            "dummy_decile10_mean" ,
+            "dummy_educ_mean"),
+  axis.labels = c( "Universitary education (BE)",
+                   "Decile 10 (BE)",
+                   "Merit: Talent (BE)",
+                  "Merit: Effort (BE)",
+                  "Merit: Talent (WE)",
+                  "Merit: Effort (WE)",
+                  "Wave^2",
+                  "Wave"),
+  transform = NULL,
+  show.ci = TRUE,     # <— muestra intervalos
+  ci.lvl  = 0.95,     # <— nivel de confianza
+  show.values = TRUE,
+  p.style = "stars",
+  vline.color = "grey40",
+  value.size = 4.5
+) +
+  scale_y_continuous(limits = c(-1,1.5))+
+  labs(title = NULL, 
+       caption = "Source: own elaboration based on ELSOC data 2016-2023 (N obs = 6,123; N individuals = 1,327)\nControls: gender, age, and political identification\n*** p < 0.001; ** p < 0.01; * p < 0.05") +
+  theme_ggdist() +
+  theme(legend.position = "top",
+        plot.title = element_text(face = "bold"),
+        text = element_text(size = 16),
+        plot.caption = element_text(size = 12, face = "italic"))
+
+ggsave(
+  plot = last_plot(),
+  filename = ("images/income_regression.png"),
+  device = "png",
+  dpi = "retina",
+  units = "cm",
+  width = 33,
+  height = 20
+)
+
+#
+#
+#
+#
+#
+#
+#| results: asis
+ ## WE and BE Interactions with controls
+
+#
+## income
+#m11 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+#               merit_effort_cwc + merit_talent_cwc + 
+#               merit_effort_mean + merit_talent_mean + 
+#               dummy_decile10_mean*merit_effort_cwc + 
+#               dummy_educ_mean + ideo + sex + age + 
+#               (1 + ola_num + merit_effort_cwc| idencuesta), 
+#            link = "logit",
+#  Hess = TRUE,
+#           data = df_study1)
+#
+#
+#m12 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+#               merit_effort_cwc + merit_talent_cwc + 
+#               merit_effort_mean + merit_talent_mean + 
+#               dummy_decile10_mean*merit_effort_mean + 
+#               dummy_educ_mean + ideo + sex + age + 
+#               (1 + ola_num + merit_effort_mean| idencuesta), 
+#            link = "logit",
+#  Hess = TRUE,
+#           data = df_study1)
+#
+#m13 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+#               merit_effort_cwc + merit_talent_cwc + 
+#               merit_effort_mean + merit_talent_mean + 
+#               dummy_decile10_mean*merit_talent_cwc + 
+#               dummy_educ_mean + ideo + sex + age + 
+#               (1 + ola_num + merit_talent_cwc| idencuesta), 
+#            link = "logit",
+#  Hess = TRUE,
+#           data = df_study1)
+#
+#
+#m14 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+#               merit_effort_cwc + merit_talent_cwc + 
+#               merit_effort_mean + merit_talent_mean + 
+#               dummy_decile10_mean*merit_talent_mean + 
+#               dummy_educ_mean + ideo + sex + age + 
+#               (1 + ola_num + merit_talent_mean| idencuesta), 
+#            link = "logit",
+#  Hess = TRUE,
+#           data = df_study1)
+#
+## educ
+#
+#
+#m15 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+#              merit_effort_cwc + merit_talent_cwc + 
+#              merit_effort_mean + merit_talent_mean + 
+#              dummy_educ_mean*merit_effort_cwc + 
+#              dummy_decile10_mean + ideo + sex + age + 
+#              (1 + ola_num + merit_effort_cwc| idencuesta), 
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+#
+#
+#m16 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+#              merit_effort_cwc + merit_talent_cwc + 
+#              merit_effort_mean + merit_talent_mean + 
+#              dummy_educ_mean*merit_effort_mean + 
+#              dummy_decile10_mean + ideo + sex + age + 
+#              (1 + ola_num + merit_effort_mean| idencuesta), 
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+#
+#m17 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+#              merit_effort_cwc + merit_talent_cwc + 
+#              merit_effort_mean + merit_talent_mean + 
+#              dummy_educ_mean*merit_talent_cwc + 
+#              dummy_decile10_mean + ideo + sex + age + 
+#              (1 + ola_num + merit_talent_cwc| idencuesta), 
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+#
+#
+#m18 <- clmm(just_pension ~ 1 + ola_num +  ola_2 + 
+#              merit_effort_cwc + merit_talent_cwc + 
+#              merit_effort_mean + merit_talent_mean + 
+#              dummy_educ_mean*merit_talent_mean + 
+#              dummy_decile10_mean + ideo + sex + age + 
+#              (1 + ola_num + merit_talent_mean| idencuesta), 
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+#
+#save(m11,m12,m13,m14,m15,m16,m17,m18,file = #here("output/rob_income/interactions_direct.RData"))
+
+load(file = here("output/rob_income/interactions_direct.RData"))
+
+htmlreg(list(m11,m12,m13,m14))
+
+htmlreg(list(m15,m16,m17,m18))
+#
+#
+#
+#
+#
+#
+#| results: asis
+# ## WE and BE Interactions with controls
+#
+#df_study1 <- df_study1 |>
+#  mutate(
+#    time  = ola_num - min(ola_num),
+#    time2 = time^2
+#  )
+#
+#m19 <- clmm(just_pension ~ 1 + time*merit_effort_cwc +  
+#              time2 + merit_talent_cwc + 
+#               merit_effort_mean + merit_talent_mean + 
+#               dummy_decile10_mean + 
+#               dummy_educ_mean + ideo + sex + age + 
+#               (1 + time + merit_effort_cwc| idencuesta), 
+#            link = "logit",
+#  Hess = TRUE,
+#           data = df_study1)
+#
+#m20 <- clmm(just_pension ~ 1 + time*merit_talent_cwc +  
+#              time2 +  merit_effort_cwc + 
+#               merit_effort_mean + merit_talent_mean + 
+#               dummy_decile10_mean + 
+#               dummy_educ_mean + ideo + sex + age + 
+#               (1 + time + merit_talent_cwc| idencuesta), 
+#            link = "logit",
+#  Hess = TRUE,
+#           data = df_study1)
+#
+#
+#screenreg(list(m19, m20))
+#
+#m19_flex <- clmm(
+#  just_pension ~ 1 + factor(ola_num)*merit_effort_cwc +
+#    merit_talent_cwc +
+#    merit_effort_mean + merit_talent_mean +
+#    dummy_decile10_mean + dummy_educ_mean +
+#    ideo + sex + age +
+#    (1 + merit_effort_cwc | idencuesta),
+#  link = "logit",
+#  Hess = TRUE,
+#  data = df_study1
+#)
+#
+#m20_flex <- clmm(
+#  just_pension ~ 1 + factor(ola_num)*merit_talent_cwc + 
+#    merit_effort_cwc +
+#    merit_effort_mean + merit_talent_mean +
+#    dummy_decile10_mean + dummy_educ_mean +
+#    ideo + sex + age +
+#    (1 + merit_talent_cwc | idencuesta),
+#  link = "logit",
+#  Hess = TRUE,
+#  data = df_study1
+#)
+#
+#screenreg(list(m19_flex, m20_flex))
+#
+#save(m19,m20, m19_flex, m20_flex, file = #here("output/rob_income/interactions_withinxtime.RData"))
+
+load(file = here("output/rob_income/interactions_withinxtime.RData"))
+
+htmlreg(list(m19, m20, m19_flex, m20_flex))
+
+#
+#
+#
+#
+#
+#
