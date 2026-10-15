@@ -1,5 +1,5 @@
 ---
-title: "Justification trajectories for pension inequality in Chile (2016-2023): The role of beliefs in meritocracy and social stratification"
+title: "Market Justice Preferences and the Dynamic Role of Objective and Subjective Status: A Longitudinal Multilevel Approach"
 format:
   html: 
     code-fold: true
@@ -31,16 +31,11 @@ author:
     email: juancastillov@uchile.cl
     affiliations:
       - ref: 1
-  - name: René Canales
-    orcid: 0009-0002-4299-2725
-    email: renecanales@uc.cl
+  - name: Julio Iturra 
+    orcid: 0000-0003-1993-3479
+    email: jiturra@uni-bremen.de
     affiliations:
       - ref: 2    
-  - name: Andreas Laffert
-    orcid: 0000-0002-9008-2454
-    email: alaffertt@estudiante.uc.cl 
-    affiliations:
-      - ref: 2
   - name: Tomás Urzúa
     orcid: 0009-0008-3167-6819
     email: tomas.urzua@ug.uchile.cl
@@ -50,18 +45,30 @@ affiliations:
   - id: 1
     name: Departament of Sociology, University of Chile
   - id: 2
-    name: Institute of Sociology, Pontifical Catholic University of Chile
+    name: Bremen International Graduate School of Social Sciences
 citeproc: true
 abstract: | 
-  **Introduction:** The Chilean pension system, characterized by full privatization and individual capitalization, plays a central role in shaping old-age inequality. Despite widespread social unrest and demands for reform, a segment of the population continues to justify income-based pension differences, a phenomenon conceptualized as preferences for pension market justice. This study investigates the interplay between social class, meritocratic beliefs (distinguishing between effort and talent), and preferences for market justice in the Chilean pension system between 2016 and 2023.
-  
-  **Methods:** Using six waves of panel data from the Chilean Longitudinal Social Survey-ELSOC ($N_{observations}$ = 5,755; $N_{individuals}$ = 1,027), the analysis employs Cumulative Link Mixed Models (CLMM) to examine longitudinal changes. This approach allows for the decomposition of variance into between-person and within-person effects, assessing how stable class positions and evolving meritocratic perceptions influence the legitimacy of market-based pension allocation.
-  
-  **Results:** The findings reveal a "class neutralization" phenomenon where objective social class does not significantly predict support for pension market justice. Instead, support has grown across all groups. Meritocratic perceptions of effort are consistently associated with higher market justice preferences at both between- and within-person levels. Conversely, talent-based perceptions do not show a main effect but interact significantly with specific positions: they predict higher support among the intermediate class (between-person) and among unemployed individuals whose perceptions of talent rewards increase over time (within-person).
-  
-  **Discussion:** These findings suggest that the institutional architecture of the pension system frames outcomes as results of individual responsibility, dampening class-based redistributive demands. Effort-based meritocracy acts as a key legitimizing ideology for pension inequality. However, talent-based justifications appear to function differently, serving as a compensatory narrative for the intermediate class and the unemployed to rationalize distributive outcomes in a context where the link between effort and reward is structurally constrained.
+  Contemporary welfare states are characterized by the public provision of services such as education, health
+  care, and pensions. Such services have experienced a process of commodification over the last years,
+  whereby access to public goods increasingly depends on individual payment capacity, linked to the concept
+  of market justice (Lane, 1986; Lindh, 2015). In this context, the study of market justice preferences acquires
+  relevance as support for that type of distribution undermines the core of the welfare state. Previous
+  literature has found modest support for the role of class and status variables in shaping market justice
+  preferences within a self-interest logic, usually from a static (cross-sectional) perspective. In the present
+  paper, we include different measures of subjective social status, arguing that changes in this dimension
+  operate above and beyond objective status measures. Furthermore, we add a dynamic perspective, arguing
+  that increasing objective and subjective status over time will be associated with stronger endorsement of 
+  market-justice preferences. This study draws on data from the Chilean Longitudinal Social Survey (ELSOC),
+  a representative panel of the Chilean urban population with six waves from 2016 to 2023 (N = 1326). This
+  unique dataset offers, for the first time, the possibility to analyze variations across three dimensions of
+  subjective social status: own, family of origin, and (future) offspring. The results of the multilevel
+  longitudinal models indicate that subjective status is positively associated with market justice preferences
+  (ceteris paribus). Moreover, the association between status variables and market justice preferences is far
+  from being static, such that increasing status leads to stronger support for the role of individual payment
+  capacity in accessing public goods.
 
-  **Keywords**: Economic inequality, meritocracy, market justice, Chile, public preferences
+  **Keywords**: Longitudinal multilevel models, Market justice preferences, Social stratification, Social
+  subjective status
 link-citations: true
 linestretch: 1.15       
 mainfont: Times New Roman
@@ -94,7 +101,7 @@ fig-width: 7.5
 
 {{< include 03-methods.qmd >}}
 
-{{< include 04-analisis.qmd >}}
+{{< include 04-results.qmd >}}
 
 {{< include 05-discussion.qmd >}}
 
