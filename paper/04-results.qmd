@@ -1,3 +1,9 @@
+---
+format: 
+  html:
+    theme: cosmo
+code-fold: true
+---
 
 ```{r}
 #| label: set
@@ -698,70 +704,85 @@ htmlreg(list(m13, m14, m15, m16, m17, m18),
 ```{r}
 #| include: false
 #| results: asis
+#| label: mjp-index-models
+
+
 ## WE and BE main effects - MJP index
 # mjp_index is a continuous mean index (1-5), so linear mixed models (lmer)
 # are used instead of cumulative link models (clmm). REML = FALSE so that
 # models with different fixed effects are comparable (LRT, BIC).
 
-m19 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
-            merit_effort_cwc + merit_talent_cwc + (1 + ola_num | idencuesta),
-           REML = FALSE,
-          data = df_study1)
+# m19 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+#             merit_effort_cwc + merit_talent_cwc + (1 + ola_num | idencuesta),
+#            REML = FALSE,
+#           data = df_study1)
 
-m20 <- lmer(mjp_index ~ 1 + ola_num +  ola_2 +
-            merit_effort_cwc + merit_talent_cwc +
-            merit_effort_mean + merit_talent_mean +
-            ess_cwc + ess_mean +
-            (1 + ola_num| idencuesta),
-           REML = FALSE,
-          data = df_study1)
+# m20 <- lmer(mjp_index ~ 1 + ola_num +  ola_2 +
+#             merit_effort_cwc + merit_talent_cwc +
+#             merit_effort_mean + merit_talent_mean +
+#             ess_cwc + ess_mean +
+#             (1 + ola_num| idencuesta),
+#            REML = FALSE,
+#           data = df_study1)
 
-m21 <- lmer(mjp_index ~ 1 + ola_num +  ola_2 +
-            merit_effort_cwc + merit_talent_cwc +
-            merit_effort_mean + merit_talent_mean +
-            ess_cwc + ess_mean +
-            ess_og_cwc + ess_og_mean +
-            ess_hijos_cwc + ess_hijos_mean +
-            (1 + ola_num| idencuesta),
-           REML = FALSE,
-          data = df_study1)
+# m21 <- lmer(mjp_index ~ 1 + ola_num +  ola_2 +
+#             merit_effort_cwc + merit_talent_cwc +
+#             merit_effort_mean + merit_talent_mean +
+#             ess_cwc + ess_mean +
+#             ess_og_cwc + ess_og_mean +
+#             ess_hijos_cwc + ess_hijos_mean +
+#             (1 + ola_num| idencuesta),
+#            REML = FALSE,
+#           data = df_study1)
 
-m22 <- lmer(mjp_index ~ 1 + ola_num +  ola_2 +
-             merit_effort_cwc + merit_talent_cwc +
-             merit_effort_mean + merit_talent_mean +
-             ess_cwc + ess_mean +
-             ess_og_cwc + ess_og_mean +
-             ess_hijos_cwc + ess_hijos_mean +
-             dummy_decile10_mean +
-             (1 + ola_num| idencuesta),
-           REML = FALSE,
-          data = df_study1)
+# m22 <- lmer(mjp_index ~ 1 + ola_num +  ola_2 +
+#              merit_effort_cwc + merit_talent_cwc +
+#              merit_effort_mean + merit_talent_mean +
+#              ess_cwc + ess_mean +
+#              ess_og_cwc + ess_og_mean +
+#              ess_hijos_cwc + ess_hijos_mean +
+#              dummy_decile10_mean +
+#              (1 + ola_num| idencuesta),
+#            REML = FALSE,
+#           data = df_study1)
 
-m23 <- lmer(mjp_index ~ 1 + ola_num +  ola_2 +
-             merit_effort_cwc + merit_talent_cwc +
-             merit_effort_mean + merit_talent_mean +
-             ess_cwc + ess_mean +
-             ess_og_cwc + ess_og_mean +
-             ess_hijos_cwc + ess_hijos_mean +
-             dummy_decile10_mean +
-            dummy_educ_mean +
-             (1 + ola_num| idencuesta),
-           REML = FALSE,
-          data = df_study1)
+# m23 <- lmer(mjp_index ~ 1 + ola_num +  ola_2 +
+#              merit_effort_cwc + merit_talent_cwc +
+#              merit_effort_mean + merit_talent_mean +
+#              ess_cwc + ess_mean +
+#              ess_og_cwc + ess_og_mean +
+#              ess_hijos_cwc + ess_hijos_mean +
+#              dummy_decile10_mean +
+#             dummy_educ_mean +
+#              (1 + ola_num| idencuesta),
+#            REML = FALSE,
+#           data = df_study1)
 
-m24 <- lmer(mjp_index ~ 1 + ola_num +  ola_2 +
-             merit_effort_cwc + merit_talent_cwc +
-             merit_effort_mean + merit_talent_mean +
-             ess_cwc + ess_mean +
-             ess_og_cwc + ess_og_mean +
-             ess_hijos_cwc + ess_hijos_mean +
-             dummy_decile10_mean +
-            dummy_educ_mean + ideo + sex + age +
-             (1 + ola_num| idencuesta),
-           REML = FALSE,
-          data = df_study1)
+# m24 <- lmer(mjp_index ~ 1 + ola_num +  ola_2 +
+#              merit_effort_cwc + merit_talent_cwc +
+#              merit_effort_mean + merit_talent_mean +
+#              ess_cwc + ess_mean +
+#              ess_og_cwc + ess_og_mean +
+#              ess_hijos_cwc + ess_hijos_mean +
+#              dummy_decile10_mean +
+#             dummy_educ_mean + ideo + sex + age +
+#              (1 + ola_num| idencuesta),
+#            REML = FALSE,
+#           data = df_study1)
 
-save(m19, m20, m21, m22, m23, m24, file = here("output/models/main_effects_mjp_index.RData"))
+# m24a <- lmer(mjp_index ~ 1 + ola_num +  ola_2 +
+#              merit_effort_cwc + merit_talent_cwc +
+#              merit_effort_mean + merit_talent_mean +
+#              ess_cwc * ess_mean +
+#              ess_og_cwc + ess_og_mean +
+#              ess_hijos_cwc + ess_hijos_mean +
+#              dummy_decile10_mean +
+#             dummy_educ_mean + ideo + sex + age +
+#              (1 + ola_num + ess_cwc | idencuesta),
+#            REML = FALSE,
+#           data = df_study1)
+
+# save(m19, m20, m21, m22, m23, m24, m24a, file = here("output/models/main_effects_mjp_index.RData"))
 ```
 
 ```{r}
@@ -772,13 +793,14 @@ save(m19, m20, m21, m22, m23, m24, file = here("output/models/main_effects_mjp_i
 
 load(here("output/models/main_effects_mjp_index.RData"))
 
-htmlreg(list(m19, m20, m21, m22, m23, m24),
-               custom.model.names = c(paste0("Model ", seq(1:6))),
+htmlreg(list(m19, m20, m21, m22, m23, m24, m24a),
+               custom.model.names = c(paste0("Model ", seq(1:6)), "Model 6a"),
                caption.above = T,
                caption = NULL,
                stars = c(0.05, 0.01, 0.001),
                omit.coef = omit,
-               custom.coef.map = c(list("(Intercept)" = "Intercept"), ccoef[-(1:5)]),
+               custom.coef.map = c(list("(Intercept)" = "Intercept"), ccoef[-(1:5)],
+                                   list("ess_cwc:ess_mean" = "Subjective social status (WE) x (BE)")),
                digits = 3,
                custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
                leading.zero = T,
@@ -788,8 +810,307 @@ htmlreg(list(m19, m20, m21, m22, m23, m24),
                include.loglik = FALSE,
                include.aic = FALSE,
                center = T,
-               custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave", "Cov: individuals (Intercept), wave", "Var: residual"),
-               custom.gof.rows = list("Controls"=c(rep("No",5), "Yes")))
+               custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave", "Cov: individuals (Intercept), wave", "Var: residual", "Var: individuals, SSS (WE)", "Cov: individuals (Intercept), SSS (WE)", "Cov: individuals wave, SSS (WE)"),
+               custom.gof.rows = list("Controls"=c(rep("No",5), "Yes", "Yes")))
 ```
 
+## Subjective social status (SSS) measurement 
+
+This section describes the processing and integration into multilevel models of a series of variables created to expand the measurement of subjective social status
+
+### SSS Index
+
+First, we constructed an averaged index based on the three variables of subjective social status: one's own status, family of origin and one's children
+
+```{r}
+# Subjective social status index: mean of own, family-of-origin and children's
+# status (all 0-10 scales)
+sss_vars <- c("ess", "ess_og", "ess_hijos")
+
+# Internal consistency and inter-item correlations
+psych::alpha(df_study1[, sss_vars])$total[c("raw_alpha", "std.alpha")]
+cor(df_study1[, sss_vars], use = "pairwise.complete.obs")
+```
+
+```{r}
+#| label: sss-index
+
+# Index (0-10): row mean of the three items
+df_study1 <- df_study1 %>%
+  mutate(sss_index = rowMeans(across(all_of(sss_vars)), na.rm = FALSE))
+
+# Between-within decomposition
+df_study1 <- df_study1 %>%
+  group_by(idencuesta) %>%
+  mutate(sss_index_mean = mean(sss_index),
+         sss_index_cwc  = sss_index - sss_index_mean) %>%
+  ungroup()
+```
+
+
+```{r}
+#| label: mjp-index-models-sss-index
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index, with the subjective social status index"
+#| tbl-cap-location: top
+#| results: asis
+
+m25 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              dummy_decile10_mean + dummy_educ_mean +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_study1)
+
+m26 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              merit_effort_cwc + merit_talent_cwc +
+              merit_effort_mean + merit_talent_mean +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_study1)
+
+m27 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              sss_index_cwc + sss_index_mean +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_study1)
+
+m28 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              merit_effort_cwc + merit_talent_cwc +
+              merit_effort_mean + merit_talent_mean +
+              sss_index_cwc + sss_index_mean +
+              dummy_decile10_mean + dummy_educ_mean +
+              ideo + sex + age +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_study1)
+
+save(m25, m26, m27, m28, file = here("output/models/main_effects_mjp_index_sss_index.RData"))
+
+ccoef_sss <- c(ccoef[names(ccoef) %in% c("ola_num", "ola_2", "merit_effort_cwc",
+                                         "merit_talent_cwc", "merit_effort_mean",
+                                         "merit_talent_mean")],
+               list(sss_index_cwc  = "SSS index (WE)",
+                    sss_index_mean = "SSS index (BE)",
+                    dummy_decile10_mean = "Decile 10 (BE)",
+                    dummy_educ_mean = "Universitary education (BE)"))
+
+htmlreg(list(m25, m26, m27, m28),
+        custom.model.names = c(paste0("Model ", seq(1:4))),
+        caption.above = T,
+        caption = NULL,
+        stars = c(0.05, 0.01, 0.001),
+        omit.coef = omit,
+        custom.coef.map = c(list("(Intercept)" = "Intercept"), ccoef_sss),
+        digits = 3,
+        custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+        leading.zero = T,
+        use.packages = F,
+        booktabs = F,
+        scalebox = 0.80,
+        include.loglik = FALSE,
+        include.aic = FALSE,
+        center = T,
+        custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave", "Cov: individuals (Intercept), wave", "Var: residual"),
+        custom.gof.rows = list("Controls" = c(rep("No", 3), "Yes")))
+```
+
+
+### SSS Mobility
+
+Then, subjective social mobility was operationalized as the difference between respondents’ perceived current social status and their family-of-origin status, with positive values indicating upward mobility and negative values indicating downward mobility. Two alternative measures were considered: (mov_dir) a direct difference score, calculated at each wave by subtracting family-of-origin status from respondents’ current status; and (mov_og) a difference score using the respondent’s mean family-of-origin status across waves as a fixed reference point, thereby reducing the influence of wave-to-wave measurement noise in the family-of-origin item.
+
+```{r}
+#| label: sss-mobility
+
+df_study1 <- df_study1 %>%
+  group_by(idencuesta) %>%
+  mutate(mov_dir      = ess - ess_og,
+         mov_dir_mean = mean(mov_dir),
+         mov_dir_cwc  = mov_dir - mov_dir_mean,
+         mov_og       = ess - ess_og_mean,
+         mov_og_mean  = mean(mov_og),
+         mov_og_cwc   = mov_og - mov_og_mean) %>%
+  ungroup()
+```
+
+```{r}
+# Descriptives by wave
+df_study1 %>%
+  group_by(ola) %>%
+  summarise(across(c(mov_dir, mov_og), list(mean = mean, sd = sd)),
+            up_dir   = mean(mov_dir > 0), down_dir = mean(mov_dir < 0),
+            up_og    = mean(mov_og > 0),  down_og  = mean(mov_og < 0))
+
+# Overlap between both measures
+cor(df_study1[, c("mov_dir", "mov_og")])
+```
+
+For the models, we decided to use the decomposed mov_og variable because it contains less inter-wave measurement noise.
+
+```{r}
+#| label: mjp-index-models-sss-mobility
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index, with subjective social mobility"
+#| tbl-cap-location: top
+#| results: asis
+
+m30 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              dummy_decile10_mean + dummy_educ_mean +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_study1)
+
+m31 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              merit_effort_cwc + merit_talent_cwc +
+              merit_effort_mean + merit_talent_mean +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_study1)
+
+m32 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              mov_og_cwc + mov_og_mean +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_study1)
+
+m33 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              merit_effort_cwc + merit_talent_cwc +
+              merit_effort_mean + merit_talent_mean +
+              mov_og_cwc + mov_og_mean +
+              dummy_decile10_mean + dummy_educ_mean +
+              ideo + sex + age +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_study1)
+
+
+save(m30, m31, m32, m33, file = here("output/models/main_effects_mjp_index_sss_mobility.RData"))
+
+ccoef_mov <- c(ccoef[names(ccoef) %in% c("ola_num", "ola_2", "merit_effort_cwc",
+                                         "merit_talent_cwc", "merit_effort_mean",
+                                         "merit_talent_mean")],
+               list(mov_og_cwc  = "Subjective social mobility (WE)",
+                    mov_og_mean = "Subjective social mobility (BE)",
+                    dummy_decile10_mean = "Decile 10 (BE)",
+                    dummy_educ_mean = "Universitary education (BE)"))
+
+htmlreg(list(m30, m31, m32, m33),
+        custom.model.names = c(paste0("Model ", seq(1:4))),
+        caption.above = T,
+        caption = NULL,
+        stars = c(0.05, 0.01, 0.001),
+        omit.coef = omit,
+        custom.coef.map = c(list("(Intercept)" = "Intercept"), ccoef_mov),
+        digits = 3,
+        custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+        leading.zero = T,
+        use.packages = F,
+        booktabs = F,
+        scalebox = 0.80,
+        include.loglik = FALSE,
+        include.aic = FALSE,
+        center = T,
+        custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave", "Cov: individuals (Intercept), wave", "Var: residual"),
+        custom.gof.rows = list("Controls" = c(rep("No", 3), "Yes")))
+```
+
+
+
+### SSS Slope
+
+Individual trajectories in subjective social status were estimated using ordinary least squares (OLS) regression of perceived social status on calendar year, yielding an individual-specific slope expressed in status points per year. Positive slopes indicate an upward trajectory in subjective social status, whereas negative slopes indicate a downward trajectory. The measure was calculated only for respondents with at least four observed waves.
+
+```{r}
+#| label: sss-slope
+
+min_waves <- 4
+
+ess_slope <- df_study1 %>%
+  mutate(year = as.numeric(as.character(ola))) %>%
+  group_by(idencuesta) %>%
+  summarise(n_waves   = sum(!is.na(ess)),
+            ess_slope = if (n_waves >= min_waves) unname(coef(lm(ess ~ year))[2]) else NA_real_,
+            .groups = "drop") %>%
+  select(idencuesta, ess_slope)
+
+df_study1 <- df_study1 %>%
+  left_join(ess_slope, by = "idencuesta")
+```
+
+```{r}
+# Distribution at the person level
+ess_slope %>%
+  summarise(n          = sum(!is.na(ess_slope)),
+            n_missing  = sum(is.na(ess_slope)),
+            mean       = mean(ess_slope, na.rm = TRUE),
+            sd         = sd(ess_slope, na.rm = TRUE),
+            upward     = mean(ess_slope > 0, na.rm = TRUE),
+            downward   = mean(ess_slope < 0, na.rm = TRUE))
+
+summary(ess_slope$ess_slope)
+```
+
+```{r}
+#| label: mjp-index-models-sss-slope
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index, with the individual slope of subjective social status"
+#| tbl-cap-location: top
+#| results: asis
+
+df_slope <- df_study1 %>% filter(!is.na(ess_slope))
+
+m35 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              dummy_decile10_mean + dummy_educ_mean +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_slope)
+
+m36 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              merit_effort_cwc + merit_talent_cwc +
+              merit_effort_mean + merit_talent_mean +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_slope)
+
+m37 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              ess_slope +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_slope)
+
+m38 <- lmer(mjp_index ~ 1 + ola_num + ola_2 +
+              merit_effort_cwc + merit_talent_cwc +
+              merit_effort_mean + merit_talent_mean +
+              ess_slope +
+              dummy_decile10_mean + dummy_educ_mean +
+              ideo + sex + age +
+              (1 + ola_num | idencuesta),
+            REML = FALSE,
+            data = df_slope)
+
+save(m35, m36, m37, m38, file = here("output/models/main_effects_mjp_index_sss_slope.RData"))
+
+ccoef_slope <- c(ccoef[names(ccoef) %in% c("ola_num", "ola_2", "merit_effort_cwc",
+                                           "merit_talent_cwc", "merit_effort_mean",
+                                           "merit_talent_mean")],
+                 list(ess_slope = "Subjective social status slope (BE)",
+                      dummy_decile10_mean = "Decile 10 (BE)",
+                      dummy_educ_mean = "Universitary education (BE)"))
+
+htmlreg(list(m35, m36, m37, m38),
+        custom.model.names = c(paste0("Model ", seq(1:4))),
+        caption.above = T,
+        caption = NULL,
+        stars = c(0.05, 0.01, 0.001),
+        omit.coef = omit,
+        custom.coef.map = c(list("(Intercept)" = "Intercept"), ccoef_slope),
+        digits = 3,
+        custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+        leading.zero = T,
+        use.packages = F,
+        booktabs = F,
+        scalebox = 0.80,
+        include.loglik = FALSE,
+        include.aic = FALSE,
+        center = T,
+        custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave", "Cov: individuals (Intercept), wave", "Var: residual"),
+        custom.gof.rows = list("Controls" = c(rep("No", 3), "Yes")))
+```
 
