@@ -1,7 +1,8 @@
 ---
-title: "Data preparation for robustness check Income"
-subtitle: "Changes in the Justification of Pension Inequality in Chile (2016–2023) and its Relationship to Social Class and Beliefs in Meritocracy"
-author: "Andreas Laffert"
+title: "Data processing"
+subtitle: "Market Justice Preferences and the Dynamic Role of Objective and Subjective Status: A
+           Longitudinal Multilevel Approach"
+author: "Equipo JUSMER"
 date: today
 lang: en
 fontsize: 12pt
@@ -28,7 +29,8 @@ editor_options:
 
 # Presentation
 
-This is the data preparation code for the paper "Changes in the Justification of Pension Inequality in Chile (2016–2023) and its Relationship to Social Class and Beliefs in Meritocracy". The prepared dataset is `ELSOC_Long_2016_2023_1.00.RData`.
+This is the data preparation code for the paper "Market Justice Preferences and the Dynamic Role of Objective and Subjective Status: A
+           Longitudinal Multilevel Approach". The prepared dataset is `ELSOC_Long_2016_2023_1.00.RData`.
 
 ```{r}
 #| label: set
@@ -120,7 +122,7 @@ elsoc_long_2016_2023 <- elsoc_long_2016_2023 %>%
 
 
 ```{r}
-# Market Justice Preferences
+#| label: Market Justice Preferences
 
 # Average index (1-5) of pension, education and healthcare market justice.
 # Computed on the numeric items, before they are recoded to factors.
@@ -161,7 +163,7 @@ elsoc_long_2016_2023$just_salud <- sjlabelled::set_label(elsoc_long_2016_2023$ju
 
 
 ```{r}
-# Meritocracy
+#| label: Meritocracy
 
 frq(elsoc_long_2016_2023$merit_effort)
 frq(elsoc_long_2016_2023$merit_talent)
@@ -189,7 +191,7 @@ elsoc_long_2016_2023$merit_talent <- sjlabelled::set_label(elsoc_long_2016_2023$
 
 
 ```{r}
-# Controls
+#| label: controls
 
 # sex
 elsoc_long_2016_2023$sex <- car::recode(elsoc_long_2016_2023$sex, 
@@ -258,9 +260,8 @@ elsoc_long_2016_2023$ess_hijos <- sjlabelled::set_label(elsoc_long_2016_2023$ess
 ```
 
 ```{r}
-# Socioeconomic_________________________________________________________________
+#| label: education
 
-# Education_______________________________________
 elsoc_long_2016_2023$educ <- 
   car::recode(elsoc_long_2016_2023$m01,
               "c(1,2,3,4,5,6,7)=1;c(8,9,10)=2; c(-888,-999)=NA")
@@ -275,6 +276,22 @@ elsoc_long_2016_2023$educ <-
 sjlabelled::set_label(x = elsoc_long_2016_2023$educ,
                       label = "Education")
 sjmisc::frq(elsoc_long_2016_2023$educ)
+
+# Education in 4 categories
+elsoc_long_2016_2023$educ_4 <-
+  car::recode(elsoc_long_2016_2023$m01,
+              "c(1,2,3)=1;c(4,5)=2;c(6,7)=3;c(8,9,10)=4;c(-888,-999)=NA")
+elsoc_long_2016_2023$educ_4 <-
+  factor(elsoc_long_2016_2023$educ_4,
+         labels = c("Primary or less",
+                    "Secondary",
+                    "Technical",
+                    "University or postgraduate"))
+
+elsoc_long_2016_2023$educ_4 <-
+sjlabelled::set_label(x = elsoc_long_2016_2023$educ_4,
+                      label = "Education (4 categories)")
+sjmisc::frq(elsoc_long_2016_2023$educ_4)
 
 #Recoding of education to years based on casen 2017.
 elsoc_long_2016_2023$educyear<- as.numeric(
@@ -294,6 +311,7 @@ sjmisc::frq(elsoc_long_2016_2023$educyear)
 
 
 ```{r}
+#| label: income
 
 elsoc_long_2016_2023 <- elsoc_long_2016_2023 %>% 
  mutate(ola = case_when(ola == 1 ~ 2016,
@@ -438,6 +456,14 @@ sjmisc::descr(elsoc_long_2016_2023$m29_imp)
 sjmisc::descr(elsoc_long_2016_2023$inc_eq_real_sqrt)
 sjmisc::descr(elsoc_long_2016_2023$ln_inc_eq_real_sqrt)
 
+# Continuous income: equivalised real income in millions of CLP (base = 2023 Dec)
+elsoc_long_2016_2023$inc_eq_mill <- elsoc_long_2016_2023$inc_eq_real_sqrt / 1000000
+
+elsoc_long_2016_2023$inc_eq_mill <-
+  sjlabelled::set_label(x = elsoc_long_2016_2023$inc_eq_mill,
+                        label = "Equivalised household income (millions CLP, Dec 2023)")
+sjmisc::descr(elsoc_long_2016_2023$inc_eq_mill)
+
 # Original per-capita measure for comparison -------------
 elsoc_long_2016_2023$ing_pc <- elsoc_long_2016_2023$m29_imp / elsoc_long_2016_2023$n_hogar_r
 sjmisc::descr(elsoc_long_2016_2023$ing_pc)
@@ -467,6 +493,34 @@ elsoc_long_2016_2023 <- elsoc_long_2016_2023 %>%
     )
   )
 
+# Income groups: Bottom (deciles 1-4), Middle (5-9), Top (10)
+elsoc_long_2016_2023 <- elsoc_long_2016_2023 %>%
+  mutate(
+    inc_group = case_when(
+      as.character(decile_eq) %in% as.character(1:4)  ~ "Bottom",
+      as.character(decile_eq) %in% as.character(5:9)  ~ "Middle",
+      as.character(decile_eq) == "10"                 ~ "Top"),
+    inc_group = factor(inc_group, levels = c("Bottom", "Middle", "Top")),
+
+    # Same grouping, keeping missing cases as "DNA"
+    inc_group1 = case_when(
+      as.character(decile_eq1) %in% as.character(1:4) ~ "Bottom",
+      as.character(decile_eq1) %in% as.character(5:9) ~ "Middle",
+      as.character(decile_eq1) == "10"                ~ "Top",
+      as.character(decile_eq1) == "DNA"               ~ "DNA"),
+    inc_group1 = factor(inc_group1, levels = c("Bottom", "Middle", "Top", "DNA"))
+  )
+
+elsoc_long_2016_2023$inc_group <-
+  sjlabelled::set_label(x = elsoc_long_2016_2023$inc_group,
+                        label = "Income group (deciles)")
+elsoc_long_2016_2023$inc_group1 <-
+  sjlabelled::set_label(x = elsoc_long_2016_2023$inc_group1,
+                        label = "Income group (deciles), including missing")
+
+sjmisc::frq(elsoc_long_2016_2023$inc_group)
+sjmisc::frq(elsoc_long_2016_2023$inc_group1)
+
 ```
 
 ```{r}
@@ -486,6 +540,7 @@ df_study1_long <- elsoc_long_2016_2023 %>%
          merit_effort,
          merit_talent,
          educ,
+         educ_4,
          educyear,
          sex,
          age,
@@ -495,7 +550,12 @@ df_study1_long <- elsoc_long_2016_2023 %>%
          ess_hijos,
          ess,
          decile_eq,
-         decile_eq1)
+         decile_eq1,
+         inc_group,
+         inc_group1,
+         inc_eq_real_sqrt,
+         ln_inc_eq_real_sqrt,
+         inc_eq_mill)
 
 vars_invariantes <- c("age", "aget",
                       "sex",
@@ -563,8 +623,9 @@ df_balanced   %>% count(ola)
 #| label: df balanced final proc
 
 df_study1 <- df_balanced %>%
-  select(-muestra) %>% 
-  na.omit() %>% 
+  select(-muestra) %>%
+  # na.omit() %>%
+
   mutate(ola = case_when(ola == "2016" ~ 1,
                          ola == "2017" ~ 2, 
                          ola == "2018" ~ 3,
@@ -581,8 +642,9 @@ df_study1 <- df_study1 %>%
   ungroup()
 
 df_study1 <- df_study1 %>% filter(n_participaciones>1)
+```
 
-
+```{r}
 
 df_study1$merit_effort <- as_numeric(df_study1$merit_effort)
 df_study1$merit_talent <- as_numeric(df_study1$merit_talent)
@@ -608,7 +670,7 @@ df_study1 <- df_study1 %>%
                                         "2023")))
 
 
-df_study1 <- df_study1 %>% 
+df_study1 <- df_study1 %>% # WE and BE effects
   group_by(idencuesta) %>% 
   mutate(merit_effort_mean = mean(merit_effort, na.rm = T),
          merit_effort_cwc = merit_effort - merit_effort_mean,
@@ -624,6 +686,12 @@ df_study1 <- df_study1 %>%
         dummy_educ_cwc = dummy_educ - dummy_educ_mean,       
         dummy_decile10_mean = mean(dummy_decile10, na.rm = T),
         dummy_decile10_cwc = dummy_decile10 - dummy_decile10_mean,
+        educyear_mean = mean(educyear, na.rm = T),
+        educyear_cwc = educyear - educyear_mean,
+        ln_inc_eq_real_sqrt_mean = mean(ln_inc_eq_real_sqrt, na.rm = T),
+        ln_inc_eq_real_sqrt_cwc = ln_inc_eq_real_sqrt - ln_inc_eq_real_sqrt_mean,
+        decile_eq_mean = mean(decile_eq, na.rm = T),
+        decile_eq_cwc = decile_eq - decile_eq_mean,
          ) %>% 
   ungroup()
 
@@ -637,6 +705,86 @@ df_study1 <- df_study1 %>%
 df_study1$just_pension <- as_factor(df_study1$just_pension)
 df_study1$just_educ <- as_factor(df_study1$just_educ)
 df_study1$just_salud <- as_factor(df_study1$just_salud)
+
+```
+
+```{r}
+#| label: new-sss
+
+
+# Subjective social status index: mean of own, family-of-origin and children's
+# status (all 0-10 scales)
+sss_vars <- c("ess", "ess_og", "ess_hijos")
+
+# Internal consistency and inter-item correlations
+psych::alpha(df_study1[, sss_vars])$total[c("raw_alpha", "std.alpha")]
+cor(df_study1[, sss_vars], use = "pairwise.complete.obs")
+
+
+```
+
+```{r}
+#| label: sss-mobility
+
+df_study1 <- df_study1 %>%
+  group_by(idencuesta) %>%
+  mutate(mov_dir      = ess - ess_og,
+         mov_dir_mean = mean(mov_dir),
+         mov_dir_cwc  = mov_dir - mov_dir_mean,
+         mov_og       = ess - ess_og_mean,
+         mov_og_mean  = mean(mov_og),
+         mov_og_cwc   = mov_og - mov_og_mean) %>%
+  ungroup()
+```
+
+```{r}
+#| label: sss-mobility-expectations
+
+df_study1 <- df_study1 %>%
+  mutate(mov_exp = ess_hijos - ess) %>%
+  group_by(idencuesta) %>%
+  mutate(mov_exp_mean = mean(mov_exp),
+         mov_exp_cwc  = mov_exp - mov_exp_mean) %>%
+  ungroup()
+```
+
+```{r}
+#| label: sss-intergenerational-mobility
+
+df_study1 <- df_study1 %>%
+  mutate(mov_inter = ess_hijos - ess - ess_og) %>%
+  group_by(idencuesta) %>%
+  mutate(mov_inter_mean = mean(mov_inter),
+         mov_inter_cwc  = mov_inter - mov_inter_mean) %>%
+  ungroup()
+```
+
+```{r}
+#| label: sss-mobility-expectations-origin
+
+# Children's SSS minus family-of-origin SSS: positive values = higher
+# expected social mobility
+df_study1 <- df_study1 %>%
+  mutate(mov_exp_og = ess_hijos - ess_og) %>%
+  group_by(idencuesta) %>%
+  mutate(mov_exp_og_mean = mean(mov_exp_og),
+         mov_exp_og_cwc  = mov_exp_og - mov_exp_og_mean) %>%
+  ungroup()
+```
+
+```{r}
+#| label: sss-slope
+
+# SSS trajectory within each person-wave: family of origin (t = 1), own (t = 2)
+# and children (t = 3). The OLS slope of ess ~ t over these three points is the
+# trajectory (positive = upward). NA if any of the three measures is missing
+df_study1 <- df_study1 %>%
+  rowwise() %>%
+  mutate(ess_traj = {
+    y <- c(ess_og, ess, ess_hijos)
+    if (anyNA(y)) NA_real_ else unname(coef(lm(y ~ c(1, 2, 3)))[2])
+  }) %>%
+  ungroup()
 
 ```
 

@@ -52,12 +52,15 @@ abstract: |
   care, and pensions. Such services have experienced a process of commodification over the last years,
   whereby access to public goods increasingly depends on individual payment capacity, linked to the concept
   of market justice (Lane, 1986; Lindh, 2015). In this context, the study of market justice preferences acquires
-  relevance as support for that type of distribution undermines the core of the welfare state. Previous
-  literature has found modest support for the role of class and status variables in shaping market justice
+  relevance as support for that type of distribution undermines the core of the welfare state.
+
+  Previous literature has found modest support for the role of class and status variables in shaping market justice
   preferences within a self-interest logic, usually from a static (cross-sectional) perspective. In the present
   paper, we include different measures of subjective social status, arguing that changes in this dimension
-  operate above and beyond objective status measures. Furthermore, we add a dynamic perspective, arguing
-  that increasing objective and subjective status over time will be associated with stronger endorsement of 
+  operate above and beyond objective status measures. 
+  
+  Furthermore, we add a dynamic perspective, arguing that increasing objective and subjective status over time 
+  will be associated with stronger endorsement of 
   market-justice preferences. This study draws on data from the Chilean Longitudinal Social Survey (ELSOC),
   a representative panel of the Chilean urban population with six waves from 2016 to 2023 (N = 1326). This
   unique dataset offers, for the first time, the possibility to analyze variations across three dimensions of

@@ -76,6 +76,93 @@ load(file = here("input/data/proc/df_final.RData"))
 
 ## Descriptives
 
+### NA
+
+```{r}
+#| label: tbl-na
+
+# Table of valid (non-missing) cases: n (%) per wave, and persons with valid
+# responses in at least 4 waves / in all waves. Only NA counts as missing
+# ("DNA" is a valid category).
+table_na <- function(labs, caption) {
+  n_ids   <- n_distinct(df_study1$idencuesta)
+  n_waves <- n_distinct(df_study1$ola)
+  fmt_n   <- function(n, total) sprintf("%d (%.1f%%)", n, 100 * n / total)
+  is_valid <- function(x) !is.na(x)
+
+  # Valid cases by wave
+  valid_wave <- df_study1 %>%
+    ungroup() %>%
+    select(ola, all_of(names(labs))) %>%
+    mutate(across(-ola, is_valid)) %>%
+    pivot_longer(-ola, names_to = "var", values_to = "valid") %>%
+    group_by(var, ola) %>%
+    summarise(txt = fmt_n(sum(valid), n()), .groups = "drop") %>%
+    pivot_wider(names_from = ola, values_from = txt)
+
+  # Persons with valid responses in at least 4 waves / in all waves
+  valid_person <- df_study1 %>%
+    ungroup() %>%
+    select(idencuesta, all_of(names(labs))) %>%
+    mutate(across(-idencuesta, is_valid)) %>%
+    pivot_longer(-idencuesta, names_to = "var", values_to = "valid") %>%
+    group_by(var, idencuesta) %>%
+    summarise(n_valid = sum(valid), .groups = "drop") %>%
+    group_by(var) %>%
+    summarise(`At least 4 waves` = fmt_n(sum(n_valid >= 4), n_ids),
+              `All waves`        = fmt_n(sum(n_valid == n_waves), n_ids),
+              .groups = "drop")
+
+  tab <- left_join(valid_wave, valid_person, by = "var") %>%
+    mutate(var = factor(var, levels = names(labs), labels = labs)) %>%
+    arrange(var) %>%
+    rename(Variable = var)
+
+  kable(tab,
+        format = table_format,
+        align = c("l", rep("c", ncol(tab) - 1)),
+        caption = caption) %>%
+    kable_styling(full_width = FALSE, bootstrap_options = c("striped", "condensed")) %>%
+    add_header_above(c(" " = 1, "Wave" = n_waves, "Persons" = 2))
+}
+
+na_labs <- c(ess           = "Subjective social status (own)",
+             ess_og        = "Subjective social status (family of origin)",
+             ess_hijos     = "Subjective social status (children)",
+             merit_effort  = "Merit: effort",
+             merit_talent  = "Merit: talent",
+             ideo          = "Political ideology",
+             sex           = "Sex",
+             just_educ     = "Market justice: education",
+             just_pension  = "Market justice: pensions",
+             just_salud    = "Market justice: healthcare",
+             educ          = "Education")
+
+table_na(na_labs,
+         "Valid cases by variable: n (%) per wave, and persons with valid responses in at least 4 waves and in all waves")
+```
+
+### Income NA
+
+```{r}
+#| label: tbl-na-income
+
+income_labs <- c(inc_eq_real_sqrt     = "Equivalised income (CLP, Dec 2023)",
+                 inc_eq_mill          = "Equivalised income (millions CLP)",
+                 ln_inc_eq_real_sqrt  = "Equivalised income (log)",
+                 decile_eq            = "Income decile",
+                 decile_eq1           = "Income decile (DNA as category)",
+                 dummy_decile10       = "Top decile (dummy)",
+                 inc_group            = "Income group",
+                 inc_group1           = "Income group (DNA as category)")
+
+table_na(income_labs,
+         "Valid income cases: n (%) per wave, and persons with valid income in at least 4 waves and in all waves")
+```
+
+Equivalised income, its millions-of-CLP rescaling, the decile and the top-decile dummy share the same valid cases (1,130 to 1,313 per wave; 975 persons with all six waves), with the lowest coverage in 2017. The log of income loses 35 further cases with non-positive income (950 persons with all waves). The variables that keep "DNA" as a category show full coverage because only `NA` is counted as missing; they retain 410 non-respondent cases.
+
+
 ### Market justice preferences
 
 ```{r}
@@ -948,28 +1035,28 @@ This section describes the processing and integration into multilevel models of 
 First, we constructed an averaged index based on the three variables of subjective social status: one's own status, family of origin and one's children
 
 ```{r}
-# Subjective social status index: mean of own, family-of-origin and children's
-# status (all 0-10 scales)
-sss_vars <- c("ess", "ess_og", "ess_hijos")
+# # Subjective social status index: mean of own, family-of-origin and children's
+# # status (all 0-10 scales)
+# sss_vars <- c("ess", "ess_og", "ess_hijos")
 
-# Internal consistency and inter-item correlations
-psych::alpha(df_study1[, sss_vars])$total[c("raw_alpha", "std.alpha")]
-cor(df_study1[, sss_vars], use = "pairwise.complete.obs")
+# # Internal consistency and inter-item correlations
+# psych::alpha(df_study1[, sss_vars])$total[c("raw_alpha", "std.alpha")]
+# cor(df_study1[, sss_vars], use = "pairwise.complete.obs")
 ```
 
 ```{r}
 #| label: sss-index
 
-# Index (0-10): row mean of the three items
-df_study1 <- df_study1 %>%
-  mutate(sss_index = rowMeans(across(all_of(sss_vars)), na.rm = FALSE))
+# # Index (0-10): row mean of the three items
+# df_study1 <- df_study1 %>%
+#   mutate(sss_index = rowMeans(across(all_of(sss_vars)), na.rm = FALSE))
 
-# Between-within decomposition
-df_study1 <- df_study1 %>%
-  group_by(idencuesta) %>%
-  mutate(sss_index_mean = mean(sss_index),
-         sss_index_cwc  = sss_index - sss_index_mean) %>%
-  ungroup()
+# # Between-within decomposition
+# df_study1 <- df_study1 %>%
+#   group_by(idencuesta) %>%
+#   mutate(sss_index_mean = mean(sss_index),
+#          sss_index_cwc  = sss_index - sss_index_mean) %>%
+#   ungroup()
 ```
 
 
@@ -980,27 +1067,27 @@ Then, subjective social mobility was operationalized as the difference between r
 ```{r}
 #| label: sss-mobility
 
-df_study1 <- df_study1 %>%
-  group_by(idencuesta) %>%
-  mutate(mov_dir      = ess - ess_og,
-         mov_dir_mean = mean(mov_dir),
-         mov_dir_cwc  = mov_dir - mov_dir_mean,
-         mov_og       = ess - ess_og_mean,
-         mov_og_mean  = mean(mov_og),
-         mov_og_cwc   = mov_og - mov_og_mean) %>%
-  ungroup()
+# df_study1 <- df_study1 %>%
+#   group_by(idencuesta) %>%
+#   mutate(mov_dir      = ess - ess_og,
+#          mov_dir_mean = mean(mov_dir),
+#          mov_dir_cwc  = mov_dir - mov_dir_mean,
+#          mov_og       = ess - ess_og_mean,
+#          mov_og_mean  = mean(mov_og),
+#          mov_og_cwc   = mov_og - mov_og_mean) %>%
+#   ungroup()
 ```
 
 ```{r}
-# Descriptives by wave
-df_study1 %>%
-  group_by(ola) %>%
-  summarise(across(c(mov_dir, mov_og), list(mean = mean, sd = sd)),
-            up_dir   = mean(mov_dir > 0), down_dir = mean(mov_dir < 0),
-            up_og    = mean(mov_og > 0),  down_og  = mean(mov_og < 0))
+# # Descriptives by wave
+# df_study1 %>%
+#   group_by(ola) %>%
+#   summarise(across(c(mov_dir, mov_og), list(mean = mean, sd = sd)),
+#             up_dir   = mean(mov_dir > 0), down_dir = mean(mov_dir < 0),
+#             up_og    = mean(mov_og > 0),  down_og  = mean(mov_og < 0))
 
-# Overlap between both measures
-cor(df_study1[, c("mov_dir", "mov_og")])
+# # Overlap between both measures
+# cor(df_study1[, c("mov_dir", "mov_og")])
 ```
 
 For the models, we decided to use the decomposed mov_og variable because it contains less inter-wave measurement noise.
@@ -1012,20 +1099,20 @@ Expected mobility for the next generation (mov_exp) was operationalized as the d
 ```{r}
 #| label: sss-mobility-expectations
 
-df_study1 <- df_study1 %>%
-  mutate(mov_exp = ess_hijos - ess) %>%
-  group_by(idencuesta) %>%
-  mutate(mov_exp_mean = mean(mov_exp),
-         mov_exp_cwc  = mov_exp - mov_exp_mean) %>%
-  ungroup()
+# df_study1 <- df_study1 %>%
+#   mutate(mov_exp = ess_hijos - ess) %>%
+#   group_by(idencuesta) %>%
+#   mutate(mov_exp_mean = mean(mov_exp),
+#          mov_exp_cwc  = mov_exp - mov_exp_mean) %>%
+#   ungroup()
 ```
 
 ```{r}
-# Descriptives by wave
-df_study1 %>%
-  group_by(ola) %>%
-  summarise(mean = mean(mov_exp, na.rm = TRUE), sd = sd(mov_exp, na.rm = TRUE),
-            up = mean(mov_exp > 0, na.rm = TRUE), down = mean(mov_exp < 0, na.rm = TRUE))
+# # Descriptives by wave
+# df_study1 %>%
+#   group_by(ola) %>%
+#   summarise(mean = mean(mov_exp, na.rm = TRUE), sd = sd(mov_exp, na.rm = TRUE),
+#             up = mean(mov_exp > 0, na.rm = TRUE), down = mean(mov_exp < 0, na.rm = TRUE))
 ```
 
 ### SSS Intergenerational mobility
@@ -1035,20 +1122,20 @@ Expected intergenerational mobility (mov_inter) was operationalized as the perce
 ```{r}
 #| label: sss-intergenerational-mobility
 
-df_study1 <- df_study1 %>%
-  mutate(mov_inter = ess_hijos - ess - ess_og) %>%
-  group_by(idencuesta) %>%
-  mutate(mov_inter_mean = mean(mov_inter),
-         mov_inter_cwc  = mov_inter - mov_inter_mean) %>%
-  ungroup()
+# df_study1 <- df_study1 %>%
+#   mutate(mov_inter = ess_hijos - ess - ess_og) %>%
+#   group_by(idencuesta) %>%
+#   mutate(mov_inter_mean = mean(mov_inter),
+#          mov_inter_cwc  = mov_inter - mov_inter_mean) %>%
+#   ungroup()
 ```
 
 ```{r}
-# Descriptives by wave
-df_study1 %>%
-  group_by(ola) %>%
-  summarise(mean = mean(mov_inter, na.rm = TRUE), sd = sd(mov_inter, na.rm = TRUE),
-            up = mean(mov_inter > 0, na.rm = TRUE), down = mean(mov_inter < 0, na.rm = TRUE))
+# # Descriptives by wave
+# df_study1 %>%
+#   group_by(ola) %>%
+#   summarise(mean = mean(mov_inter, na.rm = TRUE), sd = sd(mov_inter, na.rm = TRUE),
+#             up = mean(mov_inter > 0, na.rm = TRUE), down = mean(mov_inter < 0, na.rm = TRUE))
 ```
 
 
@@ -1059,31 +1146,31 @@ Individual trajectories in subjective social status were estimated using ordinar
 ```{r}
 #| label: sss-slope
 
-min_waves <- 4
+# min_waves <- 4
 
-ess_slope <- df_study1 %>%
-  mutate(year = as.numeric(as.character(ola))) %>%
-  group_by(idencuesta) %>%
-  summarise(n_waves   = sum(!is.na(ess)),
-            ess_slope = if (n_waves >= min_waves) unname(coef(lm(ess ~ year))[2]) else NA_real_,
-            .groups = "drop") %>%
-  select(idencuesta, ess_slope)
+# ess_slope <- df_study1 %>%
+#   mutate(year = as.numeric(as.character(ola))) %>%
+#   group_by(idencuesta) %>%
+#   summarise(n_waves   = sum(!is.na(ess)),
+#             ess_slope = if (n_waves >= min_waves) unname(coef(lm(ess ~ year))[2]) else NA_real_,
+#             .groups = "drop") %>%
+#   select(idencuesta, ess_slope)
 
-df_study1 <- df_study1 %>%
-  left_join(ess_slope, by = "idencuesta")
+# df_study1 <- df_study1 %>%
+#   left_join(ess_slope, by = "idencuesta")
 ```
 
 ```{r}
-# Distribution at the person level
-ess_slope %>%
-  summarise(n          = sum(!is.na(ess_slope)),
-            n_missing  = sum(is.na(ess_slope)),
-            mean       = mean(ess_slope, na.rm = TRUE),
-            sd         = sd(ess_slope, na.rm = TRUE),
-            upward     = mean(ess_slope > 0, na.rm = TRUE),
-            downward   = mean(ess_slope < 0, na.rm = TRUE))
+# # Distribution at the person level
+# ess_slope %>%
+#   summarise(n          = sum(!is.na(ess_slope)),
+#             n_missing  = sum(is.na(ess_slope)),
+#             mean       = mean(ess_slope, na.rm = TRUE),
+#             sd         = sd(ess_slope, na.rm = TRUE),
+#             upward     = mean(ess_slope > 0, na.rm = TRUE),
+#             downward   = mean(ess_slope < 0, na.rm = TRUE))
 
-summary(ess_slope$ess_slope) # 42 NA
+# summary(ess_slope$ess_slope) # 42 NA
 ```
 
 

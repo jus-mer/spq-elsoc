@@ -1,0 +1,2181 @@
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#| label: set
+#| echo: false
+#| message: false
+#| warning: false
+
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE, include = TRUE, warning = FALSE, message = FALSE)
+
+table_format <- if(is_html_output()) {
+  "html"
+} else if(is_latex_output()) {
+  "latex"
+}
+table_format2 <- if(is_html_output()) {
+  T
+} else if(is_latex_output()) {
+  F
+}
+
+options(kableExtra.html.bsTable = T)
+options(knitr.kable.NA = "")
+#
+#
+#
+#
+#
+#
+#| label: packages
+#| include: true
+
+if (! require("pacman")) install.packages("pacman")
+
+pacman::p_load(tidyverse, 
+               sjmisc, 
+               sjPlot, 
+               lme4, 
+               here, 
+               performance,
+               influence.ME, 
+               srvyr,
+               ordinal,
+               texreg, 
+               ggdist,
+               misty,
+               kableExtra,
+               ggalluvial, 
+               shadowtext,
+               MetBrewer,
+               patchwork,
+               sjlabelled,
+               corrplot)
+
+
+options(scipen=999)
+#
+#
+#
+#
+#
+#| label: data
+#| echo: true
+
+load(file = here("input/data/proc/df_final.RData"))
+
+
+#
+#
+#
+#
+#
+#
+#
+#| label: fig-likert-just
+#| fig-cap: "Distribution of market justice preferences by wave"
+#| fig-width: 9
+#| fig-height: 7
+#| fig-align: center
+
+just_labs <- c(just_pension = "Pensions",
+               just_educ    = "Education",
+               just_salud   = "Healthcare")
+
+df_likert <- df_study1 %>%
+  ungroup() %>%
+  select(ola, all_of(names(just_labs))) %>%
+  pivot_longer(-ola, names_to = "item", values_to = "resp") %>%
+  filter(!is.na(resp)) %>%
+  mutate(item = factor(item, levels = names(just_labs), labels = just_labs),
+         resp = factor(resp, levels = levels(df_study1$just_pension))) %>%
+  count(item, ola, resp) %>%
+  group_by(item, ola) %>%
+  mutate(prop = n / sum(n)) %>%
+  ungroup()
+
+ggplot(df_likert, aes(x = fct_rev(ola), y = prop, fill = fct_rev(resp))) +
+  geom_col(width = 0.75) +
+  geom_text(aes(label = ifelse(prop >= 0.05, scales::percent(prop, accuracy = 1), "")),
+            position = position_stack(vjust = 0.5), size = 3, colour = "black") +
+  scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
+  scale_fill_manual(values = rev(met.brewer("Hiroshige", 5)),
+                    breaks = levels(df_study1$just_pension),
+                    guide = guide_legend(reverse = FALSE, nrow = 1)) +
+  coord_flip() +
+  facet_wrap(~ item, ncol = 1) +
+  labs(x = "Wave", y = NULL, fill = NULL) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom",
+        panel.grid.major.y = element_blank(),
+        strip.text = element_text(face = "bold", hjust = 0))
+#
+#
+#
+#
+#
+#| label: fig-likert-merit
+#| fig-cap: "Distribution of merit perceptions (effort and talent) by wave"
+#| fig-width: 9
+#| fig-height: 5
+#| fig-align: center
+
+merit_labs <- c(merit_effort = "People are rewarded for their efforts",
+                merit_talent = "People are rewarded for their intelligence")
+
+lik_levels <- levels(df_study1$just_pension)  # same 5-point agreement scale
+
+df_merit <- df_study1 %>%
+  ungroup() %>%
+  select(ola, all_of(names(merit_labs))) %>%
+  pivot_longer(-ola, names_to = "item", values_to = "resp") %>%
+  filter(!is.na(resp)) %>%
+  mutate(item = factor(item, levels = names(merit_labs), labels = merit_labs),
+         resp = factor(resp, levels = 1:5, labels = lik_levels)) %>%
+  count(item, ola, resp) %>%
+  group_by(item, ola) %>%
+  mutate(prop = n / sum(n)) %>%
+  ungroup()
+
+ggplot(df_merit, aes(x = fct_rev(ola), y = prop, fill = fct_rev(resp))) +
+  geom_col(width = 0.75) +
+  geom_text(aes(label = ifelse(prop >= 0.05, scales::percent(prop, accuracy = 1), "")),
+            position = position_stack(vjust = 0.5), size = 3, colour = "black") +
+  scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
+  scale_fill_manual(values = rev(met.brewer("Hiroshige", 5)),
+                    breaks = lik_levels,
+                    guide = guide_legend(nrow = 1)) +
+  coord_flip() +
+  facet_wrap(~ item, ncol = 1) +
+  labs(x = "Wave", y = NULL, fill = NULL) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom",
+        panel.grid.major.y = element_blank(),
+        strip.text = element_text(face = "bold", hjust = 0))
+#
+#
+#
+#
+#
+#| label: fig-mjp-dist
+#| fig-cap: "Distribution of the market justice preferences (MJP) index by wave"
+#| fig-width: 9
+#| fig-height: 5.5
+#| fig-align: center
+
+df_mjp <- df_study1 %>%
+  ungroup() %>%
+  filter(!is.na(mjp_index)) %>%
+  mutate(mjp_bin = cut(mjp_index, breaks = seq(1, 5, by = 0.5),
+                       include.lowest = TRUE, right = FALSE))
+
+df_mjp_mean <- df_mjp %>%
+  group_by(ola) %>%
+  summarise(m = mean(mjp_index), .groups = "drop") %>%
+  mutate(lab = paste0("Mean = ", sprintf("%.2f", m)))
+
+ggplot(df_mjp, aes(x = mjp_index)) +
+  geom_histogram(aes(y = after_stat(count / tapply(count, PANEL, sum)[PANEL])),
+                 breaks = seq(0.75, 5.25, by = 0.5), closed = "right",
+                 fill = met.brewer("Hiroshige", 1, direction = -1)[1],
+                 colour = "white") +
+  geom_vline(data = df_mjp_mean, aes(xintercept = m),
+             linetype = "dashed", colour = "grey20") +
+  geom_text(data = df_mjp_mean, aes(x = 5, y = Inf, label = lab),
+            hjust = 1, vjust = 1.5, size = 3.2, inherit.aes = FALSE) +
+  scale_x_continuous(breaks = 1:5) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1),
+                     expand = expansion(mult = c(0, 0.1))) +
+  facet_wrap(~ ola, nrow = 2) +
+  labs(x = "MJP index (1 = strongly disagree, 5 = strongly agree)", y = NULL,
+       caption = "Bins of width 0.5 centred on 1, 1.5, ..., 5. Dashed line: wave mean.") +
+  theme_minimal(base_size = 12) +
+  theme(strip.text = element_text(face = "bold"),
+        panel.grid.minor = element_blank())
+#
+#
+#
+#
+#
+#| label: fig-ess-dist
+#| fig-cap: "Distribution of subjective social status (own, family of origin and children) by wave"
+#| fig-width: 9
+#| fig-height: 8
+#| fig-align: center
+
+ess_labs <- c(ess = "Own", ess_og = "Family of origin", ess_hijos = "Children")
+
+df_ess <- df_study1 %>%
+  ungroup() %>%
+  select(ola, all_of(names(ess_labs))) %>%
+  pivot_longer(-ola, names_to = "var", values_to = "val") %>%
+  filter(!is.na(val)) %>%
+  mutate(var = factor(var, levels = names(ess_labs), labels = ess_labs)) %>%
+  count(var, ola, val) %>%
+  group_by(var, ola) %>%
+  mutate(prop = n / sum(n)) %>%
+  ungroup()
+
+df_ess_mean <- df_study1 %>%
+  ungroup() %>%
+  select(ola, all_of(names(ess_labs))) %>%
+  pivot_longer(-ola, names_to = "var", values_to = "val") %>%
+  mutate(var = factor(var, levels = names(ess_labs), labels = ess_labs)) %>%
+  group_by(var, ola) %>%
+  summarise(m = mean(val, na.rm = TRUE), .groups = "drop")
+
+ggplot(df_ess, aes(x = val, y = prop)) +
+  geom_col(fill = met.brewer("Hiroshige", 1, direction = -1)[1], width = 0.8) +
+  geom_vline(data = df_ess_mean, aes(xintercept = m),
+             linetype = "dashed", colour = "grey20") +
+  scale_x_continuous(breaks = 0:10) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), n.breaks = 3) +
+  facet_grid(ola ~ var) +
+  labs(x = "Subjective social status (0 = lowest, 10 = highest)", y = NULL,
+       caption = "Dashed line: wave mean.") +
+  theme_minimal(base_size = 11) +
+  theme(strip.text = element_text(face = "bold"),
+        panel.grid.minor = element_blank())
+#
+#
+#
+#
+#
+#| label: tbl-correlations
+#| tbl-cap: "Average within-wave Spearman correlations between merit perception, subjective social status, market justice preferences, education and income"
+#| tbl-cap-location: top
+#| include: false
+
+vars <- c(
+  merit_effort = "Merit: Effort",
+  merit_talent = "Merit: Talent",
+  ess          = "Subjective social status",
+  ess_og       = "Family subjective social status",
+  ess_hijos    = "Son's subjective social status",
+  just_pension = "Pension justice",
+  just_salud   = "Healthcare justice",
+  just_educ    = "Education justice",
+  educyear     = "Education (years)",
+  decile_eq    = "Income (decile)"
+)
+
+df_cor <- df_study1 %>%
+  ungroup() %>%
+  select(ola, all_of(names(vars))) %>%
+  mutate(across(starts_with("just_"), ~ as.numeric(.x)),
+         across(-ola, ~ as.numeric(.x)))
+
+# one correlation matrix per wave
+cor_waves <- df_cor %>%
+  group_split(ola, .keep = FALSE) %>%
+  map(~ cor(.x, method = "spearman", use = "pairwise.complete.obs"))
+
+# average across waves on Fisher's z scale
+z_mean <- Reduce(`+`, map(cor_waves, ~ atanh(pmin(pmax(.x, -0.999999), 0.999999)))) / length(cor_waves)
+cor_avg <- tanh(z_mean)
+diag(cor_avg) <- 1
+
+# full matrix (with variable labels) kept for the corrplot below
+cor_full <- cor_avg
+rownames(cor_full) <- colnames(cor_full) <- unname(vars)
+
+rownames(cor_avg) <- paste0(seq_along(vars), ". ", vars)
+colnames(cor_avg) <- seq_along(vars)
+cor_avg[upper.tri(cor_avg)] <- NA
+
+cor_avg %>%
+  as.data.frame() %>%
+  kbl(digits = 2, format = table_format, booktabs = TRUE,
+      caption = NULL) %>%
+  kable_styling(full_width = FALSE) %>%
+  footnote(general = paste0("Spearman correlations computed within each wave (",
+                            length(cor_waves), " waves, 2016-2023) and averaged using Fisher's z."),
+           general_title = "Note:", footnote_as_chunk = TRUE)
+#
+#
+#
+#| label: fig-correlations
+#| fig-cap: "Average within-wave Spearman correlations (corrplot)"
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+#| include: false
+
+corrplot(cor_full,
+         method = "color",
+         type = "lower",
+         diag = FALSE,
+         order = "original",
+         addCoef.col = "black",
+         number.cex = 0.75,
+         number.digits = 2,
+         tl.col = "black",
+         tl.cex = 0.85,
+         tl.srt = 45,
+         cl.cex = 0.8,
+         col = colorRampPalette(c("#2166AC", "white", "#B2182B"))(200),
+         col.lim = c(-1, 1),
+         is.corr = TRUE,
+         mar = c(0, 0, 1, 0))
+#
+#
+#
+#
+#| label: fun-corrplot-wave
+#| include: false
+
+plot_cor_wave <- function(i) {
+  m <- cor_waves[[i]]
+  rownames(m) <- colnames(m) <- unname(vars)
+  corrplot(m,
+           method = "color",
+           type = "lower",
+           diag = FALSE,
+           order = "original",
+           addCoef.col = "black",
+           number.cex = 0.75,
+           number.digits = 2,
+           tl.col = "black",
+           tl.cex = 0.85,
+           tl.srt = 45,
+           cl.cex = 0.8,
+           col = colorRampPalette(c("#2166AC", "white", "#B2182B"))(200),
+           col.lim = c(-1, 1),
+           is.corr = TRUE,
+           na.label = "-",
+           mar = c(0, 0, 1, 0))
+}
+#
+#
+#
+#
+#
+#
+#
+#| label: fig-correlations-w1
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(1)
+#
+#
+#
+#
+#
+#| label: fig-correlations-w2
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(2)
+#
+#
+#
+#
+#
+#| label: fig-correlations-w3
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(3)
+#
+#
+#
+#
+#
+#| label: fig-correlations-w4
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(4)
+#
+#
+#
+#
+#
+#| label: fig-correlations-w5
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(5)
+#
+#
+#
+#
+#
+#| label: fig-correlations-w6
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(6)
+#
+#
+#
+#
+#
+#
+# m0_pension <- clmm(just_pension ~ 1 + (1 | idencuesta), 
+#            link = "logit",
+#   Hess = TRUE, # calcula explícitamente la matriz varianza-covarianza de estimadores
+#                 data = df_study1)
+
+# performance::icc(m0_pension, by_group = T) # 0.23 es between, 0.77 within
+#
+#
+#
+#
+# m0_educ <- clmm(just_educ ~ 1 + (1 | idencuesta), 
+#            link = "logit",
+#   Hess = TRUE, # calcula explícitamente la matriz varianza-covarianza de estimadores
+#                 data = df_study1)
+
+# performance::icc(m0_educ, by_group = T)
+#
+#
+#
+#
+# m0_salud <- clmm(just_salud ~ 1 + (1 | idencuesta), 
+#            link = "logit",
+#   Hess = TRUE, # calcula explícitamente la matriz varianza-covarianza de estimadores
+#                 data = df_study1)
+
+# performance::icc(m0_salud, by_group = T)
+#
+#
+#
+#
+#
+#
+#
+#
+#| include: false
+#| results: asis
+## WE and BE main effects - pensions
+
+
+# m1 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m2 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m3 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m4 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m5 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# save(m1, m2, m3, m4, m5, file = here("output/models/main_effects_pensions.RData"))
+#
+#
+#
+#
+#| label: tbl-modelos-pension
+#| tbl-cap: "Cumulative link longitudinal multilevel models for pension market justice preferences"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/main_effects_pensions.RData"))
+
+omit <- "(ideo)|(sex)|(age)"
+
+ccoef <- list(
+  #"Strongly disagree|Disagree" = "Strongly disagree|Disagree",
+  #"Disagree|Neither agree nor disagree" = "Disagree|Neither agree nor disagree",
+  #"Neither agree nor disagree|Agree" = "Neither agree nor disagree|Agree",
+  #"Agree|Strongly agree" = "Agree|Strongly agree",
+  "ola2017" = "Wave 2017",
+  "ola2018" = "Wave 2018",
+  "ola2019" = "Wave 2019",
+  "ola2022" = "Wave 2022",
+  "ola2023" = "Wave 2023",
+  ola_num = "Wave",
+  ola_2 = "Wave^2",
+  dummy_decile10_mean = "Decile 10 (BE)",
+  dummy_educ_mean = "Universitary education (BE)",
+  ess_cwc = "Subjective social status (WE)",
+  ess_mean = "Subjective social status (BE)",
+  ess_og_cwc = "Family subjective social status (WE)",
+  ess_og_mean = "Family subjective social status (BE)",
+  ess_hijos_cwc = "Son's subjective social status (WE)",
+  ess_hijos_mean = "Son's subjective social status (BE)"
+  )
+
+htmlreg(list(m1, m2, m3, m4, m5),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = ccoef,
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave"),
+               custom.gof.rows = list("Controls"=rep("Yes",5)))
+#
+#
+#
+#
+#
+#| include: false
+#| results: asis
+## WE and BE main effects
+
+
+# m7 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m8 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m9 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m10 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m11 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# save(m7, m8, m9, m10, m11, file = here("output/models/main_effects_education.RData"))
+#
+#
+#
+#| label: tbl-modelos-education
+#| tbl-cap: "Cumulative link longitudinal multilevel models for education market justice preferences"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/main_effects_education.RData"))
+
+htmlreg(list(m7, m8, m9, m10, m11),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = ccoef,
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave"),
+               custom.gof.rows = list("Controls"=rep("Yes",5)))
+#
+#
+#
+#
+#
+#| include: false
+#| results: asis
+## WE and BE main effects
+
+
+# m13 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m14 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m15 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m16 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m17 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# save(m13, m14, m15, m16, m17, file = here("output/models/main_effects_healthcare.RData"))
+#
+#
+#
+#| label: tbl-modelos-health
+#| tbl-cap: "Cumulative link longitudinal multilevel models for health care market justice preferences"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/main_effects_healthcare.RData"))
+
+htmlreg(list(m13, m14, m15, m16, m17),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = ccoef,
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave"),
+               custom.gof.rows = list("Controls"=rep("Yes",5)))
+#
+#
+#
+#
+#
+#
+#| include: false
+#| results: asis
+#| label: mjp-index-models
+
+
+## WE and BE main effects - MJP index
+# mjp_index is a continuous mean index (1-5), so linear mixed models (lmer)
+# are used instead of cumulative link models (clmm). REML = FALSE so that
+# models with different fixed effects are comparable (LRT, BIC).
+
+# m18 <- lmer(mjp_index ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              (1 + ola_num | idencuesta),
+#            REML = FALSE,
+#            data = df_study1)
+
+# m19 <- lmer(mjp_index ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              (1 + ola_num | idencuesta),
+#            REML = FALSE,
+#            data = df_study1)
+
+# m20 <- lmer(mjp_index ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              (1 + ola_num | idencuesta),
+#            REML = FALSE,
+#            data = df_study1)
+
+# m21 <- lmer(mjp_index ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +             
+#              ess_og_cwc +
+#              ess_og_mean +
+#              (1 + ola_num | idencuesta),
+#            REML = FALSE,
+#            data = df_study1)
+
+# m22 <- lmer(mjp_index ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              (1 + ola_num | idencuesta),
+#            REML = FALSE,
+#            data = df_study1)
+
+# save(m18, m19, m20, m21, m22, file = here("output/models/main_effects_mjp_index.RData"))
+#
+#
+#
+#| label: tbl-modelos-mjp
+#| tbl-cap: "Linear longitudinal multilevel models for the market justice preferences (MJP) index"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/main_effects_mjp_index.RData"))
+
+htmlreg(list(m18, m19, m20, m21, m22),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = c(list("(Intercept)" = "Intercept"), ccoef[-(1:5)]),
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave", "Cov: individuals (Intercept), wave", "Var: residual"),
+               custom.gof.rows = list("Controls"=rep("Yes",5)))
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# Subjective social status index: mean of own, family-of-origin and children's
+# status (all 0-10 scales)
+sss_vars <- c("ess", "ess_og", "ess_hijos")
+
+# Internal consistency and inter-item correlations
+psych::alpha(df_study1[, sss_vars])$total[c("raw_alpha", "std.alpha")]
+cor(df_study1[, sss_vars], use = "pairwise.complete.obs")
+#
+#
+#
+#| label: sss-index
+
+# Index (0-10): row mean of the three items
+df_study1 <- df_study1 %>%
+  mutate(sss_index = rowMeans(across(all_of(sss_vars)), na.rm = FALSE))
+
+# Between-within decomposition
+df_study1 <- df_study1 %>%
+  group_by(idencuesta) %>%
+  mutate(sss_index_mean = mean(sss_index),
+         sss_index_cwc  = sss_index - sss_index_mean) %>%
+  ungroup()
+#
+#
+#
+#
+#
+#
+#
+#
+#| label: sss-mobility
+
+df_study1 <- df_study1 %>%
+  group_by(idencuesta) %>%
+  mutate(mov_dir      = ess - ess_og,
+         mov_dir_mean = mean(mov_dir),
+         mov_dir_cwc  = mov_dir - mov_dir_mean,
+         mov_og       = ess - ess_og_mean,
+         mov_og_mean  = mean(mov_og),
+         mov_og_cwc   = mov_og - mov_og_mean) %>%
+  ungroup()
+#
+#
+#
+# Descriptives by wave
+df_study1 %>%
+  group_by(ola) %>%
+  summarise(across(c(mov_dir, mov_og), list(mean = mean, sd = sd)),
+            up_dir   = mean(mov_dir > 0), down_dir = mean(mov_dir < 0),
+            up_og    = mean(mov_og > 0),  down_og  = mean(mov_og < 0))
+
+# Overlap between both measures
+cor(df_study1[, c("mov_dir", "mov_og")])
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#| label: sss-mobility-expectations
+
+df_study1 <- df_study1 %>%
+  mutate(mov_exp = ess_hijos - ess) %>%
+  group_by(idencuesta) %>%
+  mutate(mov_exp_mean = mean(mov_exp),
+         mov_exp_cwc  = mov_exp - mov_exp_mean) %>%
+  ungroup()
+#
+#
+#
+# Descriptives by wave
+df_study1 %>%
+  group_by(ola) %>%
+  summarise(mean = mean(mov_exp, na.rm = TRUE), sd = sd(mov_exp, na.rm = TRUE),
+            up = mean(mov_exp > 0, na.rm = TRUE), down = mean(mov_exp < 0, na.rm = TRUE))
+#
+#
+#
+#
+#
+#
+#
+#| label: sss-intergenerational-mobility
+
+df_study1 <- df_study1 %>%
+  mutate(mov_inter = ess_hijos - ess - ess_og) %>%
+  group_by(idencuesta) %>%
+  mutate(mov_inter_mean = mean(mov_inter),
+         mov_inter_cwc  = mov_inter - mov_inter_mean) %>%
+  ungroup()
+#
+#
+#
+# Descriptives by wave
+df_study1 %>%
+  group_by(ola) %>%
+  summarise(mean = mean(mov_inter, na.rm = TRUE), sd = sd(mov_inter, na.rm = TRUE),
+            up = mean(mov_inter > 0, na.rm = TRUE), down = mean(mov_inter < 0, na.rm = TRUE))
+#
+#
+#
+#
+#
+#
+#
+#
+#| label: sss-slope
+
+min_waves <- 4
+
+ess_slope <- df_study1 %>%
+  mutate(year = as.numeric(as.character(ola))) %>%
+  group_by(idencuesta) %>%
+  summarise(n_waves   = sum(!is.na(ess)),
+            ess_slope = if (n_waves >= min_waves) unname(coef(lm(ess ~ year))[2]) else NA_real_,
+            .groups = "drop") %>%
+  select(idencuesta, ess_slope)
+
+df_study1 <- df_study1 %>%
+  left_join(ess_slope, by = "idencuesta")
+#
+#
+#
+# Distribution at the person level
+ess_slope %>%
+  summarise(n          = sum(!is.na(ess_slope)),
+            n_missing  = sum(is.na(ess_slope)),
+            mean       = mean(ess_slope, na.rm = TRUE),
+            sd         = sd(ess_slope, na.rm = TRUE),
+            upward     = mean(ess_slope > 0, na.rm = TRUE),
+            downward   = mean(ess_slope < 0, na.rm = TRUE))
+
+summary(ess_slope$ess_slope) # 42 NA
+#
+#
+#
+#
+#
+#
+#
+#| include: false
+#| results: asis
+
+# m23 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              sss_index_cwc +
+#              sss_index_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m24 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_og_cwc +
+#              mov_og_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m25 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_exp_cwc +
+#              mov_exp_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m26 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_inter_cwc +
+#              mov_inter_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m27 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_slope +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# save(m23, m24, m25, m26, m27, file = here("output/models/main_effects_pensions_sss.RData"))
+#
+#
+#
+#| label: tbl-sss-pension
+#| tbl-cap: "Cumulative link longitudinal multilevel models for pension market justice preferences, with subjective social status measures"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/main_effects_pensions_sss.RData"))
+
+ccoef_sss <- list(
+  ola_num = "Wave",
+  ola_2 = "Wave^2",
+  dummy_decile10_mean = "Decile 10 (BE)",
+  dummy_educ_mean = "Universitary education (BE)",
+  sss_index_cwc = "SSS index (WE)",
+  sss_index_mean = "SSS index (BE)",
+  mov_og_cwc = "Subjective social mobility (WE)",
+  mov_og_mean = "Subjective social mobility (BE)",
+  mov_exp_cwc = "Expected mobility for children (WE)",
+  mov_exp_mean = "Expected mobility for children (BE)",
+  mov_inter_cwc = "Expected intergenerational mobility (WE)",
+  mov_inter_mean = "Expected intergenerational mobility (BE)",
+  ess_slope = "Subjective social status slope"
+)
+
+htmlreg(list(m23, m24, m25, m26, m27),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = ccoef_sss,
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave"),
+               custom.gof.rows = list("Controls" = rep("Yes", 5)))
+#
+#
+#
+#
+#
+#| include: false
+#| results: asis
+
+# m28 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              sss_index_cwc +
+#              sss_index_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m29 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_og_cwc +
+#              mov_og_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m30 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_exp_cwc +
+#              mov_exp_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m31 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_inter_cwc +
+#              mov_inter_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m32 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_slope +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# save(m28, m29, m30, m31, m32, file = here("output/models/main_effects_education_sss.RData"))
+#
+#
+#
+#
+#| label: tbl-sss-education
+#| tbl-cap: "Cumulative link longitudinal multilevel models for education market justice preferences, with subjective social status measures"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/main_effects_education_sss.RData"))
+
+htmlreg(list(m28, m29, m30, m31, m32),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = ccoef_sss,
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave"),
+               custom.gof.rows = list("Controls" = rep("Yes", 5)))
+#
+#
+#
+#
+#
+#| include: false
+#| results: asis
+
+# m33 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              sss_index_cwc +
+#              sss_index_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m34 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_og_cwc +
+#              mov_og_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m35 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_exp_cwc +
+#              mov_exp_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m36 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_inter_cwc +
+#              mov_inter_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m37 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_slope +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# save(m33, m34, m35, m36, m37, file = here("output/models/main_effects_healthcare_sss.RData"))
+#
+#
+#
+#
+#| label: tbl-sss-health
+#| tbl-cap: "Cumulative link longitudinal multilevel models for health care market justice preferences, with subjective social status measures"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/main_effects_healthcare_sss.RData"))
+
+htmlreg(list(m33, m34, m35, m36, m37),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = ccoef_sss,
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave"),
+               custom.gof.rows = list("Controls" = rep("Yes", 5)))
+#
+#
+#
+#
+#
+#| include: false
+#| results: asis
+
+# m38 <- lmer(mjp_index ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              sss_index_cwc +
+#              sss_index_mean +
+#              (1 + ola_num | idencuesta),
+#            REML = FALSE,
+#            data = df_study1)
+
+# m39 <- lmer(mjp_index ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_og_cwc +
+#              mov_og_mean +
+#              (1 + ola_num | idencuesta),
+#            REML = FALSE,
+#            data = df_study1)
+
+# m40 <- lmer(mjp_index ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_exp_cwc +
+#              mov_exp_mean +
+#              (1 + ola_num | idencuesta),
+#            REML = FALSE,
+#            data = df_study1)
+
+# m41 <- lmer(mjp_index ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              mov_inter_cwc +
+#              mov_inter_mean +
+#              (1 + ola_num | idencuesta),
+#            REML = FALSE,
+#            data = df_study1)
+
+# m42 <- lmer(mjp_index ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_slope +
+#              (1 + ola_num | idencuesta),
+#            REML = FALSE,
+#            data = df_study1)
+
+# save(m38, m39, m40, m41, m42, file = here("output/models/main_effects_mjp_index_sss.RData"))
+#
+#
+#
+#| label: tbl-sss-mjp
+#| tbl-cap: "Linear longitudinal multilevel models for the market justice preferences (MJP) index, with subjective social status measures"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/main_effects_mjp_index_sss.RData"))
+
+htmlreg(list(m38, m39, m40, m41, m42),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = ccoef_sss,
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.names = c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave", "Cov: individuals (Intercept), wave", "Var: residual"),
+               custom.gof.rows = list("Controls" = rep("Yes", 5)))
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# m43 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              ess_cwc * ess_mean +
+#              (1 + ola_num + ess_cwc | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m44 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_educ_mean * ess_cwc +
+#              (1 + ola_num + ess_cwc | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m45 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_decile10_mean * ess_cwc +
+#              (1 + ola_num + ess_cwc | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m46 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_decile10_mean * ess_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m47 <- clmm(just_pension ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_educ_mean * ess_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# save(m43, m44, m45, m46, m47, file = here("output/models/inter_effects_pensions.RData"))
+#
+#
+#
+#| label: tbl-int-pension
+#| tbl-cap: "Cumulative link longitudinal multilevel models for pension market justice preferences: interactions"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/inter_effects_pensions.RData"))
+
+ccoef_int <- c(ccoef,
+  list("ess_cwc:ess_mean" = "Subjective social status (WE) x (BE)",
+       "dummy_educ_mean:ess_cwc" = "Universitary education (BE) x Subjective social status (WE)",
+       "dummy_decile10_mean:ess_cwc" = "Decile 10 (BE) x Subjective social status (WE)",
+       "dummy_decile10_mean:ess_mean" = "Decile 10 (BE) x Subjective social status (BE)",
+       "dummy_educ_mean:ess_mean" = "Universitary education (BE) x Subjective social status (BE)"))
+
+htmlreg(list(m43, m44, m45, m46, m47),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = c(ccoef_int[names(ccoef_int) != "(Intercept)"]),
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.rows = list("Controls" = rep("Yes", 5)))
+#
+#
+#
+#
+#
+#
+# m48 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              ess_cwc * ess_mean +
+#              (1 + ola_num + ess_cwc | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m49 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_educ_mean * ess_cwc +
+#              (1 + ola_num + ess_cwc | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m50 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_decile10_mean * ess_cwc +
+#              (1 + ola_num + ess_cwc | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m51 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_decile10_mean * ess_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m52 <- clmm(just_educ ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_educ_mean * ess_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# save(m48, m49, m50, m51, m52, file = here("output/models/inter_effects_education.RData"))
+#
+#
+#
+#| label: tbl-int-education
+#| tbl-cap: "Cumulative link longitudinal multilevel models for education market justice preferences: interactions"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/inter_effects_education.RData"))
+
+htmlreg(list(m48, m49, m50, m51, m52),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = c(ccoef_int[names(ccoef_int) != "(Intercept)"]),
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.rows = list("Controls" = rep("Yes", 5)))
+#
+#
+#
+#
+#
+#
+# m53 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              ess_cwc * ess_mean +
+#              (1 + ola_num + ess_cwc | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m54 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_educ_mean * ess_cwc +
+#              (1 + ola_num + ess_cwc | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m55 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_decile10_mean * ess_cwc +
+#              (1 + ola_num + ess_cwc | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m56 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_decile10_mean * ess_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# m57 <- clmm(just_salud ~ 1 +
+#              ola_num +
+#              ola_2 +
+#              ideo +
+#              sex +
+#              age +
+#              dummy_decile10_mean +
+#              dummy_educ_mean +
+#              ess_cwc +
+#              ess_mean +
+#              ess_og_cwc +
+#              ess_og_mean +
+#              ess_hijos_cwc +
+#              ess_hijos_mean +
+#              dummy_educ_mean * ess_mean +
+#              (1 + ola_num | idencuesta),
+#            link = "logit",
+#            Hess = TRUE,
+#            data = df_study1)
+
+# save(m53, m54, m55, m56, m57, file = here("output/models/inter_effects_health.RData"))
+#
+#
+#
+#| label: tbl-int-health
+#| tbl-cap: "Cumulative link longitudinal multilevel models for health care market justice preferences: interactions"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/inter_effects_health.RData"))
+
+htmlreg(list(m53, m54, m55, m56, m57),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = c(ccoef_int[names(ccoef_int) != "(Intercept)"]),
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.rows = list("Controls" = rep("Yes", 5)))
+#
+#
+#
+#
+#
+#
+m58 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ideo +
+             sex +
+             age +
+             dummy_decile10_mean +
+             dummy_educ_mean +
+             ess_cwc +
+             ess_mean +
+             ess_og_cwc +
+             ess_og_mean +
+             ess_hijos_cwc +
+             ess_hijos_mean +
+             ess_cwc * ess_mean +
+             (1 + ola_num + ess_cwc | idencuesta),
+           REML = FALSE,
+           data = df_study1)
+
+m59 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ideo +
+             sex +
+             age +
+             dummy_decile10_mean +
+             dummy_educ_mean +
+             ess_cwc +
+             ess_mean +
+             ess_og_cwc +
+             ess_og_mean +
+             ess_hijos_cwc +
+             ess_hijos_mean +
+             dummy_educ_mean * ess_cwc +
+             (1 + ola_num + ess_cwc | idencuesta),
+           REML = FALSE,
+           data = df_study1)
+
+m60 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ideo +
+             sex +
+             age +
+             dummy_decile10_mean +
+             dummy_educ_mean +
+             ess_cwc +
+             ess_mean +
+             ess_og_cwc +
+             ess_og_mean +
+             ess_hijos_cwc +
+             ess_hijos_mean +
+             dummy_decile10_mean * ess_cwc +
+             (1 + ola_num + ess_cwc | idencuesta),
+           REML = FALSE,
+           data = df_study1)
+
+m61 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ideo +
+             sex +
+             age +
+             dummy_decile10_mean +
+             dummy_educ_mean +
+             ess_cwc +
+             ess_mean +
+             ess_og_cwc +
+             ess_og_mean +
+             ess_hijos_cwc +
+             ess_hijos_mean +
+             dummy_decile10_mean * ess_mean +
+             (1 + ola_num | idencuesta),
+           REML = FALSE,
+           data = df_study1)
+
+m62 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ideo +
+             sex +
+             age +
+             dummy_decile10_mean +
+             dummy_educ_mean +
+             ess_cwc +
+             ess_mean +
+             ess_og_cwc +
+             ess_og_mean +
+             ess_hijos_cwc +
+             ess_hijos_mean +
+             dummy_educ_mean * ess_mean +
+             (1 + ola_num | idencuesta),
+           REML = FALSE,
+           data = df_study1)
+
+save(m58, m59, m60, m61, m62, file = here("output/models/inter_effects_mjp_index.RData"))
+#
+#
+#
+#| label: tbl-int-mjp
+#| tbl-cap: "Linear longitudinal multilevel models for the market justice preferences (MJP) index: interactions"
+#| tbl-cap-location: top
+#| results: asis
+
+load(here("output/models/inter_effects_mjp_index.RData"))
+
+htmlreg(list(m58, m59, m60, m61, m62),
+               custom.model.names = c(paste0("Model ", seq(1:5))),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               omit.coef = omit,
+               custom.coef.map = c(ccoef_int[names(ccoef_int) != "(Intercept)"]),
+               digits = 3,
+               custom.note = "Note: Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.rows = list("Controls" = rep("Yes", 5)))
+#
+#
+#
+#
+#
+#
+#
+#
+#| label: fig-pred-ess-we-be
+#| fig-cap: "Predicted MJP index by within-person SSS, at -1 SD, mean and +1 SD of between-person SSS"
+#| fig-width: 7
+#| fig-height: 5
+#| fig-align: center
+
+load(here("output/models/inter_effects_mjp_index.RData"))
+
+# between-person distribution of ess_mean (one row per person)
+be <- df_study1 %>% distinct(idencuesta, ess_mean) %>% pull(ess_mean)
+be_vals <- c("-1 SD" = mean(be, na.rm = TRUE) - sd(be, na.rm = TRUE),
+             "Mean"  = mean(be, na.rm = TRUE),
+             "+1 SD" = mean(be, na.rm = TRUE) + sd(be, na.rm = TRUE))
+
+we_seq <- seq(quantile(df_study1$ess_cwc, 0.05, na.rm = TRUE),
+              quantile(df_study1$ess_cwc, 0.95, na.rm = TRUE), length.out = 50)
+
+# other covariates fixed at mean / modal category
+mf <- model.frame(m58)
+fixed_terms <- setdiff(names(mf), c("mjp_index", "idencuesta", "ess_cwc", "ess_mean"))
+ref <- lapply(mf[fixed_terms], function(x) {
+  if (is.numeric(x)) mean(x, na.rm = TRUE)
+  else factor(names(which.max(table(x))), levels = levels(factor(x)))
+})
+
+newdata <- expand.grid(ess_cwc = we_seq, be = names(be_vals), stringsAsFactors = FALSE) %>%
+  mutate(ess_mean = be_vals[be]) %>%
+  bind_cols(as.data.frame(ref))
+
+# fixed-effects prediction with CI
+X    <- model.matrix(delete.response(terms(m58)), newdata)
+beta <- fixef(m58)
+V    <- as.matrix(vcov(m58))
+fit  <- as.vector(X %*% beta)
+se   <- sqrt(rowSums((X %*% V) * X))
+
+pred <- newdata %>%
+  mutate(fit = fit, lwr = fit - 1.96 * se, upr = fit + 1.96 * se,
+         be = factor(be, levels = names(be_vals)))
+
+ggplot(pred, aes(x = ess_cwc, y = fit, colour = be, fill = be)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.15, colour = NA) +
+  geom_line(linewidth = 1) +
+  scale_colour_manual(values = met.brewer("Hiroshige", 3), name = "Between-person SSS") +
+  scale_fill_manual(values = met.brewer("Hiroshige", 3), name = "Between-person SSS") +
+  labs(x = "Within-person SSS (centered)", y = "Predicted MJP index") +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom",
+        panel.grid.minor = element_blank())
+#
+#
+#
+#
+#
+#
+#
+#| label: fig-ame-ess-we-be
+#| fig-cap: "Marginal effect of within-person SSS on the MJP index, at -1 SD, mean and +1 SD of between-person SSS"
+#| fig-width: 6
+#| fig-height: 4
+#| fig-align: center
+
+b <- fixef(m58)
+V <- as.matrix(vcov(m58))
+int_name <- intersect(c("ess_cwc:ess_mean", "ess_mean:ess_cwc"), names(b))
+
+# be_vals defined in the predicted-values chunk above
+ame <- map_dfr(names(be_vals), function(lv) {
+  x  <- be_vals[[lv]]
+  w  <- setNames(c(1, x), c("ess_cwc", int_name))   # gradient of the slope
+  est <- sum(w * b[names(w)])
+  se  <- sqrt(as.numeric(t(w) %*% V[names(w), names(w)] %*% w))
+  tibble(be = lv, ess_mean = x, ame = est, lwr = est - 1.96 * se, upr = est + 1.96 * se)
+}) %>%
+  mutate(be = factor(be, levels = names(be_vals)))
+
+ggplot(ame, aes(x = be, y = ame, ymin = lwr, ymax = upr, colour = be)) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey40") +
+  geom_pointrange(linewidth = 0.8, size = 0.6) +
+  scale_colour_manual(values = met.brewer("Hiroshige", 3), guide = "none") +
+  labs(x = "Between-person SSS", y = "Marginal effect of within-person SSS") +
+  theme_minimal(base_size = 11) +
+  theme(panel.grid.minor = element_blank())
+#
+#
+#
+#
