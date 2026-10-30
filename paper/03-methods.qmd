@@ -1,0 +1,16 @@
+
+# Methodology
+
+
+Data
+Replicate what is on the paper about pensions in Frontiers
+
+
+Add:
+
+- Histograms For the SSS and the Subjective mobility measures
+
+
+
+
+
