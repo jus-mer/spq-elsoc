@@ -786,6 +786,28 @@ df_study1 <- df_study1 %>%
   }) %>%
   ungroup()
 
+# Curve of the SSS trajectory: quadratic term of ess ~ t + t^2 with time centred
+# on own status (t = -1, 0, 1). Equals (ess_og - 2 * ess + ess_hijos) / 2;
+# positive = own status below the origin-children line (convex path), negative =
+# above it (concave path). Adding it leaves the slope (ess_traj) unchanged
+tc <- c(-1, 0, 1)
+df_study1 <- df_study1 %>%
+  rowwise() %>%
+  mutate(ess_traj_sqt = {
+    y <- c(ess_og, ess, ess_hijos)
+    if (anyNA(y)) NA_real_ else unname(coef(lm(y ~ tc + I(tc^2)))[3])
+  }) %>%
+  ungroup()
+
+# Between-within decomposition of slope and curve
+df_study1 <- df_study1 %>%
+  group_by(idencuesta) %>%
+  mutate(ess_traj_mean     = mean(ess_traj),
+         ess_traj_cwc      = ess_traj - ess_traj_mean,
+         ess_traj_sqt_mean = mean(ess_traj_sqt),
+         ess_traj_sqt_cwc  = ess_traj_sqt - ess_traj_sqt_mean) %>%
+  ungroup()
+
 ```
 
 # Save and export

@@ -33,11 +33,9 @@ options(knitr.kable.NA = "")
 ```
 
 
-## Libraries
-
 ```{r}
 #| label: packages
-#| include: true
+#| include: false
 
 if (! require("pacman")) install.packages("pacman")
 
@@ -65,483 +63,14 @@ pacman::p_load(tidyverse,
 options(scipen=999)
 ```
 
-## Data
-
 ```{r}
 #| label: data
-#| echo: true
+#| include: false
 
 load(file = here("input/data/proc/df_final.RData"))
 
 df_model <- df_study1 %>%
   na.omit()
-```
-
-## Descriptives
-
-### NA
-
-```{r}
-#| label: tbl-na
-
-# Table of valid (non-missing) cases: n (%) per wave, and persons with valid
-# responses in at least 4 waves / in all waves. Only NA counts as missing
-# ("DNA" is a valid category).
-table_na <- function(labs, caption) {
-  n_ids   <- n_distinct(df_study1$idencuesta)
-  n_waves <- n_distinct(df_study1$ola)
-  fmt_n   <- function(n, total) sprintf("%d (%.1f%%)", n, 100 * n / total)
-  is_valid <- function(x) !is.na(x)
-
-  # Valid cases by wave
-  valid_wave <- df_study1 %>%
-    ungroup() %>%
-    select(ola, all_of(names(labs))) %>%
-    mutate(across(-ola, is_valid)) %>%
-    pivot_longer(-ola, names_to = "var", values_to = "valid") %>%
-    group_by(var, ola) %>%
-    summarise(txt = fmt_n(sum(valid), n()), .groups = "drop") %>%
-    pivot_wider(names_from = ola, values_from = txt)
-
-  # Persons with valid responses in at least 4 waves / in all waves
-  valid_person <- df_study1 %>%
-    ungroup() %>%
-    select(idencuesta, all_of(names(labs))) %>%
-    mutate(across(-idencuesta, is_valid)) %>%
-    pivot_longer(-idencuesta, names_to = "var", values_to = "valid") %>%
-    group_by(var, idencuesta) %>%
-    summarise(n_valid = sum(valid), .groups = "drop") %>%
-    group_by(var) %>%
-    summarise(`At least 4 waves` = fmt_n(sum(n_valid >= 4), n_ids),
-              `All waves`        = fmt_n(sum(n_valid == n_waves), n_ids),
-              .groups = "drop")
-
-  tab <- left_join(valid_wave, valid_person, by = "var") %>%
-    mutate(var = factor(var, levels = names(labs), labels = labs)) %>%
-    arrange(var) %>%
-    rename(Variable = var)
-
-  kable(tab,
-        format = table_format,
-        align = c("l", rep("c", ncol(tab) - 1)),
-        caption = caption) %>%
-    kable_styling(full_width = FALSE, bootstrap_options = c("striped", "condensed")) %>%
-    add_header_above(c(" " = 1, "Wave" = n_waves, "Persons" = 2))
-}
-
-na_labs <- c(ess           = "Subjective social status (own)",
-             ess_og        = "Subjective social status (family of origin)",
-             ess_hijos     = "Subjective social status (children)",
-             merit_effort  = "Merit: effort",
-             merit_talent  = "Merit: talent",
-             ideo          = "Political ideology",
-             sex           = "Sex",
-             just_educ     = "Market justice: education",
-             just_pension  = "Market justice: pensions",
-             just_salud    = "Market justice: healthcare",
-             educ          = "Education")
-
-table_na(na_labs,
-         "Valid cases by variable: n (%) per wave, and persons with valid responses in at least 4 waves and in all waves")
-```
-
-### Income NA
-
-```{r}
-#| label: tbl-na-income
-
-income_labs <- c(inc_eq_real_sqrt     = "Equivalised income (CLP, Dec 2023)",
-                 inc_eq_mill          = "Equivalised income (millions CLP)",
-                 ln_inc_eq_real_sqrt  = "Equivalised income (log)",
-                 decile_eq            = "Income decile",
-                 decile_eq1           = "Income decile (DNA as category)",
-                 dummy_decile10       = "Top decile (dummy)",
-                 inc_group            = "Income group",
-                 inc_group1           = "Income group (DNA as category)")
-
-table_na(income_labs,
-         "Valid income cases: n (%) per wave, and persons with valid income in at least 4 waves and in all waves")
-```
-
-Equivalised income, its millions-of-CLP rescaling, the decile and the top-decile dummy share the same valid cases (1,130 to 1,313 per wave; 975 persons with all six waves), with the lowest coverage in 2017. The log of income loses 35 further cases with non-positive income (950 persons with all waves). The variables that keep "DNA" as a category show full coverage because only `NA` is counted as missing; they retain 410 non-respondent cases.
-
-
-### Market justice preferences
-
-```{r}
-#| label: fig-likert-just
-#| fig-cap: "Distribution of market justice preferences by wave"
-#| fig-width: 9
-#| fig-height: 7
-#| fig-align: center
-
-just_labs <- c(just_pension = "Pensions",
-               just_educ    = "Education",
-               just_salud   = "Healthcare")
-
-df_likert <- df_study1 %>%
-  ungroup() %>%
-  select(ola, all_of(names(just_labs))) %>%
-  pivot_longer(-ola, names_to = "item", values_to = "resp") %>%
-  filter(!is.na(resp)) %>%
-  mutate(item = factor(item, levels = names(just_labs), labels = just_labs),
-         resp = factor(resp, levels = levels(df_study1$just_pension))) %>%
-  count(item, ola, resp) %>%
-  group_by(item, ola) %>%
-  mutate(prop = n / sum(n)) %>%
-  ungroup()
-
-ggplot(df_likert, aes(x = fct_rev(ola), y = prop, fill = fct_rev(resp))) +
-  geom_col(width = 0.75) +
-  geom_text(aes(label = ifelse(prop >= 0.05, scales::percent(prop, accuracy = 1), "")),
-            position = position_stack(vjust = 0.5), size = 3, colour = "black") +
-  scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
-  scale_fill_manual(values = rev(met.brewer("Hiroshige", 5)),
-                    breaks = levels(df_study1$just_pension),
-                    guide = guide_legend(reverse = FALSE, nrow = 1)) +
-  coord_flip() +
-  facet_wrap(~ item, ncol = 1) +
-  labs(x = "Wave", y = NULL, fill = NULL) +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "bottom",
-        panel.grid.major.y = element_blank(),
-        strip.text = element_text(face = "bold", hjust = 0))
-```
-
-### Merit perceptions
-
-```{r}
-#| label: fig-likert-merit
-#| fig-cap: "Distribution of merit perceptions (effort and talent) by wave"
-#| fig-width: 9
-#| fig-height: 5
-#| fig-align: center
-
-merit_labs <- c(merit_effort = "People are rewarded for their efforts",
-                merit_talent = "People are rewarded for their intelligence")
-
-lik_levels <- levels(df_study1$just_pension)  # same 5-point agreement scale
-
-df_merit <- df_study1 %>%
-  ungroup() %>%
-  select(ola, all_of(names(merit_labs))) %>%
-  pivot_longer(-ola, names_to = "item", values_to = "resp") %>%
-  filter(!is.na(resp)) %>%
-  mutate(item = factor(item, levels = names(merit_labs), labels = merit_labs),
-         resp = factor(resp, levels = 1:5, labels = lik_levels)) %>%
-  count(item, ola, resp) %>%
-  group_by(item, ola) %>%
-  mutate(prop = n / sum(n)) %>%
-  ungroup()
-
-ggplot(df_merit, aes(x = fct_rev(ola), y = prop, fill = fct_rev(resp))) +
-  geom_col(width = 0.75) +
-  geom_text(aes(label = ifelse(prop >= 0.05, scales::percent(prop, accuracy = 1), "")),
-            position = position_stack(vjust = 0.5), size = 3, colour = "black") +
-  scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
-  scale_fill_manual(values = rev(met.brewer("Hiroshige", 5)),
-                    breaks = lik_levels,
-                    guide = guide_legend(nrow = 1)) +
-  coord_flip() +
-  facet_wrap(~ item, ncol = 1) +
-  labs(x = "Wave", y = NULL, fill = NULL) +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "bottom",
-        panel.grid.major.y = element_blank(),
-        strip.text = element_text(face = "bold", hjust = 0))
-```
-
-### MJP index
-
-```{r}
-#| label: fig-mjp-dist
-#| fig-cap: "Distribution of the market justice preferences (MJP) index by wave"
-#| fig-width: 9
-#| fig-height: 5.5
-#| fig-align: center
-
-df_mjp <- df_study1 %>%
-  ungroup() %>%
-  filter(!is.na(mjp_index)) %>%
-  mutate(mjp_bin = cut(mjp_index, breaks = seq(1, 5, by = 0.5),
-                       include.lowest = TRUE, right = FALSE))
-
-df_mjp_mean <- df_mjp %>%
-  group_by(ola) %>%
-  summarise(m = mean(mjp_index), .groups = "drop") %>%
-  mutate(lab = paste0("Mean = ", sprintf("%.2f", m)))
-
-ggplot(df_mjp, aes(x = mjp_index)) +
-  geom_histogram(aes(y = after_stat(count / tapply(count, PANEL, sum)[PANEL])),
-                 breaks = seq(0.75, 5.25, by = 0.5), closed = "right",
-                 fill = met.brewer("Hiroshige", 1, direction = -1)[1],
-                 colour = "white") +
-  geom_vline(data = df_mjp_mean, aes(xintercept = m),
-             linetype = "dashed", colour = "grey20") +
-  geom_text(data = df_mjp_mean, aes(x = 5, y = Inf, label = lab),
-            hjust = 1, vjust = 1.5, size = 3.2, inherit.aes = FALSE) +
-  scale_x_continuous(breaks = 1:5) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1),
-                     expand = expansion(mult = c(0, 0.1))) +
-  facet_wrap(~ ola, nrow = 2) +
-  labs(x = "MJP index (1 = strongly disagree, 5 = strongly agree)", y = NULL,
-       caption = "Bins of width 0.5 centred on 1, 1.5, ..., 5. Dashed line: wave mean.") +
-  theme_minimal(base_size = 12) +
-  theme(strip.text = element_text(face = "bold"),
-        panel.grid.minor = element_blank())
-```
-
-### Subjective social status
-
-```{r}
-#| label: fig-ess-dist
-#| fig-cap: "Distribution of subjective social status (own, family of origin and children) by wave"
-#| fig-width: 9
-#| fig-height: 8
-#| fig-align: center
-
-ess_labs <- c(ess = "Own", ess_og = "Family of origin", ess_hijos = "Children")
-
-df_ess <- df_study1 %>%
-  ungroup() %>%
-  select(ola, all_of(names(ess_labs))) %>%
-  pivot_longer(-ola, names_to = "var", values_to = "val") %>%
-  filter(!is.na(val)) %>%
-  mutate(var = factor(var, levels = names(ess_labs), labels = ess_labs)) %>%
-  count(var, ola, val) %>%
-  group_by(var, ola) %>%
-  mutate(prop = n / sum(n)) %>%
-  ungroup()
-
-df_ess_mean <- df_study1 %>%
-  ungroup() %>%
-  select(ola, all_of(names(ess_labs))) %>%
-  pivot_longer(-ola, names_to = "var", values_to = "val") %>%
-  mutate(var = factor(var, levels = names(ess_labs), labels = ess_labs)) %>%
-  group_by(var, ola) %>%
-  summarise(m = mean(val, na.rm = TRUE), .groups = "drop")
-
-ggplot(df_ess, aes(x = val, y = prop)) +
-  geom_col(fill = met.brewer("Hiroshige", 1, direction = -1)[1], width = 0.8) +
-  geom_vline(data = df_ess_mean, aes(xintercept = m),
-             linetype = "dashed", colour = "grey20") +
-  scale_x_continuous(breaks = 0:10) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1), n.breaks = 3) +
-  facet_grid(ola ~ var) +
-  labs(x = "Subjective social status (0 = lowest, 10 = highest)", y = NULL,
-       caption = "Dashed line: wave mean.") +
-  theme_minimal(base_size = 11) +
-  theme(strip.text = element_text(face = "bold"),
-        panel.grid.minor = element_blank())
-```
-
-### Correlation matrix
-
-```{r}
-#| label: tbl-correlations
-#| tbl-cap: "Average within-wave Spearman correlations between merit perception, subjective social status, market justice preferences, education and income"
-#| tbl-cap-location: top
-#| include: false
-
-vars <- c(
-  merit_effort = "Merit: Effort",
-  merit_talent = "Merit: Talent",
-  ess          = "Subjective social status",
-  ess_og       = "Family subjective social status",
-  ess_hijos    = "Son's subjective social status",
-  just_pension = "Pension justice",
-  just_salud   = "Healthcare justice",
-  just_educ    = "Education justice",
-  educyear     = "Education (years)",
-  decile_eq    = "Income (decile)"
-)
-
-df_cor <- df_study1 %>%
-  ungroup() %>%
-  select(ola, all_of(names(vars))) %>%
-  mutate(across(starts_with("just_"), ~ as.numeric(.x)),
-         across(-ola, ~ as.numeric(.x)))
-
-# one correlation matrix per wave
-cor_waves <- df_cor %>%
-  group_split(ola, .keep = FALSE) %>%
-  map(~ cor(.x, method = "spearman", use = "pairwise.complete.obs"))
-
-# average across waves on Fisher's z scale
-z_mean <- Reduce(`+`, map(cor_waves, ~ atanh(pmin(pmax(.x, -0.999999), 0.999999)))) / length(cor_waves)
-cor_avg <- tanh(z_mean)
-diag(cor_avg) <- 1
-
-# full matrix (with variable labels) kept for the corrplot below
-cor_full <- cor_avg
-rownames(cor_full) <- colnames(cor_full) <- unname(vars)
-
-rownames(cor_avg) <- paste0(seq_along(vars), ". ", vars)
-colnames(cor_avg) <- seq_along(vars)
-cor_avg[upper.tri(cor_avg)] <- NA
-
-cor_avg %>%
-  as.data.frame() %>%
-  kbl(digits = 2, format = table_format, booktabs = TRUE,
-      caption = NULL) %>%
-  kable_styling(full_width = FALSE) %>%
-  footnote(general = paste0("Spearman correlations computed within each wave (",
-                            length(cor_waves), " waves, 2016-2023) and averaged using Fisher's z."),
-           general_title = "Note:", footnote_as_chunk = TRUE)
-```
-
-```{r}
-#| label: fig-correlations
-#| fig-cap: "Average within-wave Spearman correlations (corrplot)"
-#| fig-width: 8
-#| fig-height: 8
-#| fig-align: center
-#| include: false
-
-corrplot(cor_full,
-         method = "color",
-         type = "lower",
-         diag = FALSE,
-         order = "original",
-         addCoef.col = "black",
-         number.cex = 0.75,
-         number.digits = 2,
-         tl.col = "black",
-         tl.cex = 0.85,
-         tl.srt = 45,
-         cl.cex = 0.8,
-         col = colorRampPalette(c("#2166AC", "white", "#B2182B"))(200),
-         col.lim = c(-1, 1),
-         is.corr = TRUE,
-         mar = c(0, 0, 1, 0))
-```
-
-
-```{r}
-#| label: fun-corrplot-wave
-#| include: false
-
-plot_cor_wave <- function(i) {
-  m <- cor_waves[[i]]
-  rownames(m) <- colnames(m) <- unname(vars)
-  corrplot(m,
-           method = "color",
-           type = "lower",
-           diag = FALSE,
-           order = "original",
-           addCoef.col = "black",
-           number.cex = 0.75,
-           number.digits = 2,
-           tl.col = "black",
-           tl.cex = 0.85,
-           tl.srt = 45,
-           cl.cex = 0.8,
-           col = colorRampPalette(c("#2166AC", "white", "#B2182B"))(200),
-           col.lim = c(-1, 1),
-           is.corr = TRUE,
-           na.label = "-",
-           mar = c(0, 0, 1, 0))
-}
-```
-
-::: {.panel-tabset}
-
-## Wave 1
-
-```{r}
-#| label: fig-correlations-w1
-#| fig-width: 8
-#| fig-height: 8
-#| fig-align: center
-
-plot_cor_wave(1)
-```
-
-## Wave 2
-
-```{r}
-#| label: fig-correlations-w2
-#| fig-width: 8
-#| fig-height: 8
-#| fig-align: center
-
-plot_cor_wave(2)
-```
-
-## Wave 3
-
-```{r}
-#| label: fig-correlations-w3
-#| fig-width: 8
-#| fig-height: 8
-#| fig-align: center
-
-plot_cor_wave(3)
-```
-
-## Wave 4
-
-```{r}
-#| label: fig-correlations-w4
-#| fig-width: 8
-#| fig-height: 8
-#| fig-align: center
-
-plot_cor_wave(4)
-```
-
-## Wave 5
-
-```{r}
-#| label: fig-correlations-w5
-#| fig-width: 8
-#| fig-height: 8
-#| fig-align: center
-
-plot_cor_wave(5)
-```
-
-## Wave 6
-
-```{r}
-#| label: fig-correlations-w6
-#| fig-width: 8
-#| fig-height: 8
-#| fig-align: center
-
-plot_cor_wave(6)
-```
-
-:::
-
-### ICC 
-```{r}
-# m0_pension <- clmm(just_pension ~ 1 + (1 | idencuesta), 
-#            link = "logit",
-#   Hess = TRUE, # calcula explícitamente la matriz varianza-covarianza de estimadores
-#                 data = df_model)
-
-# performance::icc(m0_pension, by_group = T) # 0.23 es between, 0.77 within
-```
-
-
-```{r}
-# m0_educ <- clmm(just_educ ~ 1 + (1 | idencuesta), 
-#            link = "logit",
-#   Hess = TRUE, # calcula explícitamente la matriz varianza-covarianza de estimadores
-#                 data = df_model)
-
-# performance::icc(m0_educ, by_group = T)
-```
-
-
-```{r}
-# m0_salud <- clmm(just_salud ~ 1 + (1 | idencuesta), 
-#            link = "logit",
-#   Hess = TRUE, # calcula explícitamente la matriz varianza-covarianza de estimadores
-#                 data = df_model)
-
-# performance::icc(m0_salud, by_group = T)
 ```
 
 ## General multilevel models
@@ -838,23 +367,23 @@ lmer(mjp_index ~ 1 +
 
 
 
-ess_control_full<- 
+ess_control_full<-
 list(
 lmer(mjp_index ~ 1 +
              ola_num +
              ola_2 +
-             # ideo +
+             ideo +
              sex +
              age +
              dummy_decile10_mean +
              dummy_educ_mean +
              (1 + ola_num | idencuesta),
            REML = FALSE,
-           data = df_model),  
+           data = df_model),
 lmer(mjp_index ~ 1 +
              ola_num +
              ola_2 +
-             # ideo +
+             ideo +
              sex +
              age +
              dummy_decile10_mean +
@@ -904,9 +433,70 @@ check_collinearity(ess_control_full[[2]])
 check_collinearity(ess_control_full[[3]])
 ```
 
-### MJP ~ SSS * SES (INTERACTIONS)
+```{r}
+#| label: tbl-mjp-sss
+#| tbl-cap: "Linear longitudinal multilevel models for the market justice preferences (MJP) index, with subjective social status measures"
+#| tbl-cap-location: top
+#| results: asis
+
+ccoef <- list(
+  "(Intercept)" = "Intercept",
+  ola_num = "Wave",
+  ola_2 = "Wave^2",
+  ideoCenter = "Political ideology: Center (ref. Left)",
+  ideoRight = "Political ideology: Right (ref. Left)",
+  `ideoDoes not identify` = "Political ideology: Does not identify (ref. Left)",
+  sexFemale = "Sex: Female (ref. Male)",
+  age = "Age",
+  dummy_decile10_mean = "Decile 10 (BE)",
+  dummy_educ_mean = "Universitary education (BE)",
+  ess_cwc = "SSS own (WE)",
+  ess_mean = "SSS own (BE)",
+  ess_og_cwc = "SSS origin (WE)",
+  ess_og_mean = "SSS origin (BE)",
+  ess_hijos_cwc = "SSS children (WE)",
+  ess_hijos_mean = "SSS children (BE)",
+  sss_index_cwc = "SSS index (WE)",
+  sss_index_mean = "SSS index (BE)",
+  mov_dir_cwc = "Mobility own - origin (WE)",
+  mov_dir_mean = "Mobility own - origin (BE)",
+  mov_exp_cwc = "Mobility children - own (WE)",
+  mov_exp_mean = "Mobility children - own (BE)",
+  mov_inter_cwc = "Mobility children - own - origin (WE)",
+  mov_inter_mean = "Mobility children - own - origin (BE)",
+  mov_exp_og_cwc = "Mobility children - origin (WE)",
+  mov_exp_og_mean = "Mobility children - origin (BE)",
+  ess_traj_cwc = "SSS trajectory (WE)",
+  ess_traj_mean = "SSS trajectory (BE)",
+  ess_traj_sqt_cwc = "SSS trajectory curvature (WE)",
+  ess_traj_sqt_mean = "SSS trajectory curvature (BE)"
+)
+
+gof_lmer <- c("BIC", "Numb. obs.", "Num. groups: individuals", "Var: individuals (Intercept)", "Var: individuals, wave", "Cov: individuals (Intercept), wave", "Var: residual")
+
+htmlreg(ess_control_full,
+               custom.model.names = paste0("Model ", seq_along(ess_control_full)),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               custom.coef.map = ccoef,
+               digits = 3,
+               custom.note = "Note: SSS = subjective social status; WE = within-person effect; BE = between-person effect. Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.names = gof_lmer)
+```
 
 ```{r}
+#| include: false
+#| label: interaction-models
+
+## MJP ~ SSS * SES (INTERACTIONS)
 ess_decile_we<- 
 list(
 lmer(mjp_index ~ 1 +
@@ -1085,26 +675,14 @@ screenreg(ess_educ_be)
 
 ### MJP ~ Mobility (MAIN EFFECTS MOBILITY)
 
-This section describes the processing and integration into multilevel models of a series of variables created to expand the measurement of subjective social status
-
-### SSS Index
-
-First, we constructed an averaged index based on the three variables of subjective social status: one's own status, family of origin and one's children
-
-```{r}
-# # Subjective social status index: mean of own, family-of-origin and children's
-# status (all 0-10 scales)
-sss_vars <- c("ess", "ess_og", "ess_hijos")
-
-# Internal consistency and inter-item correlations
-psych::alpha(df_model[, sss_vars])$total[c("raw_alpha", "std.alpha")]
-cor(df_study1[, sss_vars], use = "pairwise.complete.obs")
-```
-
 ```{r}
 #| label: sss-index
+#| include: false
 
-# Index (0-10): row mean of the three items
+# Subjective social status index (0-10): row mean of own, family-of-origin
+# and children's status
+sss_vars <- c("ess", "ess_og", "ess_hijos")
+
 df_model <- df_model %>%
   mutate(sss_index = rowMeans(across(all_of(sss_vars)), na.rm = FALSE))
 
@@ -1127,14 +705,14 @@ list(
 lmer(mjp_index ~ 1 +
              ola_num +
              ola_2 +
-             # ideo +
+             ideo +
              sex +
              age +
              dummy_decile10_mean +
              dummy_educ_mean +
              sss_index_mean+sss_index_cwc+
-             mov_og_cwc +
-             mov_og_mean +
+             mov_dir_cwc +
+             mov_dir_mean +
              (1 + ola_num | idencuesta),
            REML = FALSE,
            data = df_model),
@@ -1142,7 +720,7 @@ lmer(mjp_index ~ 1 +
 lmer(mjp_index ~ 1 +
              ola_num +
              ola_2 +
-             # ideo +
+             ideo +
              sex +
              age +
              dummy_decile10_mean +
@@ -1157,7 +735,7 @@ lmer(mjp_index ~ 1 +
 lmer(mjp_index ~ 1 +
              ola_num +
              ola_2 +
-             # ideo +
+             ideo +
              sex +
              age +
              dummy_decile10_mean +
@@ -1172,7 +750,7 @@ lmer(mjp_index ~ 1 +
 lmer(mjp_index ~ 1 +
              ola_num +
              ola_2 +
-             # ideo +
+             ideo +
              sex +
              age +
              dummy_decile10_mean +
@@ -1187,13 +765,14 @@ lmer(mjp_index ~ 1 +
 lmer(mjp_index ~ 1 +
              ola_num +
              ola_2 +
-             # ideo +
+             ideo +
              sex +
              age +
              dummy_decile10_mean +
              dummy_educ_mean +
              sss_index_mean+sss_index_cwc+
-             ess_traj +
+             ess_traj_cwc +
+             ess_traj_mean +
              (1 + ola_num | idencuesta),
            REML = FALSE,
            data = df_model)
@@ -1202,3 +781,327 @@ lmer(mjp_index ~ 1 +
 
 screenreg(mobiliy_ess)
 ```
+
+```{r}
+#| label: tbl-mjp-mobility
+#| tbl-cap: "Linear longitudinal multilevel models for the market justice preferences (MJP) index, with subjective social mobility measures"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg(mobiliy_ess,
+               custom.model.names = paste0("Model ", seq_along(mobiliy_ess)),
+               caption.above = T,
+               caption = NULL,
+               stars = c(0.05, 0.01, 0.001),
+               custom.coef.map = ccoef,
+               digits = 3,
+               custom.note = "Note: SSS = subjective social status; WE = within-person effect; BE = between-person effect. Cells contain regression coefficients with standard errors in parentheses. %stars.",
+               leading.zero = T,
+               use.packages = F,
+               booktabs = F,
+               scalebox = 0.80,
+               include.loglik = FALSE,
+               include.aic = FALSE,
+               center = T,
+               custom.gof.names = gof_lmer)
+```
+
+## Appendix
+
+### A1. Sensitivity of subjective social status effects to model controls
+
+@tbl-app-controls-ess, @tbl-app-controls-ess-og and @tbl-app-controls-ess-hijos re-estimate the subjective social status (SSS) models in @tbl-mjp-sss under alternative sets of controls: no sociodemographic or political controls; political ideology, sex and age entered one at a time; and all three together, which corresponds to the main specification. All models include wave, wave squared, membership in the top income decile and university education (between-person components).
+
+```{r}
+#| include: false
+#| label: sss-controls-models
+
+# One model per control set, for a given set of focal terms
+fit_controls <- function(terms) {
+  controls <- list("No controls"  = NULL,
+                   "Ideology"     = "ideo",
+                   "Sex"          = "sex",
+                   "Age"          = "age",
+                   "All controls" = c("ideo", "sex", "age"))
+  map(controls, ~ lmer(reformulate(c("ola_num", "ola_2", .x,
+                                     "dummy_decile10_mean", "dummy_educ_mean",
+                                     terms,
+                                     "(1 + ola_num | idencuesta)"),
+                                   response = "mjp_index"),
+                       REML = FALSE,
+                       data = df_model))
+}
+
+ess_controls       <- fit_controls(c("ess_cwc", "ess_mean"))
+ess_og_controls    <- fit_controls(c("ess_og_cwc", "ess_og_mean"))
+ess_hijos_controls <- fit_controls(c("ess_hijos_cwc", "ess_hijos_mean"))
+
+# Same htmlreg settings as the main-body tables
+htmlreg_controls <- function(models) {
+  htmlreg(models,
+          custom.model.names = names(models),
+          caption.above = T,
+          caption = NULL,
+          stars = c(0.05, 0.01, 0.001),
+          custom.coef.map = ccoef,
+          digits = 3,
+          custom.note = "Note: SSS = subjective social status; WE = within-person effect; BE = between-person effect. Cells contain regression coefficients with standard errors in parentheses. %stars.",
+          leading.zero = T,
+          use.packages = F,
+          booktabs = F,
+          scalebox = 0.80,
+          include.loglik = FALSE,
+          include.aic = FALSE,
+          center = T,
+          custom.gof.names = gof_lmer)
+}
+```
+
+```{r}
+#| label: tbl-app-controls-ess
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index with own subjective social status, by combination of controls"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg_controls(ess_controls)
+```
+
+```{r}
+#| label: tbl-app-controls-ess-og
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index with family subjective social status, by combination of controls"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg_controls(ess_og_controls)
+```
+
+```{r}
+#| label: tbl-app-controls-ess-hijos
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index with son's subjective social status, by combination of controls"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg_controls(ess_hijos_controls)
+```
+
+### A2. Sensitivity of subjective social mobility effects to model controls
+
+@tbl-app-controls-mov-dir to @tbl-app-controls-ess-traj-dec repeat this exercise for the mobility models in @tbl-mjp-mobility. In addition to the controls listed in Section A1, all models include the within- and between-person components of the SSS index.
+
+```{r}
+#| include: false
+#| label: mobility-controls-models
+
+sss_terms <- c("sss_index_cwc", "sss_index_mean")
+
+mov_dir_controls    <- fit_controls(c(sss_terms, "mov_dir_cwc", "mov_dir_mean"))
+mov_exp_controls    <- fit_controls(c(sss_terms, "mov_exp_cwc", "mov_exp_mean"))
+mov_inter_controls  <- fit_controls(c(sss_terms, "mov_inter_cwc", "mov_inter_mean"))
+mov_exp_og_controls <- fit_controls(c(sss_terms, "mov_exp_og_cwc", "mov_exp_og_mean"))
+ess_traj_dec_controls <- fit_controls(c(sss_terms, "ess_traj_cwc", "ess_traj_mean"))
+```
+
+```{r}
+#| label: tbl-app-controls-mov-dir
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index with subjective social mobility, by combination of controls"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg_controls(mov_dir_controls)
+```
+
+```{r}
+#| label: tbl-app-controls-mov-exp
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index with expected mobility for children, by combination of controls"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg_controls(mov_exp_controls)
+```
+
+```{r}
+#| label: tbl-app-controls-mov-inter
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index with expected intergenerational mobility, by combination of controls"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg_controls(mov_inter_controls)
+```
+
+```{r}
+#| label: tbl-app-controls-mov-exp-og
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index with expected mobility relative to family of origin, by combination of controls"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg_controls(mov_exp_og_controls)
+```
+
+```{r}
+#| label: tbl-app-controls-ess-traj-dec
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index with subjective social status trajectory, by combination of controls"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg_controls(ess_traj_dec_controls)
+```
+
+### A3. Construction of the subjective social status trajectory
+
+```{r}
+#| label: traj-supplement-stats
+#| include: false
+
+fmt <- function(x, d = 3) formatC(x, format = "f", digits = d)
+
+# Equivalence between the trajectory and (children - origin) / 2
+ok <- !is.na(df_study1$ess_traj)
+traj_n        <- sum(ok)
+traj_max_diff <- max(abs(df_study1$ess_traj[ok] -
+                         (df_study1$ess_hijos[ok] - df_study1$ess_og[ok]) / 2))
+traj_cor_exp_og <- cor(df_study1$ess_traj, df_study1$mov_exp_og, use = "complete.obs")
+traj_cor_curve  <- cor(df_study1$ess_traj, df_study1$ess_traj_sqt, use = "complete.obs")
+
+# Model 4 (mobility children - origin) vs Model 5 (SSS trajectory)
+bic_m4 <- BIC(mobiliy_ess[[4]])
+bic_m5 <- BIC(mobiliy_ess[[5]])
+ratio_we <- fixef(mobiliy_ess[[5]])[["ess_traj_cwc"]] / fixef(mobiliy_ess[[4]])[["mov_exp_og_cwc"]]
+ratio_be <- fixef(mobiliy_ess[[5]])[["ess_traj_mean"]] / fixef(mobiliy_ess[[4]])[["mov_exp_og_mean"]]
+
+# Quadratic model: Model 5 plus the curvature (bobyqa, as the default optimizer
+# gives a convergence warning; estimates are identical)
+m_quad <- lmer(mjp_index ~ 1 + ola_num + ola_2 + ideo + sex + age +
+                 dummy_decile10_mean + dummy_educ_mean +
+                 sss_index_mean + sss_index_cwc +
+                 ess_traj_cwc + ess_traj_mean +
+                 ess_traj_sqt_cwc + ess_traj_sqt_mean +
+                 (1 + ola_num | idencuesta),
+               REML = FALSE, data = df_model,
+               control = lmerControl(optimizer = "bobyqa"))
+bic_quad <- BIC(m_quad)
+slope_lin  <- fixef(mobiliy_ess[[5]])[c("ess_traj_cwc", "ess_traj_mean")]
+slope_quad <- fixef(m_quad)[c("ess_traj_cwc", "ess_traj_mean")]
+
+# Correlations of the curvature with the slope and the SSS index (analytic sample)
+df_be <- distinct(df_model, idencuesta, .keep_all = TRUE)
+cor_we_slope_curve <- cor(df_model$ess_traj_cwc, df_model$ess_traj_sqt_cwc)
+cor_we_curve_sss   <- cor(df_model$ess_traj_sqt_cwc, df_model$sss_index_cwc)
+cor_be_slope_curve <- cor(df_be$ess_traj_mean, df_be$ess_traj_sqt_mean)
+cor_be_curve_sss   <- cor(df_be$ess_traj_sqt_mean, df_be$sss_index_mean)
+```
+
+The SSS trajectory summarises, for each respondent $i$ and wave $t$, the direction of the perceived status path across three generations. Respondents rate the status of their family of origin ($S^{O}_{it}$), their own current status ($S^{P}_{it}$) and the status they expect their children to attain ($S^{C}_{it}$), each on a 0-10 scale. These ratings are placed on a generational axis $g \in \{1, 2, 3\}$ (origin, own, children), and the trajectory is defined as the ordinary least squares slope of status on $g$, estimated separately for each person-wave with complete ratings ($n$ = `r format(traj_n, big.mark = ",")` person-waves):
+
+$$
+S_{igt} = \alpha_{it} + \beta_{it}\, g + e_{igt}, \qquad g = 1, 2, 3.
+$$
+
+**Closed form.** With three equally spaced points, the slope has a closed form. Since $\bar{g} = 2$, the deviations $g - \bar{g}$ are $-1$, $0$ and $1$, and
+
+$$
+\hat{\beta}_{it} = \frac{\sum_{g} (g - \bar{g})\, S_{igt}}{\sum_{g} (g - \bar{g})^2} = \frac{S^{C}_{it} - S^{O}_{it}}{2}.
+$$
+
+Each rating contributes to the slope in proportion to its distance from the centre of the generational axis (@tbl-traj-weights). Own status lies at the centre and therefore receives a weight of zero.
+
+| Rating | $g$ | $g - \bar{g}$ | Weight in $\hat{\beta}_{it}$ |
+|---|:-:|:-:|:-:|
+| Family of origin ($S^{O}$) | 1 | -1 | -1/2 |
+| Own status ($S^{P}$) | 2 | 0 | 0 |
+| Children ($S^{C}$) | 3 | 1 | 1/2 |
+
+: Contribution of each status rating to the trajectory slope {#tbl-traj-weights}
+
+**Geometric interpretation.** An OLS line passes through the mean point $(\bar{g}, \bar{S})$. Because own status is located at $\bar{g}$, changing it shifts the fitted line vertically but does not alter its slope. @fig-traj-pivot illustrates this with three hypothetical respondents who share the same origin (3) and expectation for their children (7) but report own status of 1, 5 and 9: the fitted lines differ in level but all have a slope of 2. Own status therefore contributes to the level of the path, which our models capture through the SSS index, and to the deviation of the path from linearity, but not to its slope. A non-zero weight for own status would require placing the three generations at unequal distances on the axis, for which the data provide no basis.
+
+```{r}
+#| label: fig-traj-pivot
+#| fig-cap: "SSS trajectories for three hypothetical respondents with the same origin and children's status but different own status. Points show the status ratings; dashed lines show the linear fit (slope) and solid lines the quadratic fit (curvature). The slope equals 2 in all three cases; only the curvature reflects own status."
+#| fig-width: 9
+#| fig-height: 3.5
+#| fig-align: center
+#| echo: false
+
+df_pivot <- tibble(own = rep(c(1, 5, 9), each = 3),
+                   g   = rep(1:3, times = 3),
+                   y   = c(3, 1, 7, 3, 5, 7, 3, 9, 7)) %>%
+  group_by(own) %>%
+  mutate(fit   = fitted(lm(y ~ g)),
+         slope = (y[3] - y[1]) / 2,
+         curve = (y[1] - 2 * y[2] + y[3]) / 2) %>%
+  ungroup() %>%
+  mutate(case = factor(sprintf("Own = %g: slope = %g, curvature = %g", own, slope, curve)))
+case_levels <- levels(df_pivot$case)[order(unique(df_pivot$own))]
+df_pivot <- mutate(df_pivot, case = factor(case, levels = case_levels))
+
+# Quadratic fit on a fine grid (time centred on own status)
+df_curve <- df_pivot %>%
+  distinct(case, own, slope, curve) %>%
+  crossing(g = seq(1, 3, length.out = 61)) %>%
+  mutate(y = own + slope * (g - 2) + curve * (g - 2)^2)
+
+ggplot(df_pivot, aes(x = g)) +
+  geom_line(data = df_curve, aes(y = y), colour = "grey30") +
+  geom_line(aes(y = fit), linetype = "dashed", colour = "grey30") +
+  geom_point(aes(y = y), size = 3, colour = met.brewer("Hiroshige", 1, direction = -1)[1]) +
+  facet_wrap(~ case, nrow = 1) +
+  scale_x_continuous(breaks = 1:3, labels = c("Origin", "Own", "Children"),
+                     expand = expansion(add = 0.4)) +
+  scale_y_continuous(limits = c(0, 10), breaks = seq(0, 10, 2)) +
+  labs(x = NULL, y = "Subjective social status") +
+  theme_minimal(base_size = 12) +
+  theme(strip.text = element_text(face = "bold"),
+        panel.grid.minor = element_blank(),
+        panel.spacing.x = unit(1.5, "lines"))
+```
+
+**Empirical verification.** In the data, the estimated slope equals $(S^{C}_{it} - S^{O}_{it})/2$ for all person-waves (maximum absolute difference: `r formatC(traj_max_diff, format = "e", digits = 1)`), and its correlation with expected mobility relative to the family of origin ($S^{C} - S^{O}$) is `r fmt(traj_cor_exp_og)`.
+
+**Implications for the models.** The trajectory is thus a rescaled version of expected mobility relative to the family of origin. When both measures are decomposed into within- and between-person components, the corresponding models are statistically equivalent: Model 5 in @tbl-mjp-mobility reproduces the fit of Model 4 (BIC = `r fmt(bic_m5, 1)` and `r fmt(bic_m4, 1)`, respectively), and its within- and between-person coefficients are `r fmt(ratio_we, 2)` and `r fmt(ratio_be, 2)` times those of Model 4.
+
+**Curvature.** To incorporate own status into the description of the trajectory, we also estimated a quadratic specification with the generational axis centred on own status ($g^{*} = -1, 0, 1$):
+
+$$
+S_{igt} = \alpha_{it} + \beta_{it}\, g^{*} + \gamma_{it}\, g^{*2}, \qquad \hat{\gamma}_{it} = \frac{S^{O}_{it} - 2\,S^{P}_{it} + S^{C}_{it}}{2}.
+$$
+
+Centring makes the linear and quadratic terms orthogonal: with $g^{*} = (-1, 0, 1)$ and $g^{*2} = (1, 0, 1)$, $\sum g^{*}\,(g^{*2} - \overline{g^{*2}}) = \sum g^{*3} - \overline{g^{*2}} \sum g^{*} = 0$. The estimated slope $\hat{\beta}_{it}$ is therefore identical in the linear and quadratic fits for every person-wave. Without centring ($g = 1, 2, 3$), $g$ and $g^2$ are nearly collinear and the linear coefficient changes when the quadratic term is added. The curvature indicates whether own status lies below ($\hat{\gamma}_{it} > 0$, convex path) or above ($\hat{\gamma}_{it} < 0$, concave path) the line connecting origin and children. In @fig-traj-pivot, the respondent whose own status lies below the line has a curvature of 4, the one on the line a curvature of 0, and the one above it a curvature of -4, while all three share a slope of 2. Slope and curvature are nearly uncorrelated in the data ($r$ = `r fmt(traj_cor_curve, 2)`).
+
+@tbl-app-traj-curve compares the linear and quadratic specifications of the trajectory. Following the usual practice for polynomial terms, the quadratic model retains the slope and adds the within- and between-person components of the curvature; the first column reproduces Model 5 in @tbl-mjp-mobility. The linear model is
+
+$$
+\begin{aligned}
+\text{MJP}_{it} = {} & \pi_{0} + \pi_{1}\,\text{wave}_{t} + \pi_{2}\,\text{wave}_{t}^{2} + \boldsymbol{\delta}'\mathbf{X}_{it}
++ \lambda_{W}\,(\text{SSS}_{it} - \overline{\text{SSS}}_{i}) + \lambda_{B}\,\overline{\text{SSS}}_{i} \\
+& + \theta_{W}\,(\hat{\beta}_{it} - \bar{\hat{\beta}}_{i}) + \theta_{B}\,\bar{\hat{\beta}}_{i}
++ u_{0i} + u_{1i}\,\text{wave}_{t} + \varepsilon_{it},
+\end{aligned}
+$$
+
+and the quadratic model adds the within- and between-person components of the curvature:
+
+$$
+\begin{aligned}
+\text{MJP}_{it} = {} & \pi_{0} + \pi_{1}\,\text{wave}_{t} + \pi_{2}\,\text{wave}_{t}^{2} + \boldsymbol{\delta}'\mathbf{X}_{it}
++ \lambda_{W}\,(\text{SSS}_{it} - \overline{\text{SSS}}_{i}) + \lambda_{B}\,\overline{\text{SSS}}_{i} \\
+& + \theta_{W}\,(\hat{\beta}_{it} - \bar{\hat{\beta}}_{i}) + \theta_{B}\,\bar{\hat{\beta}}_{i}
++ \phi_{W}\,(\hat{\gamma}_{it} - \bar{\hat{\gamma}}_{i}) + \phi_{B}\,\bar{\hat{\gamma}}_{i}
++ u_{0i} + u_{1i}\,\text{wave}_{t} + \varepsilon_{it},
+\end{aligned}
+$$
+
+where $\text{MJP}_{it}$ is the market justice preferences index of respondent $i$ in wave $t$; $\mathbf{X}_{it}$ contains political ideology, sex, age, membership in the top income decile and university education (both between-person); $\text{SSS}_{it}$ is the SSS index (the mean of the three ratings); $\hat{\beta}_{it}$ and $\hat{\gamma}_{it}$ are the trajectory slope and curvature defined above; bars denote person means across waves; $u_{0i}$ and $u_{1i}$ are a person-specific random intercept and random wave slope; and $\varepsilon_{it}$ is the residual. The subscripts $W$ and $B$ mark within- and between-person coefficients. Adding the curvature does not improve fit (BIC = `r fmt(bic_quad, 1)`, compared with `r fmt(bic_m5, 1)`), and neither of its components is statistically significant. The curvature is therefore not included in the main tables.
+
+The slope coefficients differ slightly between the two models (within: `r fmt(slope_lin[1])` and `r fmt(slope_quad[1])`; between: `r fmt(slope_lin[2])` and `r fmt(slope_quad[2])`). This is not a change in the trajectory measure itself: for each person-wave, the estimated slope is identical in the linear and quadratic fits, because centring the generational axis makes the linear and quadratic terms orthogonal. The difference arises in the multilevel model, where each coefficient is estimated net of the other predictors. Within persons, the curvature is weakly correlated with the slope ($r$ = `r fmt(cor_we_slope_curve, 2)`) and with the SSS index ($r$ = `r fmt(cor_we_curve_sss, 2)`); between persons, the corresponding correlations are `r fmt(cor_be_slope_curve, 2)` and `r fmt(cor_be_curve_sss, 2)`. Adding the curvature therefore slightly reallocates shared variance, and the resulting changes in the slope coefficients are small relative to their standard errors.
+
+```{r}
+#| label: tbl-app-traj-curve
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index with a linear (slope) and a quadratic (slope and curvature) specification of the SSS trajectory"
+#| tbl-cap-location: top
+#| results: asis
+#| echo: false
+
+htmlreg_controls(list("Linear"             = mobiliy_ess[[5]],
+                      "Linear + quadratic" = m_quad))
+```
+
