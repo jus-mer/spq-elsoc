@@ -1,16 +1,224 @@
+---
+title: Methodology
+format: 
+  html:
+    theme: cosmo
+    toc: true
+code-fold: true
+editor_options: 
+  chunk_output_type: console
+bibliography: ../input/bib/jusmer.bib
+---
 
-# Methodology
+```{r}
+#| label: packages
+#| include: true
+#| warning: false
+
+if (! require("pacman")) install.packages("pacman")
+
+pacman::p_load(tidyverse, 
+               sjmisc, 
+               sjPlot, 
+               lme4, 
+               here, 
+               performance,
+               influence.ME, 
+               srvyr,
+               ordinal,
+               texreg, 
+               ggdist,
+               misty,
+               kableExtra,
+               ggalluvial, 
+               shadowtext,
+               MetBrewer,
+               patchwork,
+               sjlabelled,
+               corrplot)
 
 
-Data
-Replicate what is on the paper about pensions in Frontiers
+options(scipen=999)
+```
+
+```{r}
+#| label: data
+#| echo: true
+
+load(file = here("input/data/proc/df_final.RData"))
+
+df_model <- df_study1 %>%
+  na.omit()
+```
 
 
-Add:
+# Data, Variables and Methods
 
-- Histograms For the SSS and the Subjective mobility measures
+## Data
+
+This research draws on the Chilean Longitudinal Social Survey (ELSOC), a national panel study fielded between 2016 and 2023 to examine attitudes, emotions, and behaviors among adults aged 18 to 75 in relation to social cohesion and conflict. ELSOC uses a probabilistic, stratified, clustered, multistage sampling design covering urban centers and small towns. The sampling frame is proportionally stratified into six categories of urban population size; within these strata, households were selected through multistage procedures based on 1,067 sampled blocks.
+
+ELSOC has been administered annually since 2016, except in 2020 when fieldwork was suspended due to the COVID-19 pandemic. For this study, we use waves 2016, 2017, 2018, 2019, 2022, and 2023. The 2021 wave is excluded because the questionnaire version omitted key variables for the analysis. By wave 6, cumulative panel attrition was approximately 40%; we therefore restrict the analysis to a balanced panel, yielding a two-level data set of *N* = 6,699 observations nested within *N* = 1,203 individuals. Additional documentation on sampling, attrition, and weighting is available from the ELSOC study team, and the data are publicly accessible through the ELSOC Dataverse.
+
+
+## Variables
+
+### Market justice preferences
+
+The dependent variable in this study is preferences for market justice (MJP). This construct is measured by three items that capture how strongly individuals endorse conditioning access to pensions, education and health care on income. The original items asks: "Is it fair that high-income individuals have better (education, health or pensions) than lower-income individuals?". The response options range from 1 ("Strongly disagree") to 5 ("Strongly agree"), so that higher values indicate stronger support for market-justified inequality in the provision of social services.
+
+We construct the MJP index as the mean of the three items, which ranges from 1 to 5. The index is computed only for respondents with valid answers on all three items and is treated as a continuous variable in the models. @fig-mjp-dist shows its distribution by wave.
+
+```{r}
+#| label: fig-mjp-dist
+#| fig-cap: "Distribution of the market justice preferences (MJP) index by wave"
+#| fig-width: 9
+#| fig-height: 5.5
+#| fig-align: center
+
+df_mjp <- df_study1 %>%
+  ungroup() %>%
+  filter(!is.na(mjp_index)) %>%
+  mutate(mjp_bin = cut(mjp_index, breaks = seq(1, 5, by = 0.5),
+                       include.lowest = TRUE, right = FALSE))
+
+df_mjp_mean <- df_mjp %>%
+  group_by(ola) %>%
+  summarise(m = mean(mjp_index), .groups = "drop") %>%
+  mutate(lab = paste0("Mean = ", sprintf("%.2f", m)))
+
+ggplot(df_mjp, aes(x = mjp_index)) +
+  geom_histogram(aes(y = after_stat(count / tapply(count, PANEL, sum)[PANEL])),
+                 breaks = seq(0.75, 5.25, by = 0.5), closed = "right",
+                 fill = met.brewer("Hiroshige", 1, direction = -1)[1],
+                 colour = "white") +
+  geom_vline(data = df_mjp_mean, aes(xintercept = m),
+             linetype = "dashed", colour = "grey20") +
+  geom_text(data = df_mjp_mean, aes(x = 5, y = Inf, label = lab),
+            hjust = 1, vjust = 1.5, size = 3.2, inherit.aes = FALSE) +
+  scale_x_continuous(breaks = 1:5) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1),
+                     expand = expansion(mult = c(0, 0.1))) +
+  facet_wrap(~ ola, nrow = 2) +
+  labs(x = "MJP index (1 = strongly disagree, 5 = strongly agree)", y = NULL,
+       caption = "Bins of width 0.5 centred on 1, 1.5, ..., 5. Dashed line: wave mean.") +
+  theme_minimal(base_size = 12) +
+  theme(strip.text = element_text(face = "bold"),
+        panel.grid.minor = element_blank())
+```
+
+### Social Subjective Status
+
+Subjective social status is measured with three ELSOC items in which respondents place themselves, their family of origin and their children on a scale from 0 ("lowest") to 10 ("highest") of the social ladder. The first item captures the respondent's own current position, the second the position of the family of origin, and the third the position where respondents expect their children to be located. Higher values indicate a higher perceived position in all three cases. The three measures are treated as continuous variables and, in the models, are decomposed into their within-person and between-person components. In addition, we construct an SSS index as the mean of the three measures, which is used as a control in the models that include the trajectory slope of subjective mobility (see below).
+
+
+### Social Subjective Mobility
+
+Based on the original variables of subjective social status (origin, self, and children), various variables were generated from all the combinations allowed by these three items. The composite variables operationalize subjective mobility as follows: $t_{2} - t_{1}$. Thus, positive values indicate upward subjective mobility. All the variables are treated as continuous and, in the models, are decomposed into their within-person and between-person components. The following variables were generated:
+
+```{r}
+#| label: tbl-mobility-vars
+#| tbl-cap: "Subjective social mobility variables constructed from the subjective social status (SSS) items"
+#| tbl-cap-location: top
+#| echo: false
+
+mov_vars_tab <- tibble::tribble(
+  ~Variable, ~Name, ~Construction, ~Interpretation,
+  "mov_dir", "Own - origin",
+  "Own SSS minus family-of-origin SSS",
+  "Own position above the family of origin (upward mobility relative to origin)",
+  "mov_og", "Own - mean origin",
+  "Own SSS minus the person's mean family-of-origin SSS across waves",
+  "Own position above the average perceived origin",
+  "mov_exp", "Children - own",
+  "Children's SSS minus own SSS",
+  "Children expected to be better off than the respondent",
+  "mov_exp_og", "Children - origin",
+  "Children's SSS minus family-of-origin SSS",
+  "Children expected to be better off than the family of origin",
+  "mov_inter", "Intergenerational",
+  "Children's SSS minus own SSS minus family-of-origin SSS",
+  "Children's expected position above the sum of own and origin positions",
+  "ess_traj", "Trajectory slope",
+  "OLS slope of SSS over the three positions: origin (t = 1), own (t = 2) and children (t = 3)",
+  "Upward trajectory across generations (equals half of children - origin)",
+  "ess_traj_sqt", "Trajectory curve",
+  "Quadratic term of the OLS regression of SSS on time (centred on own status) and time squared, equivalent to (origin - 2 x own + children) / 2",
+  "Own position below the line joining origin and children (convex path); negative values, above it (concave path)"
+)
+
+mov_vars_tab %>%
+  kbl(format = if (knitr::is_latex_output()) "latex" else "html",
+      booktabs = TRUE, caption = NULL, align = "llll") %>%
+  kable_styling(full_width = TRUE, font_size = 12,
+                latex_options = "scale_down") %>%
+  column_spec(1, monospace = TRUE) %>%
+  footnote(general = "Positive values of the mobility measures indicate upward subjective mobility. All variables are missing if any of the SSS items involved is missing.",
+           general_title = "Note:", footnote_as_chunk = TRUE)
+```
+
+All the variables are computed for each person and wave, and are missing if any of the SSS items involved is missing. @tbl-mobility-vars lists them.
 
 
 
+Additionally, with the aim of exploring subjective mobility in greater depth, a variable was constructed to represent an individual’s trajectory of subjective social status, based on a linear regression that predicts a slope (which represents the trajectory) from the three original subjective social statuses. 
+
+### Social Objective Status
+
+Objective social status is measured through education and household income. Education is the respondent's highest educational level, reported on a ten-category scale ranging from no schooling to postgraduate studies. We use it in three versions: (1) years of education, obtained by assigning to each level the average years of schooling; (2) four categories (primary or less, secondary, technical, and university or postgraduate); and (3) a dichotomous indicator of university education (university or postgraduate vs. lower levels). Years of education were descomposed into their within-person and between-person effects, while the categorical and dichotomous measures are treated as time-invariant and only include a between-person component.
+
+Income is the total monthly household income reported by the respondent. When the amount is missing, we impute the midpoint of the income bracket answered in the follow-up question. Household income is deflated to constant December 2023 prices using the consumer price index and divided by the square root of household size to obtain an equivalised income, which is used in three versions: (1) its natural logarithm; (2) three groups defined by within-wave deciles (bottom: deciles 1-4, middle: deciles 5-9, top: decile 10); and (3) a dichotomous indicator for the top decile. The logarithm of equivalised income is decomposed into its within-person and between-person effects, while the categorical and dichotomous measures only include a between-person component.
 
 
+### Controls
+
+Based on previous research [@castillo_perceptions_2025; @lindh_public_2015; @jaime-castillo_public_2013], the statistical models include sociodemographic and attitudinal controls to account for potential compositional effects in the population. We adjust for sex (1 = male, 2 = female), age (in years) and political identification (1 = left, 2 = centre, 3 = right, 4 = no identification).
+
+## Analytical Strategy
+
+The analysis proceeds in two steps. First, we describe the distribution of each status variable by wave and examine the bivariate association between the status measures and market justice preferences using Spearman correlations, computed within each wave and, for the within/between-person components, on the pooled sample. Second, we estimate linear longitudinal multilevel models for the market justice preferences (MJP) index, which is the mean of the pension, education and health items (range 1-5). Because the index is an average of several items and is treated as a continuous outcome, we use linear mixed models rather than cumulative link models. This approach accounts for the hierarchical structure of the panel data, with repeated observations (Level 1) nested within individuals (Level 2), and enables the decomposition of the variance of the predictors into within-person (WE) and between-person (BE) components, allowing us to distinguish temporal changes within individuals from stable differences between individuals [@singer_applied_2003; @bell_fixed_2019]. All descriptive figures, correlations and models are based on the same analytical sample (complete cases on all analysis variables; *N* = 6,699 observations from *N* = 1,203 individuals).
+
+### Within-Person and Between-Person Random Effects Models
+
+Following the recommendations of @bell_explaining_2015, we decompose time-varying predictors into their within-person and between-person components using person-mean centering:
+
+$$
+X_{WE_{it}} = X_{it} - \bar{X}_i
+$$
+
+$$
+X_{BE_i} = \bar{X}_i
+$$
+
+where $X_{it}$ represents the observed value for individual $i$ at time $t$, $\bar{X}_i$ is the person-specific mean across all observations, $X_{WE_{it}}$ captures within-person deviations from the individual mean (representing temporal fluctuations), and $X_{BE_i}$ represents stable between-person differences (time-invariant characteristics). The decomposition is applied to the continuous measures: the three subjective status measures (own, family of origin and children), the subjective mobility measures, years of education and log equivalised household income.
+
+For the dichotomous and categorical measures of objective status only a between-person component is included, since they vary little within individuals. For the dichotomous measures, the BE component indicates whether the person was ever observed with a university degree or in the top income decile. For the categorical measures (education in four categories and income in three groups), the BE component is the person's modal category across waves, with ties assigned to the higher category; the reference categories are primary education or less and the bottom income group (deciles 1-4), respectively.
+
+This decomposition allows us to distinguish two theoretically distinct processes: (1) Within-person effects capture how changes in an individual's subjective and objective status over time relate to changes in their market justice preferences, controlling for stable individual characteristics. (2) Between-person effects capture how individuals with different average levels of subjective and objective status differ in their market justice preferences, net of temporal fluctuations.
+
+### Model Specification
+
+The general form of our linear mixed model is:
+
+$$
+\text{MJP}_{it} = \beta_0 + \beta_1 \text{wave}_{it} + \beta_2 \text{wave}^2_{it} + \boldsymbol{\beta}_3' X_{WE_{it}} + \boldsymbol{\beta}_4' X_{BE_i} + \boldsymbol{\gamma}' Z_i + u_{0i} + u_{1i} \text{wave}_{it} + \varepsilon_{it}
+$$
+
+where $\text{MJP}_{it}$ is the market justice preferences index for individual $i$ at wave $t$; $\beta_0$ is the fixed intercept; $\beta_1$ and $\beta_2$ capture the linear and quadratic time trends (wave is coded 1 to 6, since the 2020-2021 waves are not available); $\boldsymbol{\beta}_3$ and $\boldsymbol{\beta}_4$ are the within-person and between-person effects of the status measures included in each model; $\boldsymbol{\gamma}$ are the coefficients of the controls $Z_i$ (sex, age and political identification), which enter only in the models that include controls; $u_{0i}$ is the random intercept (capturing unobserved individual heterogeneity); $u_{1i}$ is a random slope for wave (allowing individual-specific temporal trajectories); and $\varepsilon_{it}$ is the residual term, $\varepsilon_{it} \sim N(0, \sigma^2_\varepsilon)$.
+
+The random effects are assumed to follow a bivariate normal distribution:
+
+$$
+\begin{pmatrix} u_{0i} \\ u_{1i} \end{pmatrix} \sim N \begin{pmatrix} \begin{pmatrix} 0 \\ 0 \end{pmatrix}, \begin{pmatrix} \sigma^2_{u_0} & \sigma_{u_{01}} \\ \sigma_{u_{01}} & \sigma^2_{u_1} \end{pmatrix} \end{pmatrix}
+$$
+
+### Model Building Strategy
+
+The same specification (time terms and random effects) is kept in all models, and the status measures are entered in blocks. Within each block, we first enter each measure on its own, then add the controls, and finally estimate a model including all the measures of the block:
+
+1. **Subjective social status (Models 1-8)**: own, family-of-origin and children's subjective status (WE/BE), each entered separately (Models 1-3) and with controls (Models 4-6); a model with the family-of-origin and children's status and controls (Model 7); and a model with the three measures and controls (Model 8).
+2. **Subjective social mobility (Models 9-25)**: each mobility measure (own - origin, own - mean origin, children - own, intergenerational, children - origin, the trajectory slope and the trajectory curve; WE/BE) entered separately (Models 9-16; the slope and the curve are entered each on their own and together) and with controls (Models 17-24), and a model with all measures and controls (Model 25). The models that include the trajectory slope or curve also control for the SSS index (WE/BE). Since the mobility measures are linear combinations of the three subjective status measures, the full model is rank deficient and the aliased terms are dropped.
+3. **Objective social status (Models 26-38)**: education and income, each in its three operationalizations (dichotomous BE; four categories for education and three groups for income, BE; and continuous, years of education and log income, WE/BE). Each operationalization is entered separately for education (Models 26-28) and for income (Models 29-31); the same models are estimated with controls (Models 32-37); and a final model includes all the education and income measures with controls (Model 38).
+4. **Subjective mobility and objective status (Models 39-56)**: each of the mobility measures children - own, intergenerational, children - origin and trajectory slope (WE/BE) is entered together with education and income, first with continuous measures (years of education and log income, WE/BE; Models 39-42), then with controls (Models 43-46), and finally with all the variables and controls (Model 47). As in the previous block, the models that include the trajectory slope also control for the SSS index (WE/BE). The same sequence is repeated replacing the education and income measures with dichotomous education (BE) and income in three categories (BE; Models 48-56).
+
+All models are estimated by maximum likelihood (not REML), so that models with different fixed effects can be compared. Models are unweighted and are estimated on the analytical sample described above using the `lmer()` function from the `lme4` package in R, and the results are presented in tables with the regression coefficients and their standard errors (`texreg`).
