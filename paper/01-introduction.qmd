@@ -1,7 +1,8 @@
 ---
-title: "Introduction"
 bibliography: ../input/bib/jusmer.bib
 ---
+
+# Introduction
 
 In recent decades, welfare states have undergone significant transformations in their institutional architecture, with social services increasingly  coexisting with private alternatives [@busemeyer_welfare_2020]. As a result, market dynamics have taken root around the world in services such as education, health care, and pension systems. Beyond institucional arrangements, market-oriented policies have not only formal consequences but also cultural ones, operating as  moral projects in which individuals adopt such values as normative criteria [@fourcade_moral_2007]. In this context, the concept of market justice has become key to understanding how people justify the fact that access to and the quality of social services depend on market criteria such as the ability to pay.
 

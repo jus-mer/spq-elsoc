@@ -2,5 +2,7 @@
 
 ## Paper files
 
-[Data analysis](https://jus-mer.github.io/spq-elsoc/paper/04-results.html)
+[Full paper](https://jus-mer.github.io/spq-elsoc/paper/paper.html)
+
+[Data analysis](https://jus-mer.github.io/spq-elsoc/paper/04-results-final.html)
 

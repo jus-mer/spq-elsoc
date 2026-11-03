@@ -1,5 +1,4 @@
 ---
-title: Methodology
 format: 
   html:
     theme: cosmo
@@ -9,6 +8,8 @@ editor_options:
   chunk_output_type: console
 bibliography: ../input/bib/jusmer.bib
 ---
+
+# Methodology
 
 ```{r}
 #| label: packages

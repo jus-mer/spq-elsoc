@@ -1,5 +1,4 @@
 ---
-title: Results presentation
 format: 
   html:
     theme: cosmo
@@ -8,6 +7,7 @@ code-fold: true
 editor_options: 
   chunk_output_type: console
 ---
+# Results
 
 ```{r}
 #| label: set
