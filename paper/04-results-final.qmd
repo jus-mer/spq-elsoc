@@ -1,0 +1,769 @@
+---
+title: Results presentation
+format: 
+  html:
+    theme: cosmo
+    toc: true
+code-fold: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: set
+#| echo: false
+#| message: false
+#| warning: false
+
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE, include = TRUE, warning = FALSE, message = FALSE)
+
+table_format <- if(is_html_output()) {
+  "html"
+} else if(is_latex_output()) {
+  "latex"
+}
+table_format2 <- if(is_html_output()) {
+  T
+} else if(is_latex_output()) {
+  F
+}
+
+options(kableExtra.html.bsTable = T)
+options(knitr.kable.NA = "")
+```
+
+
+```{r}
+#| label: packages
+#| include: false
+
+if (! require("pacman")) install.packages("pacman")
+
+pacman::p_load(tidyverse, 
+               sjmisc, 
+               sjPlot, 
+               lme4, 
+               here, 
+               performance,
+               influence.ME, 
+               srvyr,
+               ordinal,
+               texreg, 
+               ggdist,
+               misty,
+               kableExtra,
+               ggalluvial, 
+               shadowtext,
+               MetBrewer,
+               patchwork,
+               sjlabelled,
+               corrplot)
+
+
+options(scipen=999)
+```
+
+```{r}
+#| label: data
+#| include: false
+
+load(file = here("input/data/proc/df_final.RData"))
+
+df_model <- df_study1 %>%
+  na.omit()
+```
+
+# Descriptives
+
+## Social Subjective Status (SSS)
+
+```{r}
+#| label: fig-ess-dist
+#| fig-cap: "Distribution of subjective social status (own, family of origin and children) by wave"
+#| fig-width: 9
+#| fig-height: 8
+#| fig-align: center
+
+ess_labs <- c(ess = "Own", ess_og = "Family of origin", ess_hijos = "Children")
+
+df_ess <- df_study1 %>%
+  ungroup() %>%
+  select(ola, all_of(names(ess_labs))) %>%
+  pivot_longer(-ola, names_to = "var", values_to = "val") %>%
+  filter(!is.na(val)) %>%
+  mutate(var = factor(var, levels = names(ess_labs), labels = ess_labs)) %>%
+  count(var, ola, val) %>%
+  group_by(var, ola) %>%
+  mutate(prop = n / sum(n)) %>%
+  ungroup()
+
+df_ess_mean <- df_study1 %>%
+  ungroup() %>%
+  select(ola, all_of(names(ess_labs))) %>%
+  pivot_longer(-ola, names_to = "var", values_to = "val") %>%
+  mutate(var = factor(var, levels = names(ess_labs), labels = ess_labs)) %>%
+  group_by(var, ola) %>%
+  summarise(m = mean(val, na.rm = TRUE), .groups = "drop")
+
+ggplot(df_ess, aes(x = val, y = prop)) +
+  geom_col(fill = met.brewer("Hiroshige", 1, direction = -1)[1], width = 0.8) +
+  geom_vline(data = df_ess_mean, aes(xintercept = m),
+             linetype = "dashed", colour = "grey20") +
+  scale_x_continuous(breaks = 0:10) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), n.breaks = 3) +
+  facet_grid(ola ~ var) +
+  labs(x = "Subjective social status (0 = lowest, 10 = highest)", y = NULL,
+       caption = "Dashed line: wave mean.") +
+  theme_minimal(base_size = 11) +
+  theme(strip.text = element_text(face = "bold"),
+        panel.grid.minor = element_blank())
+```
+
+## Social Subjective Mobility
+
+```{r}
+#| label: mov-dist-setup
+#| include: false
+
+mov_labs <- c(
+  mov_dir      = "Own - origin",
+  mov_og       = "Own - mean origin",
+  mov_exp      = "Children - own",
+  mov_inter    = "Intergenerational (children - own - origin)",
+  mov_exp_og   = "Children - origin",
+  ess_traj     = "Trajectory slope",
+  ess_traj_sqt = "Trajectory curve"
+)
+
+df_mov <- df_study1 %>%
+  ungroup() %>%
+  select(ola, all_of(names(mov_labs))) %>%
+  pivot_longer(-ola, names_to = "var", values_to = "val") %>%
+  filter(!is.na(val)) %>%
+  mutate(val = as.numeric(val))
+
+plot_mov <- function(v) {
+  d <- filter(df_mov, var == v)
+  ggplot(d, aes(x = val)) +
+    geom_histogram(binwidth = 1, boundary = 0, fill = met.brewer("Hiroshige", 1, direction = -1)[1],
+                   colour = "white") +
+    geom_vline(data = d %>% group_by(ola) %>% summarise(m = mean(val), .groups = "drop"),
+               aes(xintercept = m), linetype = "dashed", colour = "grey20") +
+    geom_vline(xintercept = 0, colour = "grey50") +
+    facet_wrap(~ ola, nrow = 1) +
+    labs(title = mov_labs[[v]], x = NULL, y = NULL) +
+    theme_minimal(base_size = 14) +
+    theme(plot.title = element_text(face = "bold"),
+          axis.text = element_text(size = 13),
+          strip.text = element_text(size = 14, face = "bold"),
+          panel.grid.minor = element_blank())
+}
+```
+
+
+
+::: {.panel-tabset}
+
+## Own - origin
+
+```{r}
+#| label: fig-mov-dir-dist
+#| fig-cap: "Distribution of subjective social mobility by wave: Own - origin"
+#| fig-width: 14
+#| fig-height: 7
+#| fig-align: center
+
+plot_mov("mov_dir") +
+  labs(title = NULL, caption = "Dashed line: wave mean. Solid line: no mobility (0).")
+```
+
+## Own - mean origin
+
+```{r}
+#| label: fig-mov-og-dist
+#| fig-cap: "Distribution of subjective social mobility by wave: Own - mean origin"
+#| fig-width: 14
+#| fig-height: 7
+#| fig-align: center
+
+plot_mov("mov_og") +
+  labs(title = NULL, caption = "Dashed line: wave mean. Solid line: no mobility (0).")
+```
+
+## Children - own
+
+```{r}
+#| label: fig-mov-exp-dist
+#| fig-cap: "Distribution of subjective social mobility by wave: Children - own"
+#| fig-width: 14
+#| fig-height: 7
+#| fig-align: center
+
+plot_mov("mov_exp") +
+  labs(title = NULL, caption = "Dashed line: wave mean. Solid line: no mobility (0).")
+```
+
+
+## Intergenerational (children - own - origin)
+
+```{r}
+#| label: fig-mov-inter-dist
+#| fig-cap: "Distribution of subjective social mobility by wave: Intergenerational (children - own - origin)"
+#| fig-width: 14
+#| fig-height: 7
+#| fig-align: center
+
+plot_mov("mov_inter") +
+  labs(title = NULL, caption = "Dashed line: wave mean. Solid line: no mobility (0).")
+```
+
+## Children - origin
+
+```{r}
+#| label: fig-mov-exp-og-dist
+#| fig-cap: "Distribution of subjective social mobility by wave: Children - origin"
+#| fig-width: 14
+#| fig-height: 7
+#| fig-align: center
+
+plot_mov("mov_exp_og") +
+  labs(title = NULL, caption = "Dashed line: wave mean. Solid line: no mobility (0).")
+```
+
+## Trajectory slope
+
+```{r}
+#| label: fig-traj-dist
+#| fig-cap: "Distribution of subjective social mobility by wave: Trajectory slope"
+#| fig-width: 14
+#| fig-height: 7
+#| fig-align: center
+
+plot_mov("ess_traj") +
+  labs(title = NULL, caption = "Dashed line: wave mean. Solid line: no mobility (0).")
+```
+
+:::
+
+
+# Correlation matrix
+
+
+```{r}
+#| label: tbl-correlations
+#| tbl-cap: "Average within-wave Spearman correlations between subjective social status and MJP"
+#| tbl-cap-location: top
+#| include: false
+
+vars <- c(
+  ess          = "Subjective social status",
+  ess_og       = "Family subjective social status",
+  ess_hijos    = "Son's subjective social status",
+  mjp_index    = "MJP index",
+  sex          = "Sex (Female)",
+  age          = "Age",
+  ideo        = "Political ideology"
+)
+
+df_cor <- df_study1 %>%
+  ungroup() %>%
+  select(ola, all_of(names(vars))) %>%
+  mutate(across(starts_with("just_"), ~ as.numeric(.x)),
+         across(-ola, ~ as.numeric(.x)))
+
+# one correlation matrix per wave
+cor_waves <- df_cor %>%
+  group_split(ola, .keep = FALSE) %>%
+  map(~ cor(.x, method = "spearman", use = "pairwise.complete.obs"))
+
+# average across waves on Fisher's z scale
+z_mean <- Reduce(`+`, map(cor_waves, ~ atanh(pmin(pmax(.x, -0.999999), 0.999999)))) / length(cor_waves)
+cor_avg <- tanh(z_mean)
+diag(cor_avg) <- 1
+
+# full matrix (with variable labels) kept for the corrplot below
+cor_full <- cor_avg
+rownames(cor_full) <- colnames(cor_full) <- unname(vars)
+
+rownames(cor_avg) <- paste0(seq_along(vars), ". ", vars)
+colnames(cor_avg) <- seq_along(vars)
+cor_avg[upper.tri(cor_avg)] <- NA
+
+cor_avg %>%
+  as.data.frame() %>%
+  kbl(digits = 2, format = table_format, booktabs = TRUE,
+      caption = NULL) %>%
+  kable_styling(full_width = FALSE) %>%
+  footnote(general = paste0("Spearman correlations computed within each wave (",
+                            length(cor_waves), " waves, 2016-2023) and averaged using Fisher's z."),
+           general_title = "Note:", footnote_as_chunk = TRUE)
+```
+
+```{r}
+#| label: fig-correlations
+#| fig-cap: "Average within-wave Spearman correlations (corrplot)"
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+#| include: false
+
+corrplot(cor_full,
+         method = "color",
+         type = "lower",
+         diag = FALSE,
+         order = "original",
+         addCoef.col = "black",
+         number.cex = 0.75,
+         number.digits = 2,
+         tl.col = "black",
+         tl.cex = 0.85,
+         tl.srt = 45,
+         cl.cex = 0.8,
+         col = colorRampPalette(c("#2166AC", "white", "#B2182B"))(200),
+         col.lim = c(-1, 1),
+         is.corr = TRUE,
+         mar = c(0, 0, 1, 0))
+```
+
+
+```{r}
+#| label: fun-corrplot-wave
+#| include: false
+
+plot_cor_wave <- function(i) {
+  m <- cor_waves[[i]]
+  rownames(m) <- colnames(m) <- unname(vars)
+  corrplot(m,
+           method = "color",
+           type = "lower",
+           diag = FALSE,
+           order = "original",
+           addCoef.col = "black",
+           number.cex = 0.75,
+           number.digits = 2,
+           tl.col = "black",
+           tl.cex = 0.85,
+           tl.srt = 45,
+           cl.cex = 0.8,
+           col = colorRampPalette(c("#2166AC", "white", "#B2182B"))(200),
+           col.lim = c(-1, 1),
+           is.corr = TRUE,
+           na.label = "-",
+           mar = c(0, 0, 1, 0))
+}
+```
+
+## SSS Alternative 1 (with controls and by wave)
+
+::: {.panel-tabset}
+
+## Wave 1
+
+```{r}
+#| label: fig-correlations-w1
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(1)
+```
+
+## Wave 2
+
+```{r}
+#| label: fig-correlations-w2
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(2)
+```
+
+## Wave 3
+
+```{r}
+#| label: fig-correlations-w3
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(3)
+```
+
+## Wave 4
+
+```{r}
+#| label: fig-correlations-w4
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(4)
+```
+
+## Wave 5
+
+```{r}
+#| label: fig-correlations-w5
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(5)
+```
+
+## Wave 6
+
+```{r}
+#| label: fig-correlations-w6
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+plot_cor_wave(6)
+```
+
+:::
+
+## SSS Alternative 2 (without controls and BE/WE decomposition)
+
+```{r}
+#| label: fig-correlations-we-be
+#| fig-cap: "Spearman correlations between decomposed SSS variables (within-person, WE, and between-person, BE)"
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+
+vars_wb <- c(
+  ess_cwc        = "SSS own (WE)",
+  ess_mean       = "SSS own (BE)",
+  ess_og_cwc     = "SSS origin (WE)",
+  ess_og_mean    = "SSS origin (BE)",
+  ess_hijos_cwc  = "SSS children (WE)",
+  ess_hijos_mean = "SSS children (BE)"
+)
+
+cor_wb <- df_study1 %>%
+  ungroup() %>%
+  select(all_of(names(vars_wb))) %>%
+  mutate(across(everything(), as.numeric)) %>%
+  cor(method = "spearman", use = "pairwise.complete.obs")
+
+rownames(cor_wb) <- colnames(cor_wb) <- unname(vars_wb)
+
+corrplot(cor_wb,
+         method = "color",
+         type = "lower",
+         diag = FALSE,
+         order = "original",
+         addCoef.col = "black",
+         number.cex = 0.8,
+         number.digits = 2,
+         tl.col = "black",
+         tl.cex = 0.85,
+         tl.srt = 45,
+         cl.cex = 0.8,
+         col = colorRampPalette(c("#2166AC", "white", "#B2182B"))(200),
+         col.lim = c(-1, 1),
+         is.corr = TRUE,
+         mar = c(0, 0, 1, 0))
+```
+
+## Social Subjetive Mobility (Alternative 2)
+
+```{r}
+#| label: fig-correlations-mov
+#| fig-cap: "Spearman correlations between decomposed subjective mobility variables (within-person, WE, and between-person, BE)"
+#| fig-width: 11
+#| fig-height: 11
+#| fig-align: center
+
+vars_mov <- c(
+  mov_dir_cwc       = "Own - origin (WE)",
+  mov_dir_mean      = "Own - origin (BE)",
+  mov_og_cwc        = "Own - mean origin (WE)",
+  mov_og_mean       = "Own - mean origin (BE)",
+  mov_exp_cwc       = "Children - own (WE)",
+  mov_exp_mean      = "Children - own (BE)",
+  mov_inter_cwc     = "Intergenerational (WE)",
+  mov_inter_mean    = "Intergenerational (BE)",
+  mov_exp_og_cwc    = "Children - origin (WE)",
+  mov_exp_og_mean   = "Children - origin (BE)",
+  ess_traj_cwc      = "Trajectory slope (WE)",
+  ess_traj_mean     = "Trajectory slope (BE)",
+  ess_traj_sqt_cwc  = "Trajectory curve (WE)",
+  ess_traj_sqt_mean = "Trajectory curve (BE)"
+)
+
+cor_mov <- df_study1 %>%
+  ungroup() %>%
+  select(all_of(names(vars_mov))) %>%
+  mutate(across(everything(), as.numeric)) %>%
+  cor(method = "spearman", use = "pairwise.complete.obs")
+
+rownames(cor_mov) <- colnames(cor_mov) <- unname(vars_mov)
+
+corrplot(cor_mov,
+         method = "color",
+         type = "lower",
+         diag = FALSE,
+         order = "original",
+         addCoef.col = "black",
+         number.cex = 0.6,
+         number.digits = 2,
+         tl.col = "black",
+         tl.cex = 0.8,
+         tl.srt = 45,
+         cl.cex = 0.8,
+         col = colorRampPalette(c("#2166AC", "white", "#B2182B"))(200),
+         col.lim = c(-1, 1),
+         is.corr = TRUE,
+         mar = c(0, 0, 1, 0))
+```
+
+
+# Modelling
+
+## Social Subjective Status (SSS)
+
+```{r}
+#| label: draft-modelos
+
+## WE and BE main effects - MJP index
+# mjp_index is a continuous mean index (1-5), so linear mixed models (lmer)
+# are used instead of cumulative link models (clmm). REML = FALSE so that
+# models with different fixed effects are comparable (LRT, BIC).
+
+df_model <- df_model %>% group_by(idencuesta) %>% 
+  mutate(age_gm=mean(age,na.rm = FALSE)) %>% 
+  mutate(inc_eq_mill_gm=mean(inc_eq_mill,na.rm = FALSE))
+
+model1 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ess_cwc +
+             ess_mean + 
+             (1 + ola_num | idencuesta),
+           REML = FALSE,
+           data = df_model)
+
+model2 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ess_og_cwc +
+             ess_og_mean + 
+             (1 + ola_num | idencuesta),
+           REML = FALSE,
+           data = df_model)
+
+model3 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ess_hijos_cwc +
+             ess_hijos_mean + 
+             (1 + ola_num | idencuesta),
+           REML = FALSE,
+           data = df_model)
+
+model4 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ideo +
+             sex +
+             age +
+             ess_cwc +
+             ess_mean + 
+             (1 + ola_num | idencuesta),
+           REML = FALSE,
+           data = df_model)
+
+model5 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ideo +
+             sex +
+             age +
+             ess_og_cwc +
+             ess_og_mean + 
+             (1 + ola_num | idencuesta),
+           REML = FALSE,
+           data = df_model)
+
+model6 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ideo +
+             sex +
+             age +
+             ess_hijos_cwc +
+             ess_hijos_mean +
+             (1 + ola_num | idencuesta),
+           REML = FALSE,
+           data = df_model)
+
+model7 <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ideo +
+             sex +
+             age +
+             ess_cwc +
+             ess_mean +
+             ess_og_cwc +
+             ess_og_mean +
+             ess_hijos_cwc +
+             ess_hijos_mean +
+             (1 + ola_num | idencuesta),
+           REML = FALSE,
+           data = df_model)
+
+```
+
+```{r}
+#| label: tbl-draft-modelos
+#| tbl-cap: "Draft linear longitudinal multilevel models for the MJP index"
+#| tbl-cap-location: top
+#| results: asis
+
+draft_coef <- list(
+  "(Intercept)" = "Intercept",
+  ola_num = "Wave",
+  ola_2 = "Wave^2",
+  ess_cwc = "SSS own (WE)",
+  ess_mean = "SSS own (BE)",
+  ess_og_cwc = "SSS origin (WE)",
+  ess_og_mean = "SSS origin (BE)",
+  ess_hijos_cwc = "SSS children (WE)",
+  ess_hijos_mean = "SSS children (BE)",
+  sexFemale = "Sex: Female (ref. Male)",
+  age = "Age",
+  ideoCenter = "Political ideology: Center (ref. Left)",
+  ideoRight = "Political ideology: Right (ref. Left)",
+  `ideoDoes not identify` = "Political ideology: Does not identify (ref. Left)"
+)
+
+draft_models <- list(model1, model2, model3, model4, model5, model6, model7)
+
+htmlreg(draft_models,
+        custom.model.names = paste0("Model ", seq_along(draft_models)),
+        caption.above = T,
+        caption = NULL,
+        stars = c(0.05, 0.01, 0.001),
+        custom.coef.map = draft_coef,
+        digits = 3,
+        leading.zero = T,
+        include.loglik = FALSE,
+        include.aic = FALSE,
+        center = T,
+        custom.note = "Note: SSS = subjective social status; WE = within-person effect; BE = between-person effect. Cells contain regression coefficients with standard errors in parentheses. %stars.")
+```
+
+
+## Social Subjective Mobility
+
+```{r}
+#| label: draft-modelos-ssm
+
+## WE and BE main effects of each subjective mobility measure - MJP index
+# Same specification as the SSS models above (lmer, REML = FALSE, random
+# intercept and wave slope by respondent). The mobility measures are
+# differences/combinations of ess, ess_og and ess_hijos, so they are entered
+# one at a time (they are collinear if combined), except the trajectory
+# slope and curve, which are entered together.
+
+mov_vars <- c("mov_dir", "mov_og", "mov_exp", "mov_inter", "mov_exp_og")
+
+fit_mov <- function(terms, controls = FALSE) {
+  rhs <- c("ola_num", "ola_2",
+           if (controls) c("ideo", "sex", "age"),
+           terms,
+           "(1 + ola_num | idencuesta)")
+  lmer(reformulate(rhs, response = "mjp_index"), REML = FALSE, data = df_model)
+}
+
+mov_terms <- c(
+  lapply(mov_vars, function(v) paste0(v, c("_cwc", "_mean"))),
+  list(c("ess_traj_cwc", "ess_traj_mean"),
+       c("ess_traj_cwc", "ess_traj_mean", "ess_traj_sqt_cwc", "ess_traj_sqt_mean"))
+)
+
+# models 8-14: mobility only; models 15-21: with controls
+mov_models   <- lapply(mov_terms, fit_mov)
+mov_models_c <- lapply(mov_terms, fit_mov, controls = TRUE)
+
+# model 22: all mobility measures together (with controls). They are linear
+# combinations of ess, ess_og and ess_hijos, so the design is rank deficient and
+# lmer drops the aliased terms (kept in the order they are entered).
+mov_models_c[[length(mov_models_c) + 1]] <-
+  fit_mov(unique(unlist(mov_terms)), controls = TRUE)
+```
+
+```{r}
+#| label: tbl-draft-modelos-ssm
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index: subjective social mobility"
+#| tbl-cap-location: top
+#| results: asis
+
+mov_coef <- list(
+  "(Intercept)" = "Intercept",
+  ola_num = "Wave",
+  ola_2 = "Wave^2",
+  sss_index_cwc = "SSS index (WE)",
+  sss_index_mean = "SSS index (BE)",
+  mov_dir_cwc = "Mobility own - origin (WE)",
+  mov_dir_mean = "Mobility own - origin (BE)",
+  mov_og_cwc = "Mobility own - mean origin (WE)",
+  mov_og_mean = "Mobility own - mean origin (BE)",
+  mov_exp_cwc = "Expected mobility children - own (WE)",
+  mov_exp_mean = "Expected mobility children - own (BE)",
+  mov_inter_cwc = "Intergenerational mobility (WE)",
+  mov_inter_mean = "Intergenerational mobility (BE)",
+  mov_exp_og_cwc = "Expected mobility children - origin (WE)",
+  mov_exp_og_mean = "Expected mobility children - origin (BE)",
+  ess_traj_cwc = "SSS trajectory slope (WE)",
+  ess_traj_mean = "SSS trajectory slope (BE)",
+  ess_traj_sqt_cwc = "SSS trajectory curve (WE)",
+  ess_traj_sqt_mean = "SSS trajectory curve (BE)",
+  sexFemale = "Sex: Female (ref. Male)",
+  age = "Age",
+  ideoCenter = "Political ideology: Center (ref. Left)",
+  ideoRight = "Political ideology: Right (ref. Left)",
+  `ideoDoes not identify` = "Political ideology: Does not identify (ref. Left)"
+)
+
+mov_note <- "Note: Model 22 includes all mobility measures; since they are linear combinations of the three SSS measures, aliased terms are dropped by lmer (empty cells). WE = within-person effect; BE = between-person effect. Cells contain regression coefficients with standard errors in parentheses. %stars."
+
+htmlreg(mov_models,
+        custom.model.names = paste0("Model ", 8:14),
+        caption.above = T,
+        caption = NULL,
+        stars = c(0.05, 0.01, 0.001),
+        custom.coef.map = mov_coef,
+        digits = 3,
+        leading.zero = T,
+        include.loglik = FALSE,
+        include.aic = FALSE,
+        center = T,
+        custom.note = mov_note)
+```
+
+```{r}
+#| label: tbl-draft-modelos-ssm-controls
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index: subjective social mobility, with controls"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg(mov_models_c,
+        custom.model.names = paste0("Model ", 15:22),
+        caption.above = T,
+        caption = NULL,
+        stars = c(0.05, 0.01, 0.001),
+        custom.coef.map = mov_coef,
+        digits = 3,
+        leading.zero = T,
+        include.loglik = FALSE,
+        include.aic = FALSE,
+        center = T,
+        custom.note = mov_note)
+```
