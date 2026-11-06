@@ -1369,7 +1369,7 @@ htmlreg(obj_models_c,
         custom.note = obj_note)
 ```
 
-# Proposal for final models
+# First proposal for complete models
 
 Based on separate models of subjective social status, subjective mobility, and objective status, a final proposal for the model is presented. In these subsections, the following variables were selected: subjective mobility between one’s own status and that of one’s children; intergenerational mobility; mobility between one’s status of origin and that of one’s children; and, finally, social trajectory. These were the variables that were shown to have some effect on market justice preferences, and therefore they were prioritized over the others. Furthermore, a model structure is generated that includes two modeling approaches for the objective variables: one using dichotomized educational attainment and income divided into three categories, and another using years of education and logarithmic income. This distinction was made to incorporate the WE effect of education and income into the model, which serves as a proxy for objective mobility.
 
@@ -1565,4 +1565,139 @@ htmlreg(mo2_models_c,
         include.aic = FALSE,
         center = T,
         custom.note = mo2_note)
+```
+
+
+# Proposal for revision @juancarloscastillo
+
+The proposal considers the static (3 original) and dynamic (origin-offspring mobility) variables of subjective status, and the static (categorized educational level and income) and dynamic (years of education and logarithmic income) variables of objective status. 
+
+@tbl-alt1-separate shows the models entered with each status variable to provide context for understanding the following table. @tbl-alt1-combined presents the concept of the final table, showing the coefficients of subjective status with objective status at the same time, and then presents the same series of models including the controls. Finally, a final model is generated with all variables.
+
+```{r}
+model_final <- lmer(mjp_index ~ 1 +
+             ola_num +
+             ola_2 +
+             ess_og_cwc +
+             ess_og_mean +
+             ess_cwc +
+             ess_mean +
+             ess_hijos_cwc +
+             ess_hijos_mean +
+             mov_exp_og_cwc +
+             mov_exp_og_mean +
+             dummy_educ_mean +
+             educyear_cwc +
+             inc_group_be +
+             ln_inc_eq_real_sqrt_cwc +
+             ideo +
+             sex +
+             age +
+             (1 + ola_num | idencuesta),
+           REML = FALSE,
+           data = df_model)
+```
+
+```{r}
+#| label: alt1-models
+
+# Same structure as model_final (lmer, REML = FALSE, random intercept and wave
+# slope by respondent). Blocks:
+#   1. one model per subjective status (WE/BE) and per objective status
+#      (education, income; WE/BE)                                (models 57-62)
+#   2. subjective models adding all objective status             (models 63-66)
+#   3. models of block 2 with controls (ideology, sex, age)      (models 67-70)
+#   4. final model (model_final), all variables                  (model 71)
+
+a1_subj <- list(
+  ess_og     = c("ess_og_cwc", "ess_og_mean"),
+  ess_own    = c("ess_cwc", "ess_mean"),
+  ess_hijos  = c("ess_hijos_cwc", "ess_hijos_mean"),
+  mov_exp_og = c("mov_exp_og_cwc", "mov_exp_og_mean")
+)
+a1_obj <- list(
+  educ = c("dummy_educ_mean", "educyear_cwc"),
+  inc  = c("inc_group_be", "ln_inc_eq_real_sqrt_cwc")
+)
+a1_ctrl <- c("ideo", "sex", "age")
+
+# same formula as model_final, with the selected terms
+fit_a1 <- function(terms, controls = FALSE) {
+  rhs <- c("ola_num", "ola_2", terms, if (controls) a1_ctrl,
+           "(1 + ola_num | idencuesta)")
+  lmer(reformulate(rhs, response = "mjp_index"), REML = FALSE, data = df_model)
+}
+
+a1_obj_all <- unlist(a1_obj, use.names = FALSE)
+
+a1_m1 <- lapply(c(a1_subj, a1_obj), fit_a1)
+a1_m2 <- lapply(a1_subj, function(s) fit_a1(c(s, a1_obj_all)))
+a1_m3 <- lapply(a1_subj, function(s) fit_a1(c(s, a1_obj_all), controls = TRUE))
+a1_m4 <- list(final = model_final)
+
+a1_coef <- list(
+  "(Intercept)" = "Intercept",
+  ola_num = "Wave",
+  ola_2 = "Wave^2",
+  ess_og_cwc = "SSS family of origin (WE)",
+  ess_og_mean = "SSS family of origin (BE)",
+  ess_cwc = "SSS own (WE)",
+  ess_mean = "SSS own (BE)",
+  ess_hijos_cwc = "SSS children (WE)",
+  ess_hijos_mean = "SSS children (BE)",
+  mov_exp_og_cwc = "Expected mobility children - origin (WE)",
+  mov_exp_og_mean = "Expected mobility children - origin (BE)",
+  dummy_educ_mean = "University education (BE)",
+  educyear_cwc = "Education in years (WE)",
+  inc_group_beMiddle = "Income: Middle (BE, ref. Bottom)",
+  inc_group_beTop = "Income: Top (BE, ref. Bottom)",
+  ln_inc_eq_real_sqrt_cwc = "Log equivalized income (WE)",
+  ideoCenter = "Political ideology: Center (ref. Left)",
+  ideoRight = "Political ideology: Right (ref. Left)",
+  `ideoDoes not identify` = "Political ideology: Does not identify (ref. Left)",
+  sexFemale = "Sex: Female (ref. Male)",
+  age = "Age"
+)
+
+a1_note <- "Note: WE = within-person effect; BE = between-person effect. University education (BE): ever university education. Income (BE): person's modal income group across waves. Models 63-66 add all objective status variables to each subjective status model; models 67-70 add controls (ideology, sex, age); model 71 includes all variables. Cells contain regression coefficients with standard errors in parentheses. %stars."
+```
+
+```{r}
+#| label: tbl-alt1-separate
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index: subjective and objective status, separate models"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg(a1_m1,
+        custom.model.names = paste0("Model ", 57:62),
+        caption.above = T,
+        caption = NULL,
+        stars = c(0.05, 0.01, 0.001),
+        custom.coef.map = a1_coef,
+        digits = 3,
+        leading.zero = T,
+        include.loglik = FALSE,
+        include.aic = FALSE,
+        center = T,
+        custom.note = a1_note)
+```
+
+```{r}
+#| label: tbl-alt1-combined
+#| tbl-cap: "Linear longitudinal multilevel models for the MJP index: subjective status with objective status, with controls, and final model"
+#| tbl-cap-location: top
+#| results: asis
+
+htmlreg(c(a1_m2, a1_m3, a1_m4),
+        custom.model.names = paste0("Model ", 63:71),
+        caption.above = T,
+        caption = NULL,
+        stars = c(0.05, 0.01, 0.001),
+        custom.coef.map = a1_coef,
+        digits = 3,
+        leading.zero = T,
+        include.loglik = FALSE,
+        include.aic = FALSE,
+        center = T,
+        custom.note = a1_note)
 ```
