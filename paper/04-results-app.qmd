@@ -71,7 +71,13 @@ options(scipen=999)
 
 load(file = here("input/data/proc/df_final.RData"))
 
+# The health insurance and income trajectory variables are left out before
+# na.omit(): prev_salud is only measured in 2017 and 2022, and the trajectory
+# variables are NA for respondents without income in 2016 or 2023, so keeping
+# them would drop rows that the paper models do not need
 df_model <- df_study1 %>%
+  dplyr::select(-dplyr::any_of(c("prev_salud", "prev_salud_fill", "cambio_previ_salud",
+                                 "inc_origen", "inc_destino", "traj_ingreso", "dir_ingreso"))) %>%
   na.omit()
 ```
 

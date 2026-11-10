@@ -524,6 +524,196 @@ sjmisc::frq(elsoc_long_2016_2023$inc_group1)
 ```
 
 ```{r}
+#| label: health insurance
+
+# Health insurance system (s18): "¿A qué sistema previsional de salud pertenece
+# usted?". Only asked in 2017 and 2022.
+#
+# The response codes are NOT the same in both waves. 2017 has two residual
+# FONASA codes (5 = FONASA, 6 = FONASA no sabe grupo) and 2022 only one (5), so
+# from code 6 onwards the 2022 codes are shifted one position down:
+#   2017: 1-4 FONASA A-D; 5-6 FONASA; 7 FFAA; 8 Isapre; 9 None; 10 Other
+#   2022: 1-4 FONASA A-D; 5   FONASA; 6 FFAA; 7 Isapre; 8 None; 9  Other
+# The value labels of the longitudinal file follow the 2017 scheme and this is
+# not documented in the codebook: it is inferred from the data. Read with the
+# 2017 labels, 2022 would have 10% FFAA and 2% Isapre, and 128 of the 183
+# respondents with Isapre in 2017 report code 7 in 2022 (only 1 reports code 8).
+table(elsoc_long_2016_2023$s18, elsoc_long_2016_2023$ola)
+
+elsoc_long_2016_2023 <- elsoc_long_2016_2023 %>%
+  mutate(
+    prev_salud = case_when(
+      ola == "2017" & s18 %in% 1:6         ~ "FONASA",
+      ola == "2017" & s18 == 8             ~ "ISAPRE",
+      ola == "2017" & s18 %in% c(7, 9, 10) ~ "Other",
+      ola == "2022" & s18 %in% 1:5         ~ "FONASA",
+      ola == "2022" & s18 == 7             ~ "ISAPRE",
+      ola == "2022" & s18 %in% c(6, 8, 9)  ~ "Other",
+      TRUE ~ NA_character_),
+    prev_salud = factor(prev_salud, levels = c("FONASA", "ISAPRE", "Other"))
+  )
+
+# Version for all waves: each wave takes the closest measurement of the same
+# respondent (2016-2019 <- 2017; 2021-2023 <- 2022), and the other measurement
+# if the closest one is missing
+elsoc_long_2016_2023 <- elsoc_long_2016_2023 %>%
+  group_by(idencuesta) %>%
+  mutate(
+    prev_salud_2017 = prev_salud[ola == "2017"][1],
+    prev_salud_2022 = prev_salud[ola == "2022"][1],
+    prev_salud_fill = if_else(ola %in% c("2016", "2017", "2018", "2019"),
+                              coalesce(prev_salud_2017, prev_salud_2022),
+                              coalesce(prev_salud_2022, prev_salud_2017))
+  ) %>%
+  ungroup()
+
+# Change in health insurance between 2017 and 2022. Person-level variable (same
+# value in all waves of the respondent); NA if either measurement is missing
+elsoc_long_2016_2023 <- elsoc_long_2016_2023 %>%
+  mutate(
+    cambio_previ_salud = case_when(
+      prev_salud_2017 == "FONASA" & prev_salud_2022 == "FONASA" ~ "Estable FONASA",
+      prev_salud_2017 == "ISAPRE" & prev_salud_2022 == "ISAPRE" ~ "Estable ISAPRE",
+      prev_salud_2017 == "FONASA" & prev_salud_2022 == "ISAPRE" ~ "FONASA -> ISAPRE",
+      prev_salud_2017 == "ISAPRE" & prev_salud_2022 == "FONASA" ~ "ISAPRE -> FONASA",
+      prev_salud_2017 == "Other"  & prev_salud_2022 == "Other"  ~ "Estable Otro",
+      prev_salud_2017 == "Other"  & prev_salud_2022 == "FONASA" ~ "Otro -> FONASA",
+      prev_salud_2017 == "Other"  & prev_salud_2022 == "ISAPRE" ~ "Otro -> ISAPRE",
+      prev_salud_2017 == "FONASA" & prev_salud_2022 == "Other"  ~ "FONASA -> Otro",
+      prev_salud_2017 == "ISAPRE" & prev_salud_2022 == "Other"  ~ "ISAPRE -> Otro",
+      TRUE ~ NA_character_),
+    cambio_previ_salud = factor(cambio_previ_salud,
+                                levels = c("Estable FONASA", "Estable ISAPRE",
+                                           "FONASA -> ISAPRE", "ISAPRE -> FONASA",
+                                           "Estable Otro", "Otro -> FONASA",
+                                           "Otro -> ISAPRE", "FONASA -> Otro",
+                                           "ISAPRE -> Otro"))
+  ) %>%
+  select(-prev_salud_2017, -prev_salud_2022)
+
+elsoc_long_2016_2023$cambio_previ_salud <-
+  sjlabelled::set_label(x = elsoc_long_2016_2023$cambio_previ_salud,
+                        label = "Change in health insurance system 2017-2022")
+
+table(elsoc_long_2016_2023$cambio_previ_salud, elsoc_long_2016_2023$ola, useNA = "ifany")
+
+elsoc_long_2016_2023$prev_salud <-
+  sjlabelled::set_label(x = elsoc_long_2016_2023$prev_salud,
+                        label = "Health insurance system (2017 and 2022)")
+elsoc_long_2016_2023$prev_salud_fill <-
+  sjlabelled::set_label(x = elsoc_long_2016_2023$prev_salud_fill,
+                        label = "Health insurance system (closest measurement)")
+
+table(elsoc_long_2016_2023$prev_salud, elsoc_long_2016_2023$ola, useNA = "ifany")
+table(elsoc_long_2016_2023$prev_salud_fill, elsoc_long_2016_2023$ola, useNA = "ifany")
+```
+
+```{r}
+#| label: children
+
+# Has children. Person-level variable (same value in all waves of the
+# respondent) built from the two questions ELSOC asks:
+#   m37_01 + m37_02: number of sons and daughters ever had
+#                    (2016 original sample, 2018 refreshment sample)
+#   m48: "¿Tiene o ha tenido hijos?", 1 = yes, 2 = no
+#        (2017 original sample, 2019 refreshment sample)
+# Having had children does not revert, so the respondent is coded as having
+# children if either source says so (the two disagree in about 5% of cases).
+# Not asked after 2019: first births after that wave are not captured.
+elsoc_long_2016_2023 <- elsoc_long_2016_2023 %>%
+  mutate(hijos_n = m37_01 + m37_02) %>%
+  group_by(idencuesta) %>%
+  mutate(
+    hijos_si    = any(m48 == 1 | hijos_n > 0, na.rm = TRUE),
+    hijos_dato  = any(!is.na(m48) | !is.na(hijos_n)),
+    tiene_hijos = case_when(hijos_si   ~ "Has children",
+                            hijos_dato ~ "No children",
+                            TRUE ~ NA_character_)
+  ) %>%
+  ungroup() %>%
+  mutate(tiene_hijos = factor(tiene_hijos, levels = c("No children", "Has children"))) %>%
+  select(-hijos_n, -hijos_si, -hijos_dato)
+
+elsoc_long_2016_2023$tiene_hijos <-
+  sjlabelled::set_label(x = elsoc_long_2016_2023$tiene_hijos,
+                        label = "Has children")
+
+table(elsoc_long_2016_2023$tiene_hijos, elsoc_long_2016_2023$ola, useNA = "ifany")
+```
+
+```{r}
+#| label: income-trajectory
+
+# Income mobility trajectory between the first and the last wave of the panel
+# (2016 -> 2023). Person-level variables (same value in all waves of the
+# respondent), built from the within-wave income deciles (decile_eq):
+#   Low    = deciles 1-2  (bottom 20%)
+#   Middle = deciles 3-8
+#   Top    = deciles 9-10 (top 20%)
+# The deciles are computed on equivalised household income in each wave, over
+# all respondents of that wave (original and refreshment samples), so the groups
+# are relative positions in each year, not fixed income thresholds. All the
+# variables are NA if the respondent has no valid income in 2016 or in 2023
+# (the refreshment sample, which enters in 2018, has no 2016 measurement).
+elsoc_long_2016_2023 <- elsoc_long_2016_2023 %>%
+  group_by(idencuesta) %>%
+  mutate(dec_origen  = as.numeric(as.character(decile_eq[ola == "2016"][1])),
+         dec_destino = as.numeric(as.character(decile_eq[ola == "2023"][1]))) %>%
+  ungroup() %>%
+  mutate(
+    # cut() with right-closed intervals: (0,2] = 1-2, (2,8] = 3-8, (8,10] = 9-10
+    inc_origen  = cut(dec_origen,  breaks = c(0, 2, 8, 10),
+                      labels = c("Low", "Middle", "Top")),
+    inc_destino = cut(dec_destino, breaks = c(0, 2, 8, 10),
+                      labels = c("Low", "Middle", "Top")),
+
+    # Origin x destination (9 trajectories)
+    traj_ingreso = case_when(
+      inc_origen == "Low"    & inc_destino == "Low"    ~ "Stable low",
+      inc_origen == "Low"    & inc_destino == "Middle" ~ "Low -> Middle",
+      inc_origen == "Low"    & inc_destino == "Top"    ~ "Low -> Top",
+      inc_origen == "Middle" & inc_destino == "Low"    ~ "Middle -> Low",
+      inc_origen == "Middle" & inc_destino == "Middle" ~ "Stable middle",
+      inc_origen == "Middle" & inc_destino == "Top"    ~ "Middle -> Top",
+      inc_origen == "Top"    & inc_destino == "Low"    ~ "Top -> Low",
+      inc_origen == "Top"    & inc_destino == "Middle" ~ "Top -> Middle",
+      inc_origen == "Top"    & inc_destino == "Top"    ~ "Stable top"),
+    traj_ingreso = factor(traj_ingreso,
+                          levels = c("Stable low", "Low -> Middle", "Low -> Top",
+                                     "Middle -> Low", "Stable middle", "Middle -> Top",
+                                     "Top -> Low", "Top -> Middle", "Stable top")),
+
+    # Direction only (3 categories), for when the cells above are too small
+    dir_ingreso = case_when(
+      is.na(inc_origen) | is.na(inc_destino)           ~ NA_character_,
+      as.integer(inc_destino) > as.integer(inc_origen) ~ "Upward",
+      as.integer(inc_destino) < as.integer(inc_origen) ~ "Downward",
+      TRUE                                             ~ "Stable"),
+    dir_ingreso = factor(dir_ingreso, levels = c("Stable", "Upward", "Downward"))) %>%
+  select(-dec_origen, -dec_destino)
+
+elsoc_long_2016_2023$inc_origen <-
+  sjlabelled::set_label(elsoc_long_2016_2023$inc_origen,
+                        label = "Income group 2016 (origin)")
+elsoc_long_2016_2023$inc_destino <-
+  sjlabelled::set_label(elsoc_long_2016_2023$inc_destino,
+                        label = "Income group 2023 (destination)")
+elsoc_long_2016_2023$traj_ingreso <-
+  sjlabelled::set_label(elsoc_long_2016_2023$traj_ingreso,
+                        label = "Income mobility trajectory 2016-2023")
+elsoc_long_2016_2023$dir_ingreso <-
+  sjlabelled::set_label(elsoc_long_2016_2023$dir_ingreso,
+                        label = "Income mobility direction 2016-2023")
+
+# One row per respondent
+person_inc <- dplyr::distinct(elsoc_long_2016_2023, idencuesta, inc_origen,
+                              inc_destino, traj_ingreso, dir_ingreso)
+table(person_inc$inc_origen, person_inc$inc_destino, useNA = "ifany")
+table(person_inc$traj_ingreso, useNA = "ifany")
+table(person_inc$dir_ingreso, useNA = "ifany")
+```
+
+```{r}
 # Reshape long to wide
 
 df_study1_long <- elsoc_long_2016_2023 %>% 
@@ -555,7 +745,15 @@ df_study1_long <- elsoc_long_2016_2023 %>%
          inc_group1,
          inc_eq_real_sqrt,
          ln_inc_eq_real_sqrt,
-         inc_eq_mill)
+         inc_eq_mill,
+         prev_salud,
+         prev_salud_fill,
+         cambio_previ_salud,
+         tiene_hijos,
+         inc_origen,
+         inc_destino,
+         traj_ingreso,
+         dir_ingreso)
 
 vars_invariantes <- c("age", "aget",
                       "sex",

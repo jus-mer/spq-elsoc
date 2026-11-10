@@ -1,0 +1,751 @@
+---
+title: "Previsión de salud, movilidad subjetiva y movilidad de ingreso"
+subtitle: "Preferencias de justicia de mercado: modelos multinivel con efectos intra-persona (WE) y entre personas (BE)"
+author: "Equipo JUSMER"
+date: today
+lang: es
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    toc-title: Contenido
+    code-fold: true
+    code-summary: "Ver código"
+    embed-resources: true
+    theme: cosmo
+execute:
+  warning: false
+  message: false
+editor_options:
+  chunk_output_type: console
+---
+
+# Presentación
+
+Este documento tiene tres partes:
+
+- **Parte 1:** interacción entre el **cambio de previsión de salud 2017-2022** (`cambio_previ_salud`) y cada uno de los tres **estatus subjetivos** (propio, de la familia de origen y esperado para los hijos).
+- **Parte 2:** interacción entre la previsión de salud y las **medidas de movilidad social subjetiva**, **una por modelo** (nunca todas juntas).
+- **Parte 3:** efecto de la **trayectoria de movilidad de ingreso** (origen en la primera ola, destino en la última) y su interacción con los estatus subjetivos.
+
+Todas las variables de estatus y movilidad se descomponen en su componente **intra-persona (WE)** y **entre personas (BE)**. La variable dependiente es el índice de preferencias de justicia de mercado (`mjp_index`, escala de 1 a 5).
+
+En las partes 1 y 2 se muestran dos tablas que difieren **solo en la estructura de efectos aleatorios**:
+
+- **Tabla A (sin pendiente aleatoria de SSS):** `(1 + ola_num | idencuesta)`, es decir, intercepto y pendiente aleatoria del tiempo.
+- **Tabla B (con pendiente aleatoria de SSS):** `(1 + ola_num + X_we | idencuesta)`, donde `X_we` es el componente WE que se interactúa en ese modelo (el estatus en la parte 1 y la movilidad en la parte 2).
+
+Todos los modelos usan máxima verosimilitud (`REML = FALSE`), de modo que son comparables mediante pruebas de razón de verosimilitud (LRT).
+
+# Datos y variables
+
+```{r}
+#| label: setup
+#| include: false
+
+library(dplyr)
+library(lme4)
+library(lmerTest)
+library(knitr)
+library(kableExtra)
+
+options(knitr.kable.NA = "")
+```
+
+La base es `df_final.RData` (panel balanceado del paper, 2016-2019 y 2022-2023). Se conservan las filas completas en todas las variables del paper (`na.omit()`), lo que incluye las medidas de movilidad, y con previsión de salud válida. Por eso **ambas partes usan exactamente la misma muestra**. Los efectos entre personas (BE) están **sin centrar**, en su escala original.
+
+```{r}
+#| label: data
+
+load(here::here("input/data/proc/df_final.RData"))
+
+# Grupos de previsión: se separa la dirección del cambio entre FONASA e ISAPRE
+# y se agrupan las categorías que involucran "Otro" (celdas muy pequeñas)
+lv <- c("Estable FONASA", "Estable ISAPRE", "FONASA -> ISAPRE",
+        "ISAPRE -> FONASA", "Otro sistema")
+
+d <- df_study1 %>%
+  # prev_salud solo existe en 2017 y 2022, y la trayectoria de ingreso es NA para
+  # quienes no tienen ingreso válido en 2016 o 2023: se excluyen antes de
+  # na.omit(), y luego se exige cambio_previ_salud válido
+  dplyr::select(-dplyr::any_of(c("prev_salud", "prev_salud_fill", "tiene_hijos",
+                                 "inc_origen", "inc_destino", "traj_ingreso", "dir_ingreso"))) %>%
+  na.omit() %>%
+  mutate(
+    # estatus: efectos intra-persona (desviación respecto del promedio de la persona)
+    og_we  = ess_og_cwc,
+    own_we = ess_cwc,
+    hij_we = ess_hijos_cwc,
+    # estatus: efectos entre personas (promedio de la persona, sin centrar)
+    og_be  = ess_og_mean,
+    own_be = ess_mean,
+    hij_be = ess_hijos_mean,
+    # índice de estatus subjetivo (control de los modelos de movilidad)
+    sss_index = (ess + ess_og + ess_hijos) / 3,
+    G = case_when(
+      cambio_previ_salud == "Estable FONASA"   ~ lv[1],
+      cambio_previ_salud == "Estable ISAPRE"   ~ lv[2],
+      cambio_previ_salud == "FONASA -> ISAPRE" ~ lv[3],
+      cambio_previ_salud == "ISAPRE -> FONASA" ~ lv[4],
+      TRUE                                     ~ lv[5]),
+    G = factor(G, levels = lv)) %>%
+  group_by(idencuesta) %>%
+  mutate(sss_index_mean = mean(sss_index),
+         sss_index_cwc  = sss_index - sss_index_mean) %>%
+  ungroup()
+```
+
+Muestra de análisis: **N~i~ = `r nrow(d)`** observaciones de **N~j~ = `r n_distinct(d$idencuesta)`** personas.
+
+```{r}
+#| label: tbl-grupos
+#| tbl-cap: "Tamaño de muestra por grupo de previsión (referencia: Estable FONASA)"
+
+d %>%
+  group_by(`Grupo de previsión` = G) %>%
+  summarise(`N_i (observaciones)` = n(), `N_j (personas)` = n_distinct(idencuesta)) %>%
+  bind_rows(tibble(`Grupo de previsión` = "Total",
+                   `N_i (observaciones)` = nrow(d),
+                   `N_j (personas)` = n_distinct(d$idencuesta)) %>%
+              mutate(`Grupo de previsión` = factor(`Grupo de previsión`))) %>%
+  kable(format = "html", format.args = list(big.mark = ".", decimal.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE)
+```
+
+"Otro sistema" agrupa a quienes tienen o tuvieron FF.AA., ningún sistema u otro sistema en 2017 o 2022 (Estable Otro, Otro a FONASA, Otro a ISAPRE, FONASA a Otro e ISAPRE a Otro).
+
+# Funciones comunes
+
+```{r}
+#| label: common-functions
+
+oc <- lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5))
+
+controls <- "ola_num + ola_2 + ideo + sex + age + dummy_decile10_mean + dummy_educ_mean"
+
+fmt  <- function(x, digits = 3) formatC(x, format = "f", digits = digits, decimal.mark = ",")
+star <- function(p) ifelse(p < .001, "***", ifelse(p < .01, "**",
+                    ifelse(p < .05, "*", ifelse(p < .1, "+", ""))))
+p_fmt <- function(p) ifelse(p < .001, "< 0,001", fmt(p))
+
+cell <- function(m, term) {
+  s <- coef(summary(m))
+  if (!term %in% rownames(s)) return("")
+  paste0(fmt(s[term, 1]), " (", fmt(s[term, 2]), ")", star(s[term, 5]))
+}
+
+var_comp <- function(m, what) {
+  v <- as.data.frame(VarCorr(m))
+  switch(what,
+    int   = v$vcov[v$grp == "idencuesta" & v$var1 == "(Intercept)" & is.na(v$var2)],
+    time  = v$vcov[v$var1 == "ola_num" & is.na(v$var2) & !is.na(v$var1)],
+    sss   = { x <- v$vcov[!is.na(v$var1) & endsWith(v$var1, "_we") & is.na(v$var2)]
+              if (length(x)) x else NA_real_ },
+    resid = sigma(m)^2)
+}
+
+# Controles (comunes a todas las tablas)
+ctrl_t <- c("(Intercept)", "ola_num", "ola_2", "ideoCenter", "ideoRight",
+            "ideoDoes not identify", "sexFemale", "age",
+            "dummy_decile10_mean", "dummy_educ_mean")
+ctrl_l <- c("Intercepto", "Tendencia lineal (ola_num)", "Tendencia cuadrática (ola_2)",
+            "Ideología: centro", "Ideología: derecha", "Ideología: no se identifica",
+            "Mujer", "Edad", "Decil 10 BE", "Universitaria BE")
+
+grp_t <- paste0("G", lv[-1])
+grp_l <- paste0("Previsión: ", lv[-1])
+
+note_prev <- paste("Coeficientes con errores estándar entre paréntesis.",
+                   "*** p < 0,001; ** p < 0,01; * p < 0,05; + p < 0,1.",
+                   "Los coeficientes de interacción son diferencias respecto de Estable FONASA;",
+                   "la pendiente de cada grupo es el efecto principal más su interacción.",
+                   "Los efectos del grupo de previsión en los modelos con interacción se leen con",
+                   "los efectos BE en 0, un valor que casi nadie tiene.")
+
+# Arma una tabla html a partir de una lista de modelos
+#   blocks:     lista de bloques (nombre, términos, etiquetas) que componen las filas
+#   extra_rows: lista con nombre de filas adicionales de pie (un valor por modelo)
+#   note:       nota al pie
+make_table <- function(models, col_names, blocks, extra_rows = list(), note = note_prev) {
+  terms  <- unlist(lapply(blocks, `[[`, "terms"))
+  labels <- unlist(lapply(blocks, `[[`, "labels"))
+  idx    <- sapply(blocks, function(b) length(b$terms)); names(idx) <- sapply(blocks, `[[`, "name")
+
+  coefs <- sapply(models, function(m) sapply(terms, function(t) cell(m, t)))
+  rownames(coefs) <- labels
+
+  fit_rows <- rbind(
+    "N_i (observaciones)"            = sapply(models, nobs),
+    "N_j (personas)"                 = sapply(models, function(m) ngrps(m)[["idencuesta"]]),
+    "AIC"                            = sapply(models, function(m) fmt(AIC(m), 1)),
+    "BIC"                            = sapply(models, function(m) fmt(BIC(m), 1)),
+    "Var. intercepto (persona)"      = sapply(models, function(m) fmt(var_comp(m, "int"))),
+    "Var. pendiente ola_num"         = sapply(models, function(m) fmt(var_comp(m, "time"))),
+    "Var. pendiente aleatoria del WE interactuado" = sapply(models, function(m) {
+                                          v <- var_comp(m, "sss"); ifelse(is.na(v), "", fmt(v, 4)) }),
+    "Var. residual"                  = sapply(models, function(m) fmt(var_comp(m, "resid"))),
+    "Ajuste singular"                = sapply(models, function(m) ifelse(isSingular(m), "sí", "no")),
+    "Convergencia"                   = sapply(models, function(m)
+                                          ifelse(is.null(m@optinfo$conv$lme4$messages), "ok", "advertencia")))
+
+  if (length(extra_rows)) {
+    fit_rows <- rbind(fit_rows, do.call(rbind, lapply(extra_rows, unname)))
+  }
+
+  out <- rbind(coefs, fit_rows)
+  colnames(out) <- col_names
+  idx <- c(idx, "Ajuste y efectos aleatorios" = nrow(fit_rows))
+
+  kable(out, format = "html", align = c("l", rep("r", length(models))),
+        format.args = list(big.mark = ".", decimal.mark = ",")) %>%
+    kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE, font_size = 12) %>%
+    pack_rows(index = idx) %>%
+    footnote(general = note, general_title = "Nota: ", footnote_as_chunk = TRUE)
+}
+
+# Tabla de valores p de los LRT
+make_lrt_table <- function(lrt, rows, label) {
+  tab <- tibble(
+    !!label := rows,
+    `A: WE + BE`  = sapply(lrt, function(x) p_fmt(x["A_conj"])),
+    `A: solo WE`  = sapply(lrt, function(x) p_fmt(x["A_we"])),
+    `B: WE + BE`  = sapply(lrt, function(x) p_fmt(x["B_conj"])),
+    `B: solo WE`  = sapply(lrt, function(x) p_fmt(x["B_we"])),
+    `Pend. aleatoria vs. sin ella` = sapply(lrt, function(x) p_fmt(x["RS"])))
+
+  kable(tab, format = "html", align = c("l", rep("r", 5))) %>%
+    kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+    add_header_above(c(" " = 1, "Sin pendiente aleatoria (A)" = 2,
+                       "Con pendiente aleatoria (B)" = 2, " " = 1)) %>%
+    footnote(general = paste("'WE + BE' prueba el bloque completo de interacciones con el grupo de previsión;",
+                             "'solo WE' prueba únicamente las interacciones con el componente intra-persona.",
+                             "En B, cada modelo con interacciones se compara con un modelo base que tiene la misma",
+                             "pendiente aleatoria. La última columna compara, sin interacciones de previsión, el",
+                             "modelo con la pendiente aleatoria contra el modelo sin ella."),
+             general_title = "Nota: ", footnote_as_chunk = TRUE)
+}
+```
+
+# Parte 1. Previsión × estatus subjetivo
+
+Cada modelo incluye los controles del paper (tendencia lineal y cuadrática, ideología, sexo, edad, decil 10 BE y educación universitaria BE), los seis efectos principales de estatus (WE y BE), el grupo de previsión y, en los modelos con interacción, el producto del grupo de previsión con el estatus WE y con el estatus BE correspondiente. Cada estatus se interactúa en un modelo distinto.
+
+```{r}
+#| label: models-sss
+
+main_sss <- "og_we + own_we + hij_we + og_be + own_be + hij_be + G"
+
+fit_sss <- function(rhs, re) {
+  lmer(as.formula(paste("mjp_index ~", controls, "+", main_sss, rhs, "+", re)),
+       data = d, REML = FALSE, control = oc)
+}
+
+ss <- c(Propio = "own", Origen = "og", Hijos = "hij")
+
+re_A <- "(1 + ola_num | idencuesta)"
+re_B <- function(s) paste0("(1 + ola_num + ", s, "_we | idencuesta)")
+
+A_sss <- list(base = fit_sss("", re_A))  # sin pendiente aleatoria de SSS
+B_sss <- list()                          # con pendiente aleatoria de SSS WE
+lrt_sss <- list()
+
+for (s in ss) {
+  int_we <- paste0("+ ", s, "_we:G")
+  int_be <- paste0("+ ", s, "_be:G")
+
+  A_sss[[s]] <- fit_sss(paste(int_we, int_be), re_A)
+  A_we       <- fit_sss(int_we, re_A)
+
+  B_base     <- fit_sss("", re_B(s))     # base con la misma pendiente aleatoria
+  B_sss[[s]] <- fit_sss(paste(int_we, int_be), re_B(s))
+  B_we       <- fit_sss(int_we, re_B(s))
+
+  lrt_sss[[s]] <- c(
+    A_conj = anova(A_sss$base, A_sss[[s]])$`Pr(>Chisq)`[2],
+    A_we   = anova(A_sss$base, A_we)$`Pr(>Chisq)`[2],
+    B_conj = anova(B_base, B_sss[[s]])$`Pr(>Chisq)`[2],
+    B_we   = anova(B_base, B_we)$`Pr(>Chisq)`[2],
+    RS     = anova(A_sss$base, B_base)$`Pr(>Chisq)`[2])
+}
+```
+
+```{r}
+#| label: blocks-sss
+
+sss_t <- c("og_we", "own_we", "hij_we", "og_be", "own_be", "hij_be")
+sss_l <- c("Origen WE", "Propio WE", "Hijos WE", "Origen BE", "Propio BE", "Hijos BE")
+
+int_t <- int_l <- character()
+for (s in ss) {
+  etq <- names(ss)[ss == s]
+  int_t <- c(int_t, paste0(s, "_we:G", lv[-1]), paste0(s, "_be:G", lv[-1]))
+  int_l <- c(int_l, paste0(etq, " WE × ", lv[-1]), paste0(etq, " BE × ", lv[-1]))
+}
+
+blocks_sss <- list(
+  list(name = "Controles", terms = ctrl_t, labels = ctrl_l),
+  list(name = "Efectos principales de estatus", terms = sss_t, labels = sss_l),
+  list(name = "Grupo de previsión (ref.: Estable FONASA)", terms = grp_t, labels = grp_l),
+  list(name = "Interacciones previsión × estatus", terms = int_t, labels = int_l))
+```
+
+## Tabla A1. Sin pendiente aleatoria de SSS
+
+Efectos aleatorios: intercepto y pendiente del tiempo por persona. La prueba de razón de verosimilitud compara cada modelo con interacciones contra M0.
+
+```{r}
+#| label: tbl-A-sss
+#| tbl-cap: "Previsión de salud × estatus subjetivo. Índice MJP, sin pendiente aleatoria de SSS"
+
+make_table(list(A_sss$base, A_sss$own, A_sss$og, A_sss$hij),
+           c("M0 base", "M1 Propio × Previ", "M2 Origen × Previ", "M3 Hijos × Previ"),
+           blocks_sss,
+           extra_rows = list("LRT interacción WE + BE (p)" =
+                               c("", sapply(ss, function(s) p_fmt(lrt_sss[[s]]["A_conj"])))))
+```
+
+## Tabla B1. Con pendiente aleatoria de SSS WE
+
+Efectos aleatorios: intercepto, pendiente del tiempo y pendiente del estatus WE interactuado, por persona. Cada prueba de razón de verosimilitud compara el modelo con interacciones contra un modelo base que tiene la misma pendiente aleatoria pero no tiene interacciones de previsión.
+
+```{r}
+#| label: tbl-B-sss
+#| tbl-cap: "Previsión de salud × estatus subjetivo. Índice MJP, con pendiente aleatoria del SSS WE interactuado"
+
+make_table(list(B_sss$own, B_sss$og, B_sss$hij),
+           c("M1 Propio × Previ", "M2 Origen × Previ", "M3 Hijos × Previ"),
+           blocks_sss,
+           extra_rows = list("LRT interacción WE + BE (p)" =
+                               sapply(ss, function(s) p_fmt(lrt_sss[[s]]["B_conj"]))))
+```
+
+## Pruebas de razón de verosimilitud (parte 1)
+
+```{r}
+#| label: tbl-lrt-sss
+#| tbl-cap: "Valores p de las interacciones previsión × estatus (LRT)"
+
+make_lrt_table(lrt_sss, names(ss), "Estatus")
+```
+
+# Parte 2. Previsión × movilidad subjetiva
+
+Las medidas de movilidad se construyen a partir de los tres estatus subjetivos (propio, de origen e hijos), igual que en los modelos de movilidad del paper. **Cada medida entra en un modelo distinto**, nunca juntas.
+
+```{r}
+#| label: tbl-mov-def
+#| tbl-cap: "Medidas de movilidad subjetiva"
+
+movs <- c("mov_dir", "mov_exp", "mov_inter", "mov_exp_og", "ess_traj")
+
+tibble(
+  Variable = movs,
+  Definición = c("Estatus propio − estatus de la familia de origen",
+                 "Estatus esperado de los hijos − estatus propio",
+                 "Estatus de los hijos − estatus propio − estatus de origen",
+                 "Estatus de los hijos − estatus de origen",
+                 "Pendiente (MCO) del estatus a lo largo de origen, propio e hijos"),
+  Lectura = c("Movilidad percibida respecto del origen",
+              "Movilidad ascendente esperada para los hijos",
+              "Movilidad intergeneracional esperada",
+              "Movilidad esperada de los hijos respecto del origen",
+              "Trayectoria origen-propio-hijos (positiva = ascendente)")) %>%
+  kable(format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE)
+```
+
+`ess_traj` es exactamente `mov_exp_og / 2` (la pendiente de tres puntos equidistantes es la diferencia entre el último y el primero dividida por 2), así que ambos modelos tienen el mismo ajuste y los coeficientes de `ess_traj` son el doble que los de `mov_exp_og`. Se muestran ambos por coherencia con las tablas del paper.
+
+```{r}
+#| label: tbl-mov-desc
+#| tbl-cap: "Movilidad promedio de la persona (BE) por grupo de previsión, media (DE)"
+
+mov_labels <- c(mov_dir = "mov_dir", mov_exp = "mov_exp", mov_inter = "mov_inter",
+                mov_exp_og = "mov_exp_og", ess_traj = "ess_traj")
+
+d %>%
+  distinct(idencuesta, G, across(all_of(paste0(movs, "_mean")))) %>%
+  group_by(`Grupo de previsión` = G) %>%
+  summarise(across(all_of(paste0(movs, "_mean")),
+                   ~ paste0(fmt(mean(.x), 2), " (", fmt(sd(.x), 2), ")")), .groups = "drop") %>%
+  rename_with(~ sub("_mean", "", .x, fixed = TRUE), all_of(paste0(movs, "_mean"))) %>%
+  kable(format = "html", align = c("l", rep("r", 5))) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE)
+```
+
+Cada modelo incluye los controles del paper, el índice de estatus subjetivo (WE y BE), **una** medida de movilidad (WE y BE), el grupo de previsión y, en los modelos con interacción, el producto del grupo de previsión con la movilidad WE y con la movilidad BE.
+
+```{r}
+#| label: models-mov
+
+main_mov <- "sss_index_cwc + sss_index_mean + mov_we + mov_be + G"
+
+# Se crean las columnas genéricas mov_we y mov_be con la medida de movilidad
+# elegida, de modo que todos los modelos comparten los mismos nombres de términos
+fit_mov <- function(mv, rhs, re) {
+  dd <- d
+  dd$mov_we <- d[[paste0(mv, "_cwc")]]
+  dd$mov_be <- d[[paste0(mv, "_mean")]]
+  lmer(as.formula(paste("mjp_index ~", controls, "+", main_mov, rhs, "+", re)),
+       data = dd, REML = FALSE, control = oc)
+}
+
+re_B_mov <- "(1 + ola_num + mov_we | idencuesta)"
+
+A_mov <- B_mov <- list()
+base_A_mov <- list()
+lrt_mov <- list()
+
+for (mv in movs) {
+  A_base <- fit_mov(mv, "", re_A)
+  A_mov[[mv]] <- fit_mov(mv, "+ mov_we:G + mov_be:G", re_A)
+  A_we   <- fit_mov(mv, "+ mov_we:G", re_A)
+
+  B_base <- fit_mov(mv, "", re_B_mov)
+  B_mov[[mv]] <- fit_mov(mv, "+ mov_we:G + mov_be:G", re_B_mov)
+  B_we   <- fit_mov(mv, "+ mov_we:G", re_B_mov)
+
+  lrt_mov[[mv]] <- c(
+    A_conj = anova(A_base, A_mov[[mv]])$`Pr(>Chisq)`[2],
+    A_we   = anova(A_base, A_we)$`Pr(>Chisq)`[2],
+    B_conj = anova(B_base, B_mov[[mv]])$`Pr(>Chisq)`[2],
+    B_we   = anova(B_base, B_we)$`Pr(>Chisq)`[2],
+    RS     = anova(A_base, B_base)$`Pr(>Chisq)`[2])
+}
+```
+
+```{r}
+#| label: blocks-mov
+
+blocks_mov <- list(
+  list(name = "Controles", terms = ctrl_t, labels = ctrl_l),
+  list(name = "Índice de estatus subjetivo", terms = c("sss_index_cwc", "sss_index_mean"),
+       labels = c("Índice SSS WE", "Índice SSS BE")),
+  list(name = "Movilidad (la medida de cada columna)", terms = c("mov_we", "mov_be"),
+       labels = c("Movilidad WE", "Movilidad BE")),
+  list(name = "Grupo de previsión (ref.: Estable FONASA)", terms = grp_t, labels = grp_l),
+  list(name = "Interacciones previsión × movilidad",
+       terms = c(paste0("mov_we:G", lv[-1]), paste0("mov_be:G", lv[-1])),
+       labels = c(paste0("Movilidad WE × ", lv[-1]), paste0("Movilidad BE × ", lv[-1]))))
+```
+
+## Tabla A2. Sin pendiente aleatoria de movilidad
+
+Efectos aleatorios: intercepto y pendiente del tiempo por persona. Cada columna es un modelo con una medida de movilidad distinta; la prueba de razón de verosimilitud compara ese modelo contra el mismo modelo sin interacciones de previsión.
+
+```{r}
+#| label: tbl-A-mov
+#| tbl-cap: "Previsión de salud × movilidad subjetiva. Índice MJP, sin pendiente aleatoria de la movilidad"
+
+make_table(unname(A_mov), movs, blocks_mov,
+           extra_rows = list("LRT interacción WE + BE (p)" =
+                               sapply(movs, function(mv) p_fmt(lrt_mov[[mv]]["A_conj"]))))
+```
+
+## Tabla B2. Con pendiente aleatoria de movilidad WE
+
+Efectos aleatorios: intercepto, pendiente del tiempo y pendiente de la movilidad WE, por persona. Cada prueba de razón de verosimilitud compara el modelo con interacciones contra un modelo base que tiene la misma pendiente aleatoria pero no tiene interacciones de previsión.
+
+```{r}
+#| label: tbl-B-mov
+#| tbl-cap: "Previsión de salud × movilidad subjetiva. Índice MJP, con pendiente aleatoria de la movilidad WE"
+
+make_table(unname(B_mov), movs, blocks_mov,
+           extra_rows = list("LRT interacción WE + BE (p)" =
+                               sapply(movs, function(mv) p_fmt(lrt_mov[[mv]]["B_conj"]))))
+```
+
+## Pruebas de razón de verosimilitud (parte 2)
+
+```{r}
+#| label: tbl-lrt-mov
+#| tbl-cap: "Valores p de las interacciones previsión × movilidad (LRT)"
+
+make_lrt_table(lrt_mov, movs, "Medida de movilidad")
+```
+
+# Parte 3. Movilidad de ingreso
+
+## Qué es la trayectoria de movilidad de ingreso
+
+La **trayectoria de ingreso** compara en qué parte de la distribución de ingreso estaba cada persona al inicio del panel (origen) con dónde está al final (destino). Es una variable **fija por persona**: toma el mismo valor en todas las olas de cada individuo. Se construyó en `processing/proc-data.qmd` (chunk `income-trajectory`).
+
+```{r}
+#| label: tbl-traj-resumen
+#| tbl-cap: "La trayectoria de movilidad de ingreso, en resumen"
+
+tibble(
+  Aspecto = c("Qué es",
+              "Base del cálculo",
+              "Grupos",
+              "Origen y destino",
+              "Trayectoria",
+              "Estables",
+              "Ascenso",
+              "Descenso",
+              "Versión simplificada",
+              "Variables en los datos",
+              "Categoría de referencia en los modelos",
+              "Cautelas"),
+  Descripción = c(
+    "Una medida de movilidad de ingreso que compara dónde estaba cada persona al inicio del panel con dónde está al final. Es fija por persona.",
+    "Ingreso equivalente del hogar a precios constantes, ordenado en deciles dentro de cada ola entre todos los encuestados. Es una posición relativa, no un monto.",
+    "Low: ingresos más bajos. Middle: ingresos intermedios. Top: ingresos más altos. Se forman agrupando deciles.",
+    "El origen es el grupo en la primera ola; el destino es el grupo en la última ola.",
+    "La combinación de origen y destino. Hay una categoría por cada par posible.",
+    "Mismo grupo al inicio y al final: Stable low, Stable middle y Stable top.",
+    "Pasa a un grupo más alto: Low -> Middle, Low -> Top y Middle -> Top.",
+    "Pasa a un grupo más bajo: Middle -> Low, Top -> Low y Top -> Middle.",
+    "La dirección: estable, ascenso o descenso. Sirve cuando las categorías de la trayectoria son muy pequeñas.",
+    "inc_origen, inc_destino, traj_ingreso y dir_ingreso.",
+    "Stable low.",
+    "Quien sube de grupo no necesariamente ganó más en pesos. El ingreso se mide en una sola ola, así que parte de la movilidad puede ser ruido. Los saltos extremos (de Low a Top y de Top a Low) tienen muy pocos casos. No hay trayectoria para quien carece de ingreso válido en alguna de las dos olas, ni para quien no participó en la primera.")) %>%
+  kable(format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+  column_spec(1, bold = TRUE, width = "14em")
+```
+
+## Datos de la parte 3
+
+La muestra de esta parte es la del paper (filas completas en todas las variables, `na.omit()`) restringida a las personas con trayectoria de ingreso válida. A diferencia de las partes 1 y 2, **no se exige previsión de salud**. Los efectos entre personas (BE) están **sin centrar**.
+
+```{r}
+#| label: data-ingreso
+
+excl3 <- c("prev_salud", "prev_salud_fill", "cambio_previ_salud",
+           "inc_origen", "inc_destino", "traj_ingreso", "dir_ingreso")
+ok3 <- complete.cases(dplyr::select(df_study1, -dplyr::any_of(excl3)))
+
+d3 <- df_study1[ok3, ] %>%
+  filter(!is.na(traj_ingreso)) %>%
+  mutate(traj_ingreso = relevel(droplevels(traj_ingreso), ref = "Stable low"),
+         # estatus: efectos intra-persona y entre personas (sin centrar)
+         og_we  = ess_og_cwc,    og_be  = ess_og_mean,
+         own_we = ess_cwc,       own_be = ess_mean,
+         hij_we = ess_hijos_cwc, hij_be = ess_hijos_mean)
+
+tl <- levels(d3$traj_ingreso)   # la referencia (Stable low) es el primer nivel
+```
+
+Muestra de análisis: **N~i~ = `r nrow(d3)`** observaciones de **N~j~ = `r n_distinct(d3$idencuesta)`** personas.
+
+```{r}
+#| label: tbl-traj-n
+#| tbl-cap: "Las trayectorias de ingreso y su tamaño"
+
+tl_all <- levels(df_study1$traj_ingreso)
+origen  <- c("Low", "Low", "Low", "Middle", "Middle", "Middle", "Top", "Top", "Top")
+destino <- c("Low", "Middle", "Top", "Low", "Middle", "Top", "Low", "Middle", "Top")
+stopifnot(identical(tl_all, c("Stable low", "Low -> Middle", "Low -> Top",
+                              "Middle -> Low", "Stable middle", "Middle -> Top",
+                              "Top -> Low", "Top -> Middle", "Stable top")))
+
+rank_g    <- c(Low = 1, Middle = 2, Top = 3)
+direccion <- ifelse(rank_g[destino] > rank_g[origen], "Ascenso",
+                    ifelse(rank_g[destino] < rank_g[origen], "Descenso", "Estable"))
+
+p_panel <- df_study1 %>% distinct(idencuesta, traj_ingreso) %>% filter(!is.na(traj_ingreso))
+p_mod   <- d3 %>% distinct(idencuesta, traj_ingreso)
+
+tab_traj <- tibble(
+  Trayectoria = tl_all, Origen = origen, Destino = destino, Dirección = unname(direccion),
+  `Personas en el panel`    = sapply(tl_all, function(l) sum(p_panel$traj_ingreso == l)),
+  `Personas en los modelos` = sapply(tl_all, function(l) sum(p_mod$traj_ingreso == l)))
+
+bind_rows(tab_traj,
+          tibble(Trayectoria = "Total", Origen = "", Destino = "", Dirección = "",
+                 `Personas en el panel` = nrow(p_panel), `Personas en los modelos` = nrow(p_mod))) %>%
+  kable(format = "html", format.args = list(big.mark = ".", decimal.mark = ","),
+        align = c("l", "l", "l", "l", "r", "r")) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+  row_spec(nrow(tab_traj) + 1, bold = TRUE)
+```
+
+"Personas en el panel" son las del panel balanceado con ingreso válido en la primera y la última ola; "personas en los modelos" son, además, las de la muestra del paper. En el panel hay `r n_distinct(df_study1$idencuesta) - nrow(p_panel)` personas sin trayectoria por falta de ingreso válido.
+
+## Tabla 1. Trayectoria de ingreso, controles y estatus subjetivo
+
+Modelos del índice MJP con intercepto y pendiente aleatoria del tiempo por persona, `(1 + ola_num | idencuesta)`. La referencia es **Stable low**.
+
+- **Modelo 1:** solo la tendencia (lineal y cuadrática) y la trayectoria.
+- **Modelo 2 (base):** agrega los controles (ideología, sexo, edad y educación universitaria BE).
+- **Modelos 3 a 5:** a la base se le agrega **cada bloque de estatus por separado** (origen, propio e hijos, cada uno con su WE y su BE), no de manera acumulada.
+
+```{r}
+#| label: models-ingreso-1
+
+ctrl3 <- "ola_num + ola_2 + ideo + sex + age + dummy_educ_mean"
+blk3  <- c(og = "og_we + og_be", own = "own_we + own_be", hij = "hij_we + hij_be")
+
+fit3 <- function(rhs, re = re_A, dat = d3) {
+  lmer(as.formula(paste("mjp_index ~", rhs, "+", re)),
+       data = dat, REML = FALSE, control = oc)
+}
+
+rhs1 <- list(tiempo = "ola_num + ola_2",
+             base   = ctrl3,
+             og     = paste(ctrl3, "+", blk3["og"]),
+             own    = paste(ctrl3, "+", blk3["own"]),
+             hij    = paste(ctrl3, "+", blk3["hij"]))
+
+T1  <- lapply(rhs1, function(r) fit3(paste(r, "+ traj_ingreso")))   # con trayectoria
+T1r <- lapply(rhs1, fit3)                                           # sin trayectoria
+
+lrt_bloque <- c("", "", sapply(c("og", "own", "hij"), function(k)
+  p_fmt(anova(T1$base, T1[[k]])$`Pr(>Chisq)`[2])))
+lrt_traj   <- sapply(names(T1), function(k)
+  p_fmt(anova(T1r[[k]], T1[[k]])$`Pr(>Chisq)`[2]))
+```
+
+```{r}
+#| label: blocks-ingreso-1
+
+ctrl3_t <- ctrl_t[ctrl_t != "dummy_decile10_mean"]
+ctrl3_l <- ctrl_l[ctrl_t != "dummy_decile10_mean"]
+
+traj_t <- paste0("traj_ingreso", tl[-1])
+
+blocks_ing1 <- list(
+  list(name = "Controles", terms = ctrl3_t, labels = ctrl3_l),
+  list(name = "Estatus subjetivo (cada bloque por separado)",
+       terms  = c("og_we", "og_be", "own_we", "own_be", "hij_we", "hij_be"),
+       labels = c("Origen WE", "Origen BE", "Propio WE", "Propio BE", "Hijos WE", "Hijos BE")),
+  list(name = "Trayectoria de ingreso (ref.: Stable low)", terms = traj_t, labels = tl[-1]))
+
+note_ing1 <- paste("Coeficientes con errores estándar entre paréntesis.",
+                   "*** p < 0,001; ** p < 0,01; * p < 0,05; + p < 0,1.",
+                   "Referencia de la trayectoria: Stable low. Efectos BE sin centrar.",
+                   "'LRT bloque de estatus' compara cada modelo contra el Modelo 2;",
+                   "'LRT trayectorias' compara cada modelo contra el mismo modelo sin las trayectorias.")
+```
+
+```{r}
+#| label: tbl-ingreso-1
+#| tbl-cap: "Trayectoria de ingreso y preferencias de justicia de mercado (índice MJP), con controles y estatus subjetivo"
+
+make_table(unname(T1),
+           c("Modelo 1: solo tiempo", "Modelo 2: base", "Modelo 3: + Origen",
+             "Modelo 4: + Propio", "Modelo 5: + Hijos"),
+           blocks_ing1,
+           extra_rows = list("LRT bloque de estatus vs. Modelo 2 (p)" = lrt_bloque,
+                             "LRT trayectorias (p)" = lrt_traj),
+           note = note_ing1)
+```
+
+## Tabla 2. Trayectoria de ingreso × estatus subjetivo (WE y BE)
+
+Un modelo por estatus (origen, propio e hijos). Cada modelo incluye los controles, los seis efectos principales de estatus, la trayectoria de ingreso y la interacción de la trayectoria con el **WE** y con el **BE** del estatus de esa columna. La **pendiente del estatus WE interactuado es aleatoria**: `(1 + ola_num + X_we | idencuesta)`. Cada prueba de razón de verosimilitud compara el modelo con interacciones contra un modelo base que tiene la misma pendiente aleatoria pero no tiene interacciones.
+
+```{r}
+#| label: models-ingreso-2
+
+ss3   <- c(Origen = "og", Propio = "own", Hijos = "hij")
+main3 <- "og_we + og_be + own_we + own_be + hij_we + hij_be + traj_ingreso"
+
+base_A3 <- fit3(paste(ctrl3, "+", main3))   # sin pendiente aleatoria de SSS
+
+T2    <- list()
+lrt2  <- list()
+
+for (s in ss3) {
+  int_we <- paste0(s, "_we:traj_ingreso")
+  int_be <- paste0(s, "_be:traj_ingreso")
+  rs     <- re_B(s)
+
+  b_rs   <- fit3(paste(ctrl3, "+", main3), rs)                                  # base con la misma pendiente aleatoria
+  T2[[s]] <- fit3(paste(ctrl3, "+", main3, "+", int_we, "+", int_be), rs)
+  m_we   <- fit3(paste(ctrl3, "+", main3, "+", int_we), rs)
+
+  lrt2[[s]] <- c(
+    conj = anova(b_rs, T2[[s]])$`Pr(>Chisq)`[2],
+    we   = anova(b_rs, m_we)$`Pr(>Chisq)`[2],
+    rs   = anova(base_A3, b_rs)$`Pr(>Chisq)`[2])
+}
+```
+
+```{r}
+#| label: blocks-ingreso-2
+
+sss3_t <- c("og_we", "og_be", "own_we", "own_be", "hij_we", "hij_be")
+sss3_l <- c("Origen WE", "Origen BE", "Propio WE", "Propio BE", "Hijos WE", "Hijos BE")
+
+int3_t <- int3_l <- character()
+for (s in ss3) {
+  etq <- names(ss3)[ss3 == s]
+  int3_t <- c(int3_t, paste0(s, "_we:traj_ingreso", tl[-1]), paste0(s, "_be:traj_ingreso", tl[-1]))
+  int3_l <- c(int3_l, paste0(etq, " WE × ", tl[-1]), paste0(etq, " BE × ", tl[-1]))
+}
+
+blocks_ing2 <- list(
+  list(name = "Controles", terms = ctrl3_t, labels = ctrl3_l),
+  list(name = "Efectos principales de estatus", terms = sss3_t, labels = sss3_l),
+  list(name = "Trayectoria de ingreso (ref.: Stable low)", terms = traj_t, labels = tl[-1]),
+  list(name = "Interacciones trayectoria × estatus", terms = int3_t, labels = int3_l))
+
+note_ing2 <- paste("Coeficientes con errores estándar entre paréntesis.",
+                   "*** p < 0,001; ** p < 0,01; * p < 0,05; + p < 0,1.",
+                   "Los coeficientes de interacción son diferencias respecto de Stable low;",
+                   "la pendiente de cada trayectoria es el efecto principal más su interacción.",
+                   "Los efectos principales de cada trayectoria se leen con los efectos BE en 0,",
+                   "un valor que casi nadie tiene, y no son interpretables por sí solos.",
+                   "Las categorías Low -> Top y Top -> Low tienen muy pocas personas.")
+```
+
+```{r}
+#| label: tbl-ingreso-2
+#| tbl-cap: "Trayectoria de ingreso × estatus subjetivo (índice MJP), con pendiente aleatoria del estatus WE interactuado"
+
+make_table(unname(T2),
+           c("Origen × Trayectoria", "Propio × Trayectoria", "Hijos × Trayectoria"),
+           blocks_ing2,
+           extra_rows = list(
+             "LRT interacción WE + BE (p)" = sapply(ss3, function(s) p_fmt(lrt2[[s]]["conj"])),
+             "LRT interacción solo WE (p)" = sapply(ss3, function(s) p_fmt(lrt2[[s]]["we"])),
+             "LRT pendiente aleatoria vs. sin ella (p)" = sapply(ss3, function(s) p_fmt(lrt2[[s]]["rs"]))),
+           note = note_ing2)
+```
+
+### Sensibilidad a las categorías más pequeñas
+
+Las trayectorias Low -> Top y Top -> Low tienen muy pocas personas, y los coeficientes asociados a ellas son muy inestables. La tabla repite la prueba de la interacción de **hijos** × trayectoria (con la misma pendiente aleatoria) en tres versiones de la muestra: con todas las trayectorias, sin esas dos categorías y uniéndolas en una sola categoría de "salto grande".
+
+```{r}
+#| label: tbl-ingreso-sens
+#| tbl-cap: "Hijos × trayectoria de ingreso: sensibilidad a las categorías más pequeñas (valores p del LRT)"
+
+sens_hij <- function(dat) {
+  dat$traj_ingreso <- relevel(droplevels(dat$traj_ingreso), ref = "Stable low")
+  rs <- re_B("hij")
+  b  <- fit3(paste(ctrl3, "+", main3), rs, dat)
+  m  <- fit3(paste(ctrl3, "+", main3, "+ hij_we:traj_ingreso + hij_be:traj_ingreso"), rs, dat)
+  w  <- fit3(paste(ctrl3, "+", main3, "+ hij_we:traj_ingreso"), rs, dat)
+  c(Ni = nrow(dat), Nj = n_distinct(dat$idencuesta),
+    conj = anova(b, m)$`Pr(>Chisq)`[2], we = anova(b, w)$`Pr(>Chisq)`[2])
+}
+
+extremos <- c("Low -> Top", "Top -> Low")
+variantes <- list(
+  "Todas las trayectorias" = d3,
+  "Sin Low -> Top ni Top -> Low" = d3 %>% filter(!traj_ingreso %in% extremos),
+  "Low -> Top y Top -> Low unidas en 'salto grande'" =
+    d3 %>% mutate(traj_ingreso = factor(ifelse(traj_ingreso %in% extremos, "Salto grande",
+                                               as.character(traj_ingreso)))))
+
+res_sens <- t(sapply(variantes, sens_hij))
+
+tibble(Variante = names(variantes),
+       `N_i` = res_sens[, "Ni"], `N_j` = res_sens[, "Nj"],
+       `LRT WE + BE (p)` = p_fmt(res_sens[, "conj"]),
+       `LRT solo WE (p)` = p_fmt(res_sens[, "we"])) %>%
+  kable(format = "html", format.args = list(big.mark = ".", decimal.mark = ","),
+        align = c("l", "r", "r", "r", "r")) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE)
+```
+
+# Información de la sesión
+
+```{r}
+#| label: session
+
+sessionInfo()
+```
