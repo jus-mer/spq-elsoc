@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Methodology</title>
+<title>methods</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -55,7 +55,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="03-methods_files/libs/clipboard/clipboard.min.js"></script>
@@ -113,14 +133,15 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#data-variables-and-methods" id="toc-data-variables-and-methods" class="nav-link active" data-scroll-target="#data-variables-and-methods">Data, Variables and Methods</a>
+  <li><a href="#methodology" id="toc-methodology" class="nav-link active" data-scroll-target="#methodology">Methodology</a></li>
+  <li><a href="#data-variables-and-methods" id="toc-data-variables-and-methods" class="nav-link" data-scroll-target="#data-variables-and-methods">Data, Variables and Methods</a>
   <ul class="collapse">
   <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">Data</a></li>
   <li><a href="#variables" id="toc-variables" class="nav-link" data-scroll-target="#variables">Variables</a>
   <ul class="collapse">
   <li><a href="#market-justice-preferences" id="toc-market-justice-preferences" class="nav-link" data-scroll-target="#market-justice-preferences">Market justice preferences</a></li>
-  <li><a href="#social-subjective-status" id="toc-social-subjective-status" class="nav-link" data-scroll-target="#social-subjective-status">Social Subjective Status</a></li>
-  <li><a href="#social-subjective-mobility" id="toc-social-subjective-mobility" class="nav-link" data-scroll-target="#social-subjective-mobility">Social Subjective Mobility</a></li>
+  <li><a href="#static-social-subjective-status" id="toc-static-social-subjective-status" class="nav-link" data-scroll-target="#static-social-subjective-status">Static Social Subjective Status</a></li>
+  <li><a href="#dinamic-subjective-social-status" id="toc-dinamic-subjective-social-status" class="nav-link" data-scroll-target="#dinamic-subjective-social-status">Dinamic Subjective Social Status</a></li>
   <li><a href="#social-objective-status" id="toc-social-objective-status" class="nav-link" data-scroll-target="#social-objective-status">Social Objective Status</a></li>
   <li><a href="#controls" id="toc-controls" class="nav-link" data-scroll-target="#controls">Controls</a></li>
   </ul></li>
@@ -136,25 +157,11 @@ window.Quarto = {
 </div>
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Methodology</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
+<section id="methodology" class="level1">
+<h1>Methodology</h1>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -190,54 +197,157 @@ window.Quarto = {
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"input/data/proc/df_final.RData"</span>))</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_model <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(prev_salud, dir_ingreso, inc_origen, inc_destino)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">traj_ingreso =</span> forcats<span class="sc">::</span><span class="fu">fct_na_value_to_level</span>(traj_ingreso, <span class="at">level =</span> <span class="st">"Missings"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+</section>
 <section id="data-variables-and-methods" class="level1">
 <h1>Data, Variables and Methods</h1>
 <section id="data" class="level2">
 <h2 class="anchored" data-anchor-id="data">Data</h2>
 <p>This research draws on the Chilean Longitudinal Social Survey (ELSOC), a national panel study fielded between 2016 and 2023 to examine attitudes, emotions, and behaviors among adults aged 18 to 75 in relation to social cohesion and conflict. ELSOC uses a probabilistic, stratified, clustered, multistage sampling design covering urban centers and small towns. The sampling frame is proportionally stratified into six categories of urban population size; within these strata, households were selected through multistage procedures based on 1,067 sampled blocks.</p>
-<p>ELSOC has been administered annually since 2016, except in 2020 when fieldwork was suspended due to the COVID-19 pandemic. For this study, we use waves 2016, 2017, 2018, 2019, 2022, and 2023. The 2021 wave is excluded because the questionnaire version omitted key variables for the analysis. By wave 6, cumulative panel attrition was approximately 40%; we therefore restrict the analysis to a balanced panel, yielding a two-level data set of <em>N</em> = 6,699 observations nested within <em>N</em> = 1,203 individuals. Additional documentation on sampling, attrition, and weighting is available from the ELSOC study team, and the data are publicly accessible through the ELSOC Dataverse.</p>
+<p>ELSOC has been administered annually since 2016, except in 2020 when fieldwork was suspended due to the COVID-19 pandemic. For this study, we use waves 2016, 2017, 2018, 2019, 2022, and 2023. The 2021 wave is excluded because the questionnaire version omitted key variables for the analysis. By wave 6, cumulative panel attrition was approximately 40%; we therefore restrict the analysis to a balanced panel, yielding a two-level data set of <em>N</em> = 6,662 observations nested within <em>N</em> = 1,196 individuals. Additional documentation on sampling, attrition, and weighting is available from the ELSOC study team, and the data are publicly accessible through the ELSOC Dataverse.</p>
 </section>
 <section id="variables" class="level2">
 <h2 class="anchored" data-anchor-id="variables">Variables</h2>
 <section id="market-justice-preferences" class="level3">
 <h3 class="anchored" data-anchor-id="market-justice-preferences">Market justice preferences</h3>
 <p>The dependent variable in this study is preferences for market justice (MJP). This construct is measured by three items that capture how strongly individuals endorse conditioning access to pensions, education and health care on income. The original items asks: “Is it fair that high-income individuals have better (education, health or pensions) than lower-income individuals?”. The response options range from 1 (“Strongly disagree”) to 5 (“Strongly agree”), so that higher values indicate stronger support for market-justified inequality in the provision of social services.</p>
-<p>We construct the MJP index as the mean of the three items, which ranges from 1 to 5. The index is computed only for respondents with valid answers on all three items and is treated as a continuous variable in the models. <a href="#fig-mjp-dist" class="quarto-xref">Figure&nbsp;1</a> shows its distribution by wave.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df_mjp <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(mjp_index)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mjp_bin =</span> <span class="fu">cut</span>(mjp_index, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="at">by =</span> <span class="fl">0.5</span>),</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">right =</span> <span class="cn">FALSE</span>))</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>items_lab <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">just_educ =</span> <span class="st">"Education"</span>, <span class="at">just_salud =</span> <span class="st">"Health care"</span>, <span class="at">just_pension =</span> <span class="st">"Pensions"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>df_items <span class="ot">&lt;-</span> df_model <span class="sc">%&gt;%</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(<span class="fu">names</span>(items_lab)))</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>df_mjp_mean <span class="ot">&lt;-</span> df_mjp <span class="sc">%&gt;%</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ola) <span class="sc">%&gt;%</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">m =</span> <span class="fu">mean</span>(mjp_index), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lab =</span> <span class="fu">paste0</span>(<span class="st">"Mean = "</span>, <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, m)))</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_mjp, <span class="fu">aes</span>(<span class="at">x =</span> mjp_index)) <span class="sc">+</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(count <span class="sc">/</span> <span class="fu">tapply</span>(count, PANEL, sum)[PANEL])),</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="fl">0.75</span>, <span class="fl">5.25</span>, <span class="at">by =</span> <span class="fl">0.5</span>), <span class="at">closed =</span> <span class="st">"right"</span>,</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="fu">met.brewer</span>(<span class="st">"Hiroshige"</span>, <span class="dv">1</span>, <span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>)[<span class="dv">1</span>],</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colour =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">data =</span> df_mjp_mean, <span class="fu">aes</span>(<span class="at">xintercept =</span> m),</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">colour =</span> <span class="st">"grey20"</span>) <span class="sc">+</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> df_mjp_mean, <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> lab),</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">size =</span> <span class="fl">3.2</span>, <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">percent_format</span>(<span class="at">accuracy =</span> <span class="dv">1</span>),</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>                     <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>))) <span class="sc">+</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> ola, <span class="at">nrow =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"MJP index (1 = strongly disagree, 5 = strongly agree)"</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">"Bins of width 0.5 centred on 1, 1.5, ..., 5. Dashed line: wave mean."</span>) <span class="sc">+</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>df_likert <span class="ot">&lt;-</span> df_items <span class="sc">%&gt;%</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"item"</span>, <span class="at">values_to =</span> <span class="st">"resp"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">item =</span> <span class="fu">factor</span>(item, <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">names</span>(items_lab)), <span class="at">labels =</span> <span class="fu">rev</span>(items_lab)),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">resp =</span> <span class="fu">factor</span>(resp, <span class="at">levels =</span> <span class="fu">levels</span>(df_model<span class="sc">$</span>just_educ))) <span class="sc">%&gt;%</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(item, resp) <span class="sc">%&gt;%</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(item) <span class="sc">%&gt;%</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_likert, <span class="fu">aes</span>(<span class="at">x =</span> p, <span class="at">y =</span> item, <span class="at">fill =</span> resp)) <span class="sc">+</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="fu">position_stack</span>(<span class="at">reverse =</span> <span class="cn">TRUE</span>), <span class="at">width =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(p <span class="sc">&gt;=</span> <span class="fl">0.04</span>, scales<span class="sc">::</span><span class="fu">percent</span>(p, <span class="at">accuracy =</span> <span class="dv">1</span>), <span class="st">""</span>),</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>                <span class="at">group =</span> resp, <span class="at">colour =</span> resp <span class="sc">%in%</span> <span class="fu">levels</span>(resp)[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)]),</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">position =</span> <span class="fu">position_stack</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">reverse =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="fl">3.2</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"TRUE"</span> <span class="ot">=</span> <span class="st">"white"</span>, <span class="st">"FALSE"</span> <span class="ot">=</span> <span class="st">"grey15"</span>)) <span class="sc">+</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">met.brewer</span>(<span class="st">"Hiroshige"</span>, <span class="dv">5</span>), <span class="at">name =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">percent_format</span>(), <span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="fu">paste0</span>(<span class="st">"Person-wave observations in the analytical sample: N = "</span>, <span class="fu">format</span>(<span class="fu">nrow</span>(df_items), <span class="at">big.mark =</span> <span class="st">","</span>), <span class="st">"."</span>)) <span class="sc">+</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">nrow =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>, <span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-mjp-likert" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mjp-likert-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-methods_files/figure-html/fig-mjp-likert-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mjp-likert-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Distribution of responses to the three market justice items (analytical sample, all person-wave observations)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mjp_num <span class="ot">&lt;-</span> df_model <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">Education   =</span> <span class="fu">as.numeric</span>(just_educ),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Health care</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.numeric</span>(just_salud),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">Pensions    =</span> <span class="fu">as.numeric</span>(just_pension))</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>cor_mjp <span class="ot">&lt;-</span> <span class="fu">cor</span>(mjp_num, <span class="at">method =</span> <span class="st">"spearman"</span>, <span class="at">use =</span> <span class="st">"pairwise.complete.obs"</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(cor_mjp,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"color"</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">type =</span> <span class="st">"lower"</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">diag =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">addCoef.col =</span> <span class="st">"black"</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">number.cex =</span> <span class="dv">1</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">number.digits =</span> <span class="dv">2</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">tl.col =</span> <span class="st">"black"</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">tl.srt =</span> <span class="dv">45</span>,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"#B2182B"</span>, <span class="st">"white"</span>, <span class="st">"#2166AC"</span>))(<span class="dv">200</span>),</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">col.lim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">is.corr =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-mjp-corr" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mjp-corr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03-methods_files/figure-html/fig-mjp-corr-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mjp-corr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Spearman correlations between the three market justice items (analytical sample)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mjp_items <span class="ot">&lt;-</span> df_model <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">just_educ    =</span> <span class="fu">as.numeric</span>(just_educ),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">just_salud   =</span> <span class="fu">as.numeric</span>(just_salud),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">just_pension =</span> <span class="fu">as.numeric</span>(just_pension))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>alpha_mjp <span class="ot">&lt;-</span> performance<span class="sc">::</span><span class="fu">cronbachs_alpha</span>(mjp_items)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(alpha_mjp, <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.83</code></pre>
+</div>
+</div>
+<p>We construct the MJP index as the mean of the three items, which ranges from 1 to 5. The index is computed only for respondents with valid answers on all three items and is treated as a continuous variable in the models. <a href="#fig-mjp-dist" class="quarto-xref">Figure&nbsp;3</a> shows its distribution by wave.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df_mjp <span class="ot">&lt;-</span> df_model <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(mjp_index)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mjp_bin =</span> <span class="fu">cut</span>(mjp_index, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="at">by =</span> <span class="fl">0.5</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">right =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>df_mjp_mean <span class="ot">&lt;-</span> df_mjp <span class="sc">%&gt;%</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ola) <span class="sc">%&gt;%</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">m =</span> <span class="fu">mean</span>(mjp_index), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lab =</span> <span class="fu">paste0</span>(<span class="st">"Mean = "</span>, <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, m)))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_mjp, <span class="fu">aes</span>(<span class="at">x =</span> mjp_index)) <span class="sc">+</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(count <span class="sc">/</span> <span class="fu">tapply</span>(count, PANEL, sum)[PANEL])),</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="fl">0.75</span>, <span class="fl">5.25</span>, <span class="at">by =</span> <span class="fl">0.5</span>), <span class="at">closed =</span> <span class="st">"right"</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="fu">met.brewer</span>(<span class="st">"Hiroshige"</span>, <span class="dv">1</span>, <span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>)[<span class="dv">1</span>],</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colour =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">data =</span> df_mjp_mean, <span class="fu">aes</span>(<span class="at">xintercept =</span> m),</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">colour =</span> <span class="st">"grey20"</span>) <span class="sc">+</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> df_mjp_mean, <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> lab),</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">size =</span> <span class="fl">3.2</span>, <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">percent_format</span>(<span class="at">accuracy =</span> <span class="dv">1</span>),</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>                     <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>))) <span class="sc">+</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> ola, <span class="at">nrow =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"MJP index (1 = strongly disagree, 5 = strongly agree)"</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">"Bins of width 0.5 centred on 1, 1.5, ..., 5. Dashed line: wave mean."</span>) <span class="sc">+</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-mjp-dist" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
@@ -246,20 +356,20 @@ window.Quarto = {
 <img src="03-methods_files/figure-html/fig-mjp-dist-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mjp-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Distribution of the market justice preferences (MJP) index by wave
+Figure&nbsp;3: Distribution of the market justice preferences (MJP) index by wave
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="social-subjective-status" class="level3">
-<h3 class="anchored" data-anchor-id="social-subjective-status">Social Subjective Status</h3>
-<p>Subjective social status is measured with three ELSOC items in which respondents place themselves, their family of origin and their children on a scale from 0 (“lowest”) to 10 (“highest”) of the social ladder. The first item captures the respondent’s own current position, the second the position of the family of origin, and the third the position where respondents expect their children to be located. Higher values indicate a higher perceived position in all three cases. The three measures are treated as continuous variables and, in the models, are decomposed into their within-person and between-person components.</p>
+<section id="static-social-subjective-status" class="level3">
+<h3 class="anchored" data-anchor-id="static-social-subjective-status">Static Social Subjective Status</h3>
+<p>Subjective social status is measured with three ELSOC items in which respondents place themselves (own), their family of origin (origin) and their children (children) on a scale from 0 (“lowest”) to 10 (“highest”) of the social ladder. The first item captures the respondent’s current position (own SSS), the second the position of the family of origin (origin SSS), and the third the position where respondents expect their children to be located (children’s SSS). Higher values indicate a higher perceived position in all three cases. The three measures are treated as continuous variables and, in the models, are decomposed into their within-person and between-person components.</p>
 </section>
-<section id="social-subjective-mobility" class="level3">
-<h3 class="anchored" data-anchor-id="social-subjective-mobility">Social Subjective Mobility</h3>
-<p>Based on the original variables of subjective social status (origin, self, and children), various variables were generated from all the combinations allowed by these three items. The composite variables operationalize subjective mobility as follows: <span class="math inline">\(t_{2} - t_{1}\)</span>. Thus, positive values indicate upward subjective mobility. All the variables are treated as continuous and, in the models, are decomposed into their within-person and between-person components. The following variables were generated:</p>
+<section id="dinamic-subjective-social-status" class="level3">
+<h3 class="anchored" data-anchor-id="dinamic-subjective-social-status">Dinamic Subjective Social Status</h3>
+<p>Based on the original variables of subjective social status (origin, own and children), a variable were generated from all the combinations betweeen origin and children SSS items. The composite variable operationalize subjective mobility as follows: <span class="math inline">\(t_{2} - t_{1}\)</span>. Thus, positive values indicate upward subjective mobility.The variable is treated as continuous and, in the models, is decomposed into their within-person and between-person components. All the subjective social mobility variables are displayed in <a href="#tbl-mobility-vars" class="quarto-xref">Table&nbsp;1</a>:</p>
 <div class="cell" data-tbl-cap-location="top">
 <div id="tbl-mobility-vars" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -271,59 +381,35 @@ Table&nbsp;1: Subjective social mobility variables constructed from the subjecti
 <table class="table do-not-create-environment cell caption-top table-sm table-striped small">
 <thead>
 <tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">Variable</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">Name</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">Construction</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">Interpretation</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Concept</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Operacionalization</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Short_label</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left; font-family: monospace;">mov_dir</td>
-<td style="text-align: left;">Own - origin</td>
-<td style="text-align: left;">Own SSS minus family-of-origin SSS</td>
-<td style="text-align: left;">Own position above the family of origin (upward mobility relative to origin)</td>
+<td style="text-align: left;">Perceived position of the family of origin on the social ladder</td>
+<td style="text-align: left;">Subjective social status of the family of origin (0-10)</td>
+<td style="text-align: left;">Origin SSS</td>
 </tr>
 <tr class="even">
-<td style="text-align: left; font-family: monospace;">mov_og</td>
-<td style="text-align: left;">Own - mean origin</td>
-<td style="text-align: left;">Own SSS minus the person's mean family-of-origin SSS across waves</td>
-<td style="text-align: left;">Own position above the average perceived origin</td>
+<td style="text-align: left;">Perceived current position of the respondent on the social ladder</td>
+<td style="text-align: left;">Subjective social status of the respondent (0-10)</td>
+<td style="text-align: left;">Own SSS</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left; font-family: monospace;">mov_exp</td>
-<td style="text-align: left;">Children - own</td>
-<td style="text-align: left;">Children's SSS minus own SSS</td>
-<td style="text-align: left;">Children expected to be better off than the respondent</td>
+<td style="text-align: left;">Position where respondents expect their children to be located</td>
+<td style="text-align: left;">Expected subjective social status of the respondent's children (0-10)</td>
+<td style="text-align: left;">Children's SSS</td>
 </tr>
 <tr class="even">
-<td style="text-align: left; font-family: monospace;">mov_exp_og</td>
-<td style="text-align: left;">Children - origin</td>
-<td style="text-align: left;">Children's SSS minus family-of-origin SSS</td>
 <td style="text-align: left;">Children expected to be better off than the family of origin</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-family: monospace;">mov_inter</td>
-<td style="text-align: left;">Intergenerational</td>
-<td style="text-align: left;">Children's SSS minus own SSS minus family-of-origin SSS</td>
-<td style="text-align: left;">Children's expected position above the sum of own and origin positions</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-family: monospace;">ess_traj</td>
-<td style="text-align: left;">Trajectory slope</td>
-<td style="text-align: left;">OLS slope of SSS over the three positions: origin (t = 1), own (t = 2) and children (t = 3)</td>
-<td style="text-align: left;">Upward trajectory across generations (equals half of children - origin)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-family: monospace;">ess_traj_sqt</td>
-<td style="text-align: left;">Trajectory curve</td>
-<td style="text-align: left;">Quadratic term of the OLS regression of SSS on time (centred on own status) and time squared, equivalent to (origin - 2 x own + children) / 2</td>
-<td style="text-align: left;">Own position below the line joining origin and children (convex path); negative values, above it (concave path)</td>
+<td style="text-align: left;">Children's SSS minus family-of-origin SSS</td>
+<td style="text-align: left;">Children - origin</td>
 </tr>
 </tbody><tfoot>
 <tr class="odd">
-<td style="text-align: left; padding: 0;"><span style="font-style: italic;">Note:</span> <sup></sup> Positive values of the mobility measures indicate upward subjective mobility. All variables are missing if any of the SSS items involved is missing.</td>
-<td style="text-align: left;"></td>
+<td style="text-align: left; padding: 0;"><span style="font-style: italic;">Note:</span> <sup></sup> Positive values indicates upward subjective status or mobility.</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 </tr>
@@ -335,8 +421,6 @@ Table&nbsp;1: Subjective social mobility variables constructed from the subjecti
 </figure>
 </div>
 </div>
-<p>All the variables are computed for each person and wave, and are missing if any of the SSS items involved is missing. <a href="#tbl-mobility-vars" class="quarto-xref">Table&nbsp;1</a> lists them.</p>
-<p>Additionally, with the aim of exploring subjective mobility in greater depth, a variable was constructed to represent an individual’s trajectory of subjective social status, based on a linear regression that predicts a slope (which represents the trajectory) from the three original subjective social statuses.</p>
 </section>
 <section id="social-objective-status" class="level3">
 <h3 class="anchored" data-anchor-id="social-objective-status">Social Objective Status</h3>
@@ -345,22 +429,22 @@ Table&nbsp;1: Subjective social mobility variables constructed from the subjecti
 </section>
 <section id="controls" class="level3">
 <h3 class="anchored" data-anchor-id="controls">Controls</h3>
-<p>Based on previous research <span class="citation" data-cites="castillo_perceptions_2025 lindh_public_2015 jaime-castillo_public_2013">[@castillo_perceptions_2025; @lindh_public_2015; @jaime-castillo_public_2013]</span>, the statistical models include sociodemographic and attitudinal controls to account for potential compositional effects in the population. We adjust for sex (1 = male, 2 = female), age (in years) and political identification (1 = left, 2 = centre, 3 = right, 4 = no identification).</p>
+<p>Based on previous research <span class="citation" data-cites="castillo_perceptions_2025 lindh_public_2015 jaime-castillo_public_2013">(<a href="#ref-castillo_perceptions_2025" role="doc-biblioref">Castillo et al. 2025</a>; <a href="#ref-lindh_public_2015" role="doc-biblioref">Lindh 2015</a>; <a href="#ref-jaime-castillo_public_2013" role="doc-biblioref">Jaime-Castillo 2013</a>)</span>, the statistical models include sociodemographic and attitudinal controls to account for potential compositional effects in the population. We adjust for sex (1 = male, 2 = female), age (in years) and political identification (1 = left, 2 = centre, 3 = right, 4 = no identification).</p>
 </section>
 </section>
 <section id="analytical-strategy" class="level2">
 <h2 class="anchored" data-anchor-id="analytical-strategy">Analytical Strategy</h2>
-<p>The analysis proceeds in two steps. First, we describe the distribution of each status variable by wave and examine the bivariate association between the status measures and market justice preferences using Spearman correlations, computed within each wave and, for the within/between-person components, on the pooled sample. Second, we estimate linear longitudinal multilevel models for the market justice preferences (MJP) index, which is the mean of the pension, education and health items (range 1-5). Because the index is an average of several items and is treated as a continuous outcome, we use linear mixed models rather than cumulative link models. This approach accounts for the hierarchical structure of the panel data, with repeated observations (Level 1) nested within individuals (Level 2), and enables the decomposition of the variance of the predictors into within-person (WE) and between-person (BE) components, allowing us to distinguish temporal changes within individuals from stable differences between individuals <span class="citation" data-cites="singer_applied_2003 bell_fixed_2019">[@singer_applied_2003; @bell_fixed_2019]</span>. All descriptive figures, correlations and models are based on the same analytical sample (complete cases on all analysis variables; <em>N</em> = 6,699 observations from <em>N</em> = 1,203 individuals).</p>
+<p>The analysis proceeds in two steps. First, we describe the distribution of each status variable by wave and examine the bivariate association between the status measures and market justice preferences using Spearman correlations, computed within each wave and, for the within/between-person components, on the pooled sample. Second, we estimate linear longitudinal multilevel models for the market justice preferences (MJP) index, which is the mean of the pension, education and health items (range 1-5). Because the index is an average of several items and is treated as a continuous outcome, we use linear mixed models rather than cumulative link models. This approach accounts for the hierarchical structure of the panel data, with repeated observations (Level 1) nested within individuals (Level 2), and enables the decomposition of the variance of the predictors into within-person (WE) and between-person (BE) components, allowing us to distinguish temporal changes within individuals from stable differences between individuals <span class="citation" data-cites="singer_applied_2003 bell_fixed_2019">(<a href="#ref-singer_applied_2003" role="doc-biblioref">Singer 2003</a>; <a href="#ref-bell_fixed_2019" role="doc-biblioref">Bell, Fairbrother, and Jones 2019</a>)</span>. All descriptive figures, correlations and models are based on the same analytical sample (complete cases on all analysis variables; <em>N</em> = 6,699 observations from <em>N</em> = 1,203 individuals).</p>
 <section id="within-person-and-between-person-random-effects-models" class="level3">
 <h3 class="anchored" data-anchor-id="within-person-and-between-person-random-effects-models">Within-Person and Between-Person Random Effects Models</h3>
-<p>Following the recommendations of <span class="citation" data-cites="bell_explaining_2015">@bell_explaining_2015</span>, we decompose time-varying predictors into their within-person and between-person components using person-mean centering:</p>
+<p>Following the recommendations of <span class="citation" data-cites="bell_explaining_2015">Bell and Jones (<a href="#ref-bell_explaining_2015" role="doc-biblioref">2015</a>)</span>, we decompose time-varying predictors into their within-person and between-person components using person-mean centering:</p>
 <p><span class="math display">\[
 X_{WE_{it}} = X_{it} - \bar{X}_i
 \]</span></p>
 <p><span class="math display">\[
 X_{BE_i} = \bar{X}_i
 \]</span></p>
-<p>where <span class="math inline">\(X_{it}\)</span> represents the observed value for individual <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span>, <span class="math inline">\(\bar{X}_i\)</span> is the person-specific mean across all observations, <span class="math inline">\(X_{WE_{it}}\)</span> captures within-person deviations from the individual mean (representing temporal fluctuations), and <span class="math inline">\(X_{BE_i}\)</span> represents stable between-person differences (time-invariant characteristics). The decomposition is applied to the continuous measures: the three subjective status measures (own, family of origin and children), the subjective mobility measures, years of education and log equivalised household income.</p>
+<p>where <span class="math inline">\(X_{it}\)</span> represents the observed value for individual <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span>, <span class="math inline">\(\bar{X}_i\)</span> is the person-specific mean across all observations, <span class="math inline">\(X_{WE_{it}}\)</span> captures within-person deviations from the individual mean (representing temporal fluctuations), and <span class="math inline">\(X_{BE_i}\)</span> represents stable between-person differences (time-invariant characteristics). The decomposition is applied to the continuous measures: the three subjective status measures (origin, own and children), the subjective mobility measures, years of education and log equivalised household income.</p>
 <p>For the dichotomous and categorical measures of objective status only a between-person component is included, since they vary little within individuals. For the dichotomous measures, the BE component indicates whether the person was ever observed with a university degree or in the top income decile. For the categorical measures (education in four categories and income in three groups), the BE component is the person’s modal category across waves, with ties assigned to the higher category; the reference categories are primary education or less and the bottom income group (deciles 1-4), respectively.</p>
 <p>This decomposition allows us to distinguish two theoretically distinct processes: (1) Within-person effects capture how changes in an individual’s subjective and objective status over time relate to changes in their market justice preferences, controlling for stable individual characteristics. (2) Between-person effects capture how individuals with different average levels of subjective and objective status differ in their market justice preferences, net of temporal fluctuations.</p>
 </section>
@@ -380,17 +464,37 @@ X_{BE_i} = \bar{X}_i
 <h3 class="anchored" data-anchor-id="model-building-strategy">Model Building Strategy</h3>
 <p>The same specification (time terms and random effects) is kept in all models, and the status measures are entered in blocks. Within each block, we first enter each measure on its own, then add the controls, and finally estimate a model including all the measures of the block:</p>
 <ol type="1">
-<li><strong>Subjective social status (Models 1-8)</strong>: own, family-of-origin and children’s subjective status (WE/BE), each entered separately (Models 1-3) and with controls (Models 4-6); a model with the family-of-origin and children’s status and controls (Model 7); and a model with the three measures and controls (Model 8).</li>
-<li><strong>Subjective social mobility (Models 9-23)</strong>: each mobility measure (own - origin, own - mean origin, children - own, intergenerational, children - origin and the trajectory slope, the latter also together with the trajectory curve; WE/BE) entered separately (Models 9-15) and with controls (Models 16-22), and a model with all measures and controls (Model 23). Since the mobility measures are linear combinations of the three subjective status measures, the full model is rank deficient and the aliased terms are dropped.</li>
-<li><strong>Objective social status (Models 24-36)</strong>: education and income, each in its three operationalizations (dichotomous BE; four categories for education and three groups for income, BE; and continuous, years of education and log income, WE/BE). Each operationalization is entered separately for education (Models 24-26) and for income (Models 27-29); the same models are estimated with controls (Models 30-35); and a final model includes all the education and income measures with controls (Model 36).</li>
-<li><strong>Subjective mobility and objective status (Models 37-54)</strong>: each of the mobility measures children - own, intergenerational, children - origin and trajectory slope (WE/BE) is entered together with education and income, first with continuous measures (years of education and log income, WE/BE; Models 37-40), then with controls (Models 41-44), and finally with all the variables and controls (Model 45). The same sequence is repeated replacing the education and income measures with dichotomous education (BE) and income in three categories (BE; Models 46-54).</li>
+<li><strong>Subjective social status (Models 1-8)</strong>: own, origin and children’s subjective status (WE/BE), each entered separately (Models 1-3) and with controls (Models 4-6); a model with the origin and children’s status and controls (Model 7); and a model with the three measures and controls (Model 8).</li>
+<li><strong>Subjective social mobility (Models 9-25)</strong>: each mobility measure (own - origin, own - mean origin, children - own, intergenerational, children - origin, the trajectory slope and the trajectory curve; WE/BE) entered separately (Models 9-16; the slope and the curve are entered each on their own and together) and with controls (Models 17-24), and a model with all measures and controls (Model 25). The models that include the trajectory slope or curve also control for the SSS index (WE/BE). Since the mobility measures are linear combinations of the three subjective status measures, the full model is rank deficient and the aliased terms are dropped.</li>
+<li><strong>Objective social status (Models 26-38)</strong>: education and income, each in its three operationalizations (dichotomous BE; four categories for education and three groups for income, BE; and continuous, years of education and log income, WE/BE). Each operationalization is entered separately for education (Models 26-28) and for income (Models 29-31); the same models are estimated with controls (Models 32-37); and a final model includes all the education and income measures with controls (Model 38).</li>
+<li><strong>Subjective mobility and objective status (Models 39-56)</strong>: each of the mobility measures children - own, intergenerational, children - origin and trajectory slope (WE/BE) is entered together with education and income, first with continuous measures (years of education and log income, WE/BE; Models 39-42), then with controls (Models 43-46), and finally with all the variables and controls (Model 47). As in the previous block, the models that include the trajectory slope also control for the SSS index (WE/BE). The same sequence is repeated replacing the education and income measures with dichotomous education (BE) and income in three categories (BE; Models 48-56).</li>
 </ol>
 <p>All models are estimated by maximum likelihood (not REML), so that models with different fixed effects can be compared. Models are unweighted and are estimated on the analytical sample described above using the <code>lmer()</code> function from the <code>lme4</code> package in R, and the results are presented in tables with the regression coefficients and their standard errors (<code>texreg</code>).</p>
+
 </section>
 </section>
 </section>
 
-</main>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-bell_fixed_2019" class="csl-entry" role="listitem">
+Bell, Andrew, Malcolm Fairbrother, and Kelvyn Jones. 2019. <span>“Fixed and Random Effects Models: Making an Informed Choice.”</span> <em>Quality &amp; Quantity</em> 53 (2): 1051–74. <a href="https://doi.org/10.1007/s11135-018-0802-x">https://doi.org/10.1007/s11135-018-0802-x</a>.
+</div>
+<div id="ref-bell_explaining_2015" class="csl-entry" role="listitem">
+Bell, Andrew, and Kelvyn Jones. 2015. <span>“Explaining Fixed Effects: Random Effects Modeling of Time-Series Cross-Sectional and Panel Data.”</span> <em>Political Science Research and Methods</em> 3 (1): 133–53. <a href="https://doi.org/10.1017/psrm.2014.7">https://doi.org/10.1017/psrm.2014.7</a>.
+</div>
+<div id="ref-castillo_perceptions_2025" class="csl-entry" role="listitem">
+Castillo, Juan Carlos, Andreas Laffert, Kevin Carrasco, and Julio Iturra-Sanhueza. 2025. <span>“Perceptions of Inequality and Meritocracy: Their Interplay in Shaping Preferences for Market Justice in Chile (2016–2023).”</span> <em>Frontiers in Sociology</em> 10 (September): 1634219. <a href="https://doi.org/10.3389/fsoc.2025.1634219">https://doi.org/10.3389/fsoc.2025.1634219</a>.
+</div>
+<div id="ref-jaime-castillo_public_2013" class="csl-entry" role="listitem">
+Jaime-Castillo, Antonio M. 2013. <span>“Public Opinion and the Reform of the Pension Systems in Europe: The Influence of Solidarity Principles.”</span> <em>Journal of European Social Policy</em> 23 (4): 390–405. <a href="https://doi.org/10.1177/0958928713507468">https://doi.org/10.1177/0958928713507468</a>.
+</div>
+<div id="ref-lindh_public_2015" class="csl-entry" role="listitem">
+Lindh, Arvid. 2015. <span>“Public Opinion Against Markets? Attitudes Towards Market Distribution of Social Services – a Comparison of 17 Countries.”</span> <em>Social Policy &amp; Administration</em> 49 (7): 887–910. <a href="https://doi.org/10.1111/spol.12105">https://doi.org/10.1111/spol.12105</a>.
+</div>
+<div id="ref-singer_applied_2003" class="csl-entry" role="listitem">
+Singer, Judith D. 2003. <em>Applied Longitudinal Data Analysis: Modeling Change and Event Occurrence</em>. Cary: Oxford University Press, Incorporated.
+</div>
+</div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

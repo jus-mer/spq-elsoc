@@ -1,0 +1,10 @@
+---
+format: 
+  html:
+    theme: cosmo
+    toc: true
+code-fold: true
+editor_options: 
+  chunk_output_type: console
+bibliography: ../input/bib/jusmer.bib
+---
