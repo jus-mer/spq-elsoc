@@ -22,7 +22,9 @@ format:
     number-sections: true
     tbl-longtable: false
 editor: source
-bibliography: "../input/bib/jusmer.bib"
+bibliography: 
+  - "../input/bib/jusmer.bib"
+  - "../input/bib/references.bib"
 csl: "../input/bib/apa6.csl"
 author:
   - name: Juan Carlos Castillo
@@ -104,7 +106,7 @@ fig-width: 7.5
 
 {{< include 03-methods.qmd >}}
 
-{{< include 04-results-final.qmd >}}
+{{< include 04-results.qmd >}}
 
 {{< include 05-discussion.qmd >}}
 

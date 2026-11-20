@@ -1,5 +1,7 @@
 ---
-bibliography: "../input/bib/jusmer.bib"
+bibliography:
+  - "../input/bib/jusmer.bib"
+  - "../input/bib/references.bib"
 csl: "../input/bib/apa6.csl"
 ---
 

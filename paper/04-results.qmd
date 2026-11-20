@@ -1,0 +1,1191 @@
+---
+format: 
+  html:
+    theme: cosmo
+    toc: true
+code-fold: true
+editor_options: 
+  chunk_output_type: console
+---
+# Results
+
+```{r}
+#| label: set
+#| echo: false
+#| message: false
+#| warning: false
+
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE, include = TRUE, warning = FALSE, message = FALSE)
+
+table_format <- if(is_html_output()) {
+  "html"
+} else if(is_latex_output()) {
+  "latex"
+}
+table_format2 <- if(is_html_output()) {
+  T
+} else if(is_latex_output()) {
+  F
+}
+
+options(kableExtra.html.bsTable = T)
+options(knitr.kable.NA = "")
+```
+
+
+```{r}
+#| label: packages-results
+#| cache: false
+#| include: false
+
+if (! require("pacman")) install.packages("pacman")
+
+pacman::p_load(tidyverse, 
+               sjmisc, 
+               sjPlot, 
+               lme4, 
+               lmerTest,
+               here, 
+               performance,
+               influence.ME, 
+               srvyr,
+               ordinal,
+               texreg, 
+               ggdist,
+               misty,
+               kableExtra,
+               ggalluvial, 
+               shadowtext,
+               MetBrewer,
+               patchwork,
+               sjlabelled,
+               corrplot)
+
+
+options(scipen=999)
+```
+
+```{r}
+#| label: data-results
+#| include: false
+
+load(file = here("input/data/proc/df_final.RData"))
+
+# Index of the three original subjective social status measures (own, family of
+# origin and children), with its WE/BE decomposition. Used as a control in the
+# models that include the trajectory slope.
+df_study1 <- df_study1 %>%
+  ungroup() %>%
+  mutate(sss_index = rowMeans(across(c(ess, ess_og, ess_hijos)))) %>%
+  group_by(idencuesta) %>%
+  mutate(sss_index_mean = mean(sss_index, na.rm = TRUE),
+         sss_index_cwc  = sss_index - sss_index_mean) %>%
+  ungroup()
+
+# Variables used in the models of the Modelling section and in the descriptive
+# figures (plus the wave). Complete cases are required only in these variables, to keep
+# as many observations as possible. People without a valid income trajectory are
+# kept as the extra category "Missings".
+vars_mod <- c("idencuesta", "ola", "mjp_index", "ola_num", "ola_2", "ideo", "sex", "age",
+              "dummy_educ_mean", "traj_ingreso",
+              "ess_og_cwc", "ess_og_mean", "ess_cwc", "ess_mean",
+              "ess_hijos_cwc", "ess_hijos_mean",
+              "mov_exp_og_cwc", "mov_exp_og_mean",
+              # variables of the descriptive figures
+              "ess", "ess_og", "ess_hijos",
+              "mov_exp_og", "educ")
+
+df_model <- df_study1 %>%
+  select(all_of(vars_mod)) %>%
+  mutate(traj_ingreso = forcats::fct_na_value_to_level(traj_ingreso, level = "Missings")) %>%
+  na.omit()
+
+# N of observations and persons used in a figure -----------------------------
+
+# single variable (or set of variables jointly non-missing)
+n_note <- function(vars, data = df_model) {
+  d <- data %>%
+    ungroup() %>%
+    filter(if_all(all_of(vars), ~ !is.na(.x)))
+  paste0("N = ", format(nrow(d), big.mark = ","), " observations, ",
+         format(n_distinct(d$idencuesta), big.mark = ","), " persons")
+}
+
+# correlation matrices (pairwise-complete): range of N across variable pairs
+n_note_pw <- function(vars, data = df_cor_base) {
+  d <- data %>% ungroup()
+  n <- combn(vars, 2, simplify = FALSE) %>%
+    map(function(p) {
+      dd <- d[complete.cases(d[, p]), ]
+      c(obs = nrow(dd), per = n_distinct(dd$idencuesta))
+    }) %>%
+    do.call(rbind, .)
+  rng <- function(x) {
+    if (min(x) == max(x)) format(min(x), big.mark = ",")
+    else paste0(format(min(x), big.mark = ","), "-", format(max(x), big.mark = ","))
+  }
+  paste0("N = ", rng(n[, "obs"]), " observations, ",
+         rng(n[, "per"]), " persons")
+}
+
+# data of the i-th wave (waves are ordered 2016, ..., 2023)
+wave_data <- function(i, data = df_cor_base) {
+  data %>% ungroup() %>% filter(ola == sort(unique(ola))[i])
+}
+```
+
+```{r}
+#| label: auxiliar function
+
+make_table <- function(models, col_names, blocks, extra_rows = list(), note = note_prev) {
+  terms  <- unlist(lapply(blocks, `[[`, "terms"))
+  labels <- unlist(lapply(blocks, `[[`, "labels"))
+  idx    <- sapply(blocks, function(b) length(b$terms)); names(idx) <- sapply(blocks, `[[`, "name")
+
+  coefs <- sapply(models, function(m) sapply(terms, function(t) cell(m, t)))
+  rownames(coefs) <- labels
+
+  fit_rows <- rbind(
+    "N_i (observaciones)"            = sapply(models, nobs),
+    "N_j (personas)"                 = sapply(models, function(m) ngrps(m)[["idencuesta"]]),
+    "AIC"                            = sapply(models, function(m) fmt(AIC(m), 1)),
+    "BIC"                            = sapply(models, function(m) fmt(BIC(m), 1)),
+    "Var. intercepto (persona)"      = sapply(models, function(m) fmt(var_comp(m, "int"))),
+    "Var. pendiente ola_num"         = sapply(models, function(m) fmt(var_comp(m, "time"))),
+    "Var. pendiente aleatoria del WE interactuado" = sapply(models, function(m) {
+                                          v <- var_comp(m, "sss"); ifelse(is.na(v), "", fmt(v, 4)) }),
+    "Var. residual"                  = sapply(models, function(m) fmt(var_comp(m, "resid"))),
+    "Ajuste singular"                = sapply(models, function(m) ifelse(isSingular(m), "sí", "no")),
+    "Convergencia"                   = sapply(models, function(m)
+                                          ifelse(is.null(m@optinfo$conv$lme4$messages), "ok", "advertencia")))
+
+  if (length(extra_rows)) {
+    fit_rows <- rbind(fit_rows, do.call(rbind, lapply(extra_rows, unname)))
+  }
+
+  out <- rbind(coefs, fit_rows)
+  colnames(out) <- col_names
+  idx <- c(idx, "Ajuste y efectos aleatorios" = nrow(fit_rows))
+
+  kable(out, format = "html", align = c("l", rep("r", length(models))),
+        format.args = list(big.mark = ".", decimal.mark = ",")) %>%
+    kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE, font_size = 12) %>%
+    pack_rows(index = idx) %>%
+    footnote(general = note, general_title = "Nota: ", footnote_as_chunk = TRUE)
+}
+```
+
+# Descriptives
+
+## Market Justice Preferences 
+
+```{r}
+#| label: fig-mjp-dist
+#| fig-cap: "Distribution of the market justice preferences (MJP) index by wave"
+#| fig-width: 9
+#| fig-height: 5.5
+#| fig-align: center
+
+df_mjp <- df_model %>%
+  ungroup() %>%
+  filter(!is.na(mjp_index)) %>%
+  mutate(mjp_bin = cut(mjp_index, breaks = seq(1, 5, by = 0.5),
+                       include.lowest = TRUE, right = FALSE))
+
+df_mjp_mean <- df_mjp %>%
+  group_by(ola) %>%
+  summarise(m = mean(mjp_index), .groups = "drop") %>%
+  mutate(lab = paste0("Mean = ", sprintf("%.2f", m)))
+
+ggplot(df_mjp, aes(x = mjp_index)) +
+  geom_histogram(aes(y = after_stat(count / tapply(count, PANEL, sum)[PANEL])),
+                 breaks = seq(0.75, 5.25, by = 0.5), closed = "right",
+                 fill = met.brewer("Hiroshige", 1, direction = -1)[1],
+                 colour = "white") +
+  geom_vline(data = df_mjp_mean, aes(xintercept = m),
+             linetype = "dashed", colour = "grey20") +
+  geom_text(data = df_mjp_mean, aes(x = 5, y = Inf, label = lab),
+            hjust = 1, vjust = 1.5, size = 3.2, inherit.aes = FALSE) +
+  scale_x_continuous(breaks = 1:5) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1),
+                     expand = expansion(mult = c(0, 0.1))) +
+  facet_wrap(~ ola, nrow = 2) +
+  labs(x = "MJP index (1 = strongly disagree, 5 = strongly agree)", y = NULL,
+       caption = "Bins of width 0.5 centred on 1, 1.5, ..., 5. Dashed line: wave mean.") +
+  theme_minimal(base_size = 12) +
+  theme(strip.text = element_text(face = "bold"),
+        panel.grid.minor = element_blank())
+```
+
+## Static Social Subjective Status
+
+```{r}
+#| label: fig-ess-dist
+#| fig-cap: "Distribution of subjective social status (own, family of origin and children) by wave"
+#| fig-width: 9
+#| fig-height: 8
+#| fig-align: center
+
+ess_labs <- c(ess = "Own", ess_og = "Family of origin", ess_hijos = "Children")
+
+df_ess <- df_model %>%
+  ungroup() %>%
+  select(ola, all_of(names(ess_labs))) %>%
+  pivot_longer(-ola, names_to = "var", values_to = "val") %>%
+  filter(!is.na(val)) %>%
+  mutate(var = factor(var, levels = names(ess_labs), labels = ess_labs)) %>%
+  count(var, ola, val) %>%
+  group_by(var, ola) %>%
+  mutate(prop = n / sum(n)) %>%
+  ungroup()
+
+df_ess_mean <- df_model %>%
+  ungroup() %>%
+  select(ola, all_of(names(ess_labs))) %>%
+  pivot_longer(-ola, names_to = "var", values_to = "val") %>%
+  mutate(var = factor(var, levels = names(ess_labs), labels = ess_labs)) %>%
+  group_by(var, ola) %>%
+  summarise(m = mean(val, na.rm = TRUE), .groups = "drop")
+
+ggplot(df_ess, aes(x = val, y = prop)) +
+  geom_col(fill = met.brewer("Hiroshige", 1, direction = -1)[1], width = 0.8) +
+  geom_vline(data = df_ess_mean, aes(xintercept = m),
+             linetype = "dashed", colour = "grey20") +
+  scale_x_continuous(breaks = 0:10) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), n.breaks = 3) +
+  facet_grid(ola ~ var) +
+  labs(x = "Subjective social status (0 = lowest, 10 = highest)", y = NULL,
+       caption = paste0("Dashed line: wave mean.\n", n_note(names(ess_labs)))) +
+  theme_minimal(base_size = 11) +
+  theme(strip.text = element_text(face = "bold"),
+        panel.grid.minor = element_blank())
+```
+
+- The Own SSS averages 4.4 (out of 10) and family-of-origin SSS 3.9, both below the scale midpoint; in contrast,  children’s SSS averages 6.4, the only one of the measures that is above the midpoint. 
+
+- Wave means move little between waves: own between 4,18 and 4,64; origin between 3,67 and 4,12; son between 6,24 and 6,75
+
+## Dinamic Social Subjective Mobility
+
+```{r}
+#| label: mov-dist-setup
+#| include: false
+
+mov_labs <- c(
+  mov_exp_og   = "Children - origin"
+)
+
+df_mov <- df_model %>%
+  ungroup() %>%
+  select(ola, all_of(names(mov_labs))) %>%
+  pivot_longer(-ola, names_to = "var", values_to = "val") %>%
+  filter(!is.na(val)) %>%
+  mutate(val = as.numeric(val))
+
+plot_mov <- function(v) {
+  d <- filter(df_mov, var == v)
+  ggplot(d, aes(x = val)) +
+    geom_histogram(binwidth = 1, boundary = 0, fill = met.brewer("Hiroshige", 1, direction = -1)[1],
+                   colour = "white") +
+    geom_vline(data = d %>% group_by(ola) %>% summarise(m = mean(val), .groups = "drop"),
+               aes(xintercept = m), linetype = "dashed", colour = "grey20") +
+    geom_vline(xintercept = 0, colour = "grey50") +
+    facet_wrap(~ ola, ncol = 3) +
+    labs(title = mov_labs[[v]], x = NULL, y = NULL) +
+    theme_minimal(base_size = 16) +
+    theme(plot.title = element_text(face = "bold"),
+          axis.text = element_text(size = 13),
+          strip.text = element_text(size = 14, face = "bold"),
+          panel.grid.minor = element_blank())
+}
+```
+
+
+```{r}
+#| label: fig-mov-exp-og-dist
+#| fig-cap: "Distribution of subjective social mobility by wave: Children - origin"
+#| fig-width: 14
+#| fig-height: 10
+#| fig-align: center
+
+plot_mov("mov_exp_og") +
+  labs(title = NULL,
+       caption = paste0("Dashed line: wave mean. Solid line: no mobility (0).\n", n_note("mov_exp_og")))
+```
+
+
+**Subjective mobility.**
+
+- *Children - origin:* mean +2.5
+
+
+## Dinamic and Static Objective Social Status
+
+```{r}
+#| label: obj-dist-setup
+#| include: false
+
+obj_col <- met.brewer("Hiroshige", 1, direction = -1)[1]
+
+theme_obj <- theme_minimal(base_size = 16) +
+  theme(axis.text = element_text(size = 13),
+        strip.text = element_text(size = 14, face = "bold"),
+        panel.grid.minor = element_blank())
+
+# categorical / dichotomous variables: proportion by wave
+plot_obj_cat <- function(var, labs = NULL, xlab = NULL) {
+  d <- df_model %>%
+    ungroup() %>%
+    select(ola, val = all_of(var)) %>%
+    filter(!is.na(val)) %>%
+    mutate(val = if (is.null(labs)) as.factor(val) else factor(val, levels = names(labs), labels = labs)) %>%
+    count(ola, val) %>%
+    group_by(ola) %>%
+    mutate(prop = n / sum(n)) %>%
+    ungroup()
+
+  ggplot(d, aes(x = val, y = prop)) +
+    geom_col(fill = obj_col, width = 0.7) +
+    geom_text(aes(label = scales::percent(prop, accuracy = 1)), vjust = -0.4, size = 4) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1),
+                       expand = expansion(mult = c(0, 0.15))) +
+    facet_wrap(~ ola, ncol = 3) +
+    labs(x = xlab, y = NULL, caption = n_note(var)) +
+    theme_obj +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1))
+}
+
+# continuous variables: histogram by wave with wave mean
+plot_obj_cont <- function(var, binwidth, xlab = NULL) {
+  d <- df_model %>%
+    ungroup() %>%
+    select(ola, val = all_of(var)) %>%
+    filter(!is.na(val))
+
+  ggplot(d, aes(x = val)) +
+    geom_histogram(binwidth = binwidth, fill = obj_col, colour = "white") +
+    geom_vline(data = d %>% group_by(ola) %>% summarise(m = mean(val), .groups = "drop"),
+               aes(xintercept = m), linetype = "dashed", colour = "grey20") +
+    facet_wrap(~ ola, ncol = 3) +
+    labs(x = xlab, y = NULL,
+         caption = paste0("Dashed line: wave mean.\n", n_note(var))) +
+    theme_obj
+}
+```
+
+
+
+::: {.panel-tabset}
+
+### Income trajectory
+
+```{r}
+#| label: fig-traj-dist
+#| fig-cap: "Distribution of income trajectory (origin in the first wave, destination in the last wave)"
+#| fig-width: 10
+#| fig-height: 6
+#| fig-align: center
+
+# the trajectory is a person-level variable (constant across waves): one row per person
+df_traj <- df_model %>%
+  ungroup() %>%
+  distinct(idencuesta, traj_ingreso) %>%
+  count(traj_ingreso) %>%
+  mutate(prop = n / sum(n))
+
+ggplot(df_traj, aes(x = prop, y = forcats::fct_rev(traj_ingreso))) +
+  geom_col(fill = obj_col, width = 0.7) +
+  geom_text(aes(label = paste0(scales::percent(prop, accuracy = 1), " (n = ", n, ")")),
+            hjust = -0.1, size = 4) +
+  scale_x_continuous(labels = scales::percent_format(accuracy = 1),
+                     expand = expansion(mult = c(0, 0.25))) +
+  labs(x = NULL, y = NULL,
+       caption = paste0("Missings: persons without a valid income trajectory.\n",
+                        "N = ", sum(df_traj$n), " persons")) +
+  theme_obj
+```
+
+### Education: dichotomous
+
+```{r}
+#| label: fig-educ-dist
+#| fig-cap: "Distribution of education (university vs. less than university) by wave"
+#| fig-width: 14
+#| fig-height: 10
+#| fig-align: center
+
+plot_obj_cat("educ")
+```
+
+
+:::
+
+- The breakdown by educational level shows that those with a college education account for approximately 16% of the sample in each wave.
+
+- The income trajectory is a person-level variable, so the figure shows one observation per person.
+
+
+# Correlation matrix
+
+```{r}
+#| label: fun-corrplot
+#| include: false
+
+# Data for the correlation matrices: df_model plus one dummy per income trajectory
+# category (the trajectory is nominal, so its categories enter as dummies;
+# "Missings" is included as one more category).
+traj_cats <- levels(df_model$traj_ingreso)
+traj_vars <- setNames(paste0("traj_", seq_along(traj_cats)), traj_cats)
+
+df_cor_base <- df_model %>% ungroup()
+for (k in seq_along(traj_cats)) {
+  df_cor_base[[traj_vars[k]]] <- as.numeric(df_cor_base$traj_ingreso == traj_cats[k])
+}
+
+# One Spearman correlation matrix per wave; ordered factors enter as numeric codes
+cor_by_wave <- function(vars) {
+  df_cor_base %>%
+    select(ola, all_of(names(vars))) %>%
+    mutate(across(-ola, ~ as.numeric(.x))) %>%
+    group_split(ola, .keep = FALSE) %>%
+    map(~ cor(.x, method = "spearman", use = "pairwise.complete.obs"))
+}
+
+plot_cor <- function(m, vars, i = NULL, cex = 0.8) {
+  rownames(m) <- colnames(m) <- unname(vars)
+  corrplot(m,
+           method = "color",
+           type = "lower",
+           diag = FALSE,
+           order = "original",
+           addCoef.col = "black",
+           number.cex = cex,
+           number.digits = 2,
+           tl.col = "black",
+           tl.cex = 0.85,
+           tl.srt = 45,
+           cl.cex = 0.8,
+           col = colorRampPalette(c("#B2182B", "white", "#2166AC"))(200),
+           col.lim = c(-1, 1),
+           is.corr = TRUE,
+           na.label = "-",
+           mar = c(4, 0, 1, 0))
+  mtext(if (is.null(i)) n_note_pw(names(vars)) else n_note_pw(names(vars), wave_data(i)),
+        side = 1, line = 3, cex = 0.8)
+}
+```
+
+## Subjective Social Status 
+
+Correlations between the MJP index, the controls (sex, age and political ideology), the three subjective social status measures (own, family of origin and children) and the subjective mobility children - origin.
+
+```{r}
+#| label: fun-corrplot-sub
+#| include: false
+
+vars_sub <- c(
+  mjp_index  = "MJP index",
+  sex        = "Sex",
+  age        = "Age",
+  ideo       = "Political ideology",
+  ess        = "SSS own",
+  ess_og     = "SSS origin",
+  ess_hijos  = "SSS children",
+  mov_exp_og = "Mobility children - origin"
+)
+
+cor_sub_waves <- cor_by_wave(vars_sub)
+plot_cor_sub  <- function(i) plot_cor(cor_sub_waves[[i]], vars_sub, i)
+```
+
+::: {.panel-tabset}
+
+### Wave 1
+
+```{r}
+#| label: fig-correlations-sub-w1
+#| fig-width: 9
+#| fig-height: 9
+#| fig-align: center
+
+plot_cor_sub(1)
+```
+
+### Wave 2
+
+```{r}
+#| label: fig-correlations-sub-w2
+#| fig-width: 9
+#| fig-height: 9
+#| fig-align: center
+
+plot_cor_sub(2)
+```
+
+### Wave 3
+
+```{r}
+#| label: fig-correlations-sub-w3
+#| fig-width: 9
+#| fig-height: 9
+#| fig-align: center
+
+plot_cor_sub(3)
+```
+
+### Wave 4
+
+```{r}
+#| label: fig-correlations-sub-w4
+#| fig-width: 9
+#| fig-height: 9
+#| fig-align: center
+
+plot_cor_sub(4)
+```
+
+### Wave 5
+
+```{r}
+#| label: fig-correlations-sub-w5
+#| fig-width: 9
+#| fig-height: 9
+#| fig-align: center
+
+plot_cor_sub(5)
+```
+
+### Wave 6
+
+```{r}
+#| label: fig-correlations-sub-w6
+#| fig-width: 9
+#| fig-height: 9
+#| fig-align: center
+
+plot_cor_sub(6)
+```
+
+:::
+
+```{r}
+#| label: fig-correlations-sub-we-be
+#| fig-cap: "Spearman correlations between the MJP index, the controls and the decomposed subjective status and mobility variables (within-person, WE, and between-person, BE), all waves"
+#| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+#| include: false
+
+vars_sub_wb <- c(
+  mjp_index       = "MJP index",
+  sex             = "Sex",
+  age             = "Age",
+  ideo            = "Political ideology",
+  ess_cwc         = "SSS own (WE)",
+  ess_mean        = "SSS own (BE)",
+  ess_og_cwc      = "SSS origin (WE)",
+  ess_og_mean     = "SSS origin (BE)",
+  ess_hijos_cwc   = "SSS children (WE)",
+  ess_hijos_mean  = "SSS children (BE)",
+  mov_exp_og_cwc  = "Mobility children - origin (WE)",
+  mov_exp_og_mean = "Mobility children - origin (BE)"
+)
+
+cor_sub_wb <- df_cor_base %>%
+  select(all_of(names(vars_sub_wb))) %>%
+  mutate(across(everything(), as.numeric)) %>%
+  cor(method = "spearman", use = "pairwise.complete.obs")
+
+plot_cor(cor_sub_wb, vars_sub_wb)
+```
+
+## Objective Status
+
+Correlations between the MJP index, education (university vs. less than university) and the income trajectory. The trajectory is nominal, so each category enters as a dummy variable (reference category not omitted; "Missings" included as one more category).
+
+```{r}
+#| label: fun-corrplot-obj
+#| include: false
+
+vars_obj <- c(
+  mjp_index = "MJP index",
+  educ      = "Education (university)",
+  setNames(paste0("Trajectory: ", traj_cats), traj_vars)
+)
+
+cor_obj_waves <- cor_by_wave(vars_obj)
+plot_cor_obj  <- function(i) plot_cor(cor_obj_waves[[i]], vars_obj, i, cex = 0.7)
+```
+
+::: {.panel-tabset}
+
+### Wave 1
+
+```{r}
+#| label: fig-correlations-obj-w1
+#| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+
+plot_cor_obj(1)
+```
+
+### Wave 2
+
+```{r}
+#| label: fig-correlations-obj-w2
+#| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+
+plot_cor_obj(2)
+```
+
+### Wave 3
+
+```{r}
+#| label: fig-correlations-obj-w3
+#| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+
+plot_cor_obj(3)
+```
+
+### Wave 4
+
+```{r}
+#| label: fig-correlations-obj-w4
+#| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+
+plot_cor_obj(4)
+```
+
+### Wave 5
+
+```{r}
+#| label: fig-correlations-obj-w5
+#| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+
+plot_cor_obj(5)
+```
+
+### Wave 6
+
+```{r}
+#| label: fig-correlations-obj-w6
+#| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+
+plot_cor_obj(6)
+```
+
+:::
+
+
+# Modelling
+
+## Subjective social status (WE and BE) and income trajectory
+
+One model per block of status (origin, own and children), without interactions: the income trajectory enters only as a main effect and the random-effects structure is `(1 + ola_num | idencuesta)` (random intercept and random time slope; **no random slope for the WE status**). The reference is **Stable low**.
+
+- **Model 1:** only the trend (linear and quadratic) and the trajectory.
+- **Model 2 (base):** adds the controls (ideology, sex, age and university education BE).
+- **Models 3 to 5:** to the base model, **each block of status is added separately** (origin, own and children, each with its WE and BE), not cumulatively.
+
+```{r}
+#| label: helpers-ingreso-2
+
+# Helpers (same definitions as analysis/previ-sss.qmd). lmerTest is called with
+# `::` so that it is not attached and the models above are not affected.
+oc    <- lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5))
+re_A  <- "(1 + ola_num | idencuesta)"
+re_B  <- function(s) paste0("(1 + ola_num + ", s, "_we | idencuesta)")
+
+fmt   <- function(x, digits = 3) formatC(x, format = "f", digits = digits, decimal.mark = ",")
+star  <- function(p) ifelse(p < .001, "***", ifelse(p < .01, "**",
+                     ifelse(p < .05, "*", ifelse(p < .1, "+", ""))))
+p_fmt <- function(p) ifelse(p < .001, "< 0,001", fmt(p))
+
+cell <- function(m, term) {
+  s <- coef(summary(m))
+  if (!term %in% rownames(s)) return("")
+  paste0(fmt(s[term, 1]), " (", fmt(s[term, 2]), ")", star(s[term, 5]))
+}
+
+var_comp <- function(m, what) {
+  v <- as.data.frame(VarCorr(m))
+  switch(what,
+    int   = v$vcov[v$grp == "idencuesta" & v$var1 == "(Intercept)" & is.na(v$var2)],
+    time  = v$vcov[v$var1 == "ola_num" & is.na(v$var2) & !is.na(v$var1)],
+    sss   = { x <- v$vcov[!is.na(v$var1) & endsWith(v$var1, "_we") & is.na(v$var2)]
+              if (length(x)) x else NA_real_ },
+    resid = sigma(m)^2)
+}
+
+ctrl_t <- c("ola_num", "ola_2", "ideoCenter", "ideoRight",
+            "ideoDoes not identify", "sexFemale", "age", "dummy_educ_mean",
+            "(Intercept)")   # the intercept goes last
+ctrl_l <- c("Tendencia lineal (ola_num)", "Tendencia cuadrática (ola_2)",
+            "Ideología: centro", "Ideología: derecha", "Ideología: no se identifica",
+            "Mujer", "Edad", "Universitaria BE",
+            "Intercepto")
+
+# Table of models with texreg: one row per coefficient ("coef (se)***", single.row = TRUE),
+# decimal comma, p-values from lmerTest (Satterthwaite).
+#   blocks:     list of blocks (name, terms, labels) that group the rows
+#   extra_rows: named list of extra footer rows (one value per model)
+make_texreg <- function(models, col_names, blocks, extra_rows = list(), note = "", caption = NULL) {
+  terms  <- unlist(lapply(blocks, `[[`, "terms"))
+  labels <- unlist(lapply(blocks, `[[`, "labels"))
+
+  # keep only the terms that appear in at least one model (texreg drops the rest)
+  present <- sapply(terms, function(t) any(sapply(models, function(m) t %in% rownames(coef(summary(m))))))
+  blk_n   <- sapply(blocks, function(b) sum(present[match(b$terms, terms)]))
+  groups  <- setNames(split(seq_len(sum(blk_n)), rep(seq_along(blk_n), blk_n)),
+                      sapply(blocks, `[[`, "name"))
+  groups  <- groups[blk_n > 0]
+  coef_map <- as.list(setNames(labels[present], terms[present]))
+
+  gof_rows <- c(
+    list("Ajuste singular" = sapply(models, function(m) ifelse(isSingular(m), "sí", "no")),
+         "Convergencia"    = sapply(models, function(m)
+           ifelse(is.null(m@optinfo$conv$lme4$messages), "ok", "advertencia"))),
+    extra_rows)
+
+  op <- options(OutDec = ","); on.exit(options(op))
+  html <- texreg::htmlreg(
+    models,
+    custom.model.names = col_names,
+    custom.coef.map = coef_map,
+    groups = groups,
+    custom.gof.rows = gof_rows,
+    custom.note = note,
+    single.row = TRUE,
+    digits = 3,
+    stars = c(0.001, 0.01, 0.05, 0.1), symbol = "+",
+    include.loglik = FALSE,
+    caption = caption, caption.above = TRUE,
+    doctype = FALSE, html.tag = FALSE, head.tag = FALSE, body.tag = FALSE,
+    center = FALSE, bold = 0)
+  # thicker rule on the lines that separate the blocks of the table
+  html <- gsub("border-top: 1px solid #000000", "border-top: 2px solid #000000", html, fixed = TRUE)
+  for (g in names(groups)) {
+    g_esc <- gsub("([][{}()+*^$|\\\\?.])", "\\\\\\1", g)
+    html <- sub(paste0('<tr( style="[^"]*")?>(\\s*<td[^>]*>)', g_esc, "</td>"),
+                paste0('<tr style="border-top: 2px solid #000000;">\\2', gsub("\\\\", "\\\\\\\\", g), "</td>"),
+                html)
+  }
+  knitr::asis_output(html)
+}
+
+# Sample: df_model (complete cases in the variables of this section; people without
+# a valid income trajectory are in the category "Missings")
+d3 <- df_model %>%
+  ungroup() %>%
+  mutate(traj_ingreso = relevel(traj_ingreso, ref = "Stable low"),
+         # status: within-person (WE) and between-person (BE, uncentred) effects
+         og_we  = ess_og_cwc,    og_be  = ess_og_mean,
+         own_we = ess_cwc,       own_be = ess_mean,
+         hij_we = ess_hijos_cwc, hij_be = ess_hijos_mean)
+
+tl <- levels(d3$traj_ingreso)   # the reference (Stable low) is the first level
+
+ctrl3 <- "ola_num + ola_2 + ideo + sex + age + dummy_educ_mean"
+
+# Same controls without political ideology (for the optional comparison tables)
+ctrl3n  <- "ola_num + ola_2 + sex + age + dummy_educ_mean"
+keep_n  <- !ctrl_t %in% c("ideoCenter", "ideoRight", "ideoDoes not identify")
+ctrl_tn <- ctrl_t[keep_n]
+ctrl_ln <- ctrl_l[keep_n]
+
+fit3 <- function(rhs, re = re_A, dat = d3) {
+  lmerTest::lmer(as.formula(paste("mjp_index ~", rhs, "+", re)),
+                 data = dat, REML = FALSE, control = oc)
+}
+```
+
+Analysis sample: **N~i~ = `r nrow(d3)`** observations from **N~j~ = `r n_distinct(d3$idencuesta)`** persons.
+
+```{r}
+#| label: models-ingreso-1
+
+blk3 <- c(og = "og_we + og_be", own = "own_we + own_be", hij = "hij_we + hij_be")
+
+rhs1 <- list(tiempo = "ola_num + ola_2",
+             base   = ctrl3,
+             og     = paste(ctrl3, "+", blk3["og"]),
+             own    = paste(ctrl3, "+", blk3["own"]),
+             hij    = paste(ctrl3, "+", blk3["hij"]))
+
+T1  <- lapply(rhs1, function(r) fit3(paste(r, "+ traj_ingreso")))   # with trajectory
+T1r <- lapply(rhs1, fit3)                                           # without trajectory
+
+lrt_bloque <- c("", "", sapply(c("og", "own", "hij"), function(k)
+  p_fmt(anova(T1$base, T1[[k]])$`Pr(>Chisq)`[2])))
+lrt_traj   <- sapply(names(T1), function(k)
+  p_fmt(anova(T1r[[k]], T1[[k]])$`Pr(>Chisq)`[2]))
+```
+
+```{r}
+#| label: blocks-ingreso-1
+
+traj_t <- paste0("traj_ingreso", tl[-1])
+
+blocks_ing1 <- list(
+  list(name = "Estatus subjetivo (cada bloque por separado)",
+       terms  = c("og_we", "og_be", "own_we", "own_be", "hij_we", "hij_be"),
+       labels = c("Origen WE", "Origen BE", "Propio WE", "Propio BE", "Hijos WE", "Hijos BE")),
+  list(name = "Trayectoria de ingreso (ref.: Stable low)", terms = traj_t, labels = tl[-1]),
+  list(name = "Controles", terms = ctrl_t, labels = ctrl_l))   # controls at the end
+
+note_ing1 <- paste("Coeficientes con errores estándar entre paréntesis.",
+                   "*** p < 0,001; ** p < 0,01; * p < 0,05; + p < 0,1.",
+                   "Referencia de la trayectoria: Stable low. Efectos BE sin centrar.",
+                   "Missings agrupa a quienes no tienen trayectoria de ingreso válida.",
+                   "'LRT bloque de estatus' compara cada modelo contra el Modelo 2;",
+                   "'LRT trayectorias' compara cada modelo contra el mismo modelo sin las trayectorias.")
+```
+
+```{r}
+#| label: tbl-ingreso-1
+
+make_texreg(unname(T1),
+           c("Modelo 1: solo tiempo", "Modelo 2: base", "Modelo 3: + Origen",
+             "Modelo 4: + Propio", "Modelo 5: + Hijos"),
+           blocks_ing1,
+           extra_rows = list("LRT bloque de estatus vs. Modelo 2 (p)" = lrt_bloque,
+                             "LRT trayectorias (p)" = lrt_traj),
+           note = note_ing1,
+           caption = "Trayectoria de ingreso y preferencias de justicia de mercado (índice MJP), con controles y estatus subjetivo")
+```
+
+::: {.callout-note collapse="true" title="Optional: same table without political ideology"}
+
+Same model as the table above, but **without political ideology** among the controls (same sample), to compare both.
+
+```{r}
+#| label: tbl-ingreso-1-noideo
+
+rhs1n <- list(tiempo = "ola_num + ola_2",
+              base   = ctrl3n,
+              og     = paste(ctrl3n, "+", blk3["og"]),
+              own    = paste(ctrl3n, "+", blk3["own"]),
+              hij    = paste(ctrl3n, "+", blk3["hij"]))
+
+T1n  <- lapply(rhs1n, function(r) fit3(paste(r, "+ traj_ingreso")))
+T1rn <- lapply(rhs1n, fit3)
+
+lrt_bloque_n <- c("", "", sapply(c("og", "own", "hij"), function(k)
+  p_fmt(anova(T1n$base, T1n[[k]])$`Pr(>Chisq)`[2])))
+lrt_traj_n   <- sapply(names(T1n), function(k)
+  p_fmt(anova(T1rn[[k]], T1n[[k]])$`Pr(>Chisq)`[2]))
+
+blocks_ing1n <- blocks_ing1
+blocks_ing1n[[3]] <- list(name = "Controles (sin ideología)", terms = ctrl_tn, labels = ctrl_ln)
+
+make_texreg(unname(T1n),
+            c("Modelo 1: solo tiempo", "Modelo 2: base", "Modelo 3: + Origen",
+              "Modelo 4: + Propio", "Modelo 5: + Hijos"),
+            blocks_ing1n,
+            extra_rows = list("LRT bloque de estatus vs. Modelo 2 (p)" = lrt_bloque_n,
+                              "LRT trayectorias (p)" = lrt_traj_n),
+            note = note_ing1,
+            caption = "Sin ideología política: trayectoria de ingreso y preferencias de justicia de mercado (índice MJP), con controles y estatus subjetivo")
+```
+
+:::
+
+
+
+## Income trajectory × subjective social status (WE and BE)
+
+One model per status (origin, own and children). Each model includes the controls, the six main effects of status, the income trajectory and the interaction of the trajectory with the **WE** and the **BE** of that column's status. The **slope of the interacted WE status is random**: `(1 + ola_num + X_we | idencuesta)`. Each likelihood-ratio test compares the model with interactions against a base model with the same random slope but no interactions.
+
+```{r}
+#| label: models-ingreso-2
+
+ss3   <- c(Origen = "og", Propio = "own", Hijos = "hij")
+main3 <- "og_we + og_be + own_we + own_be + hij_we + hij_be + traj_ingreso"
+
+base_A3 <- fit3(paste(ctrl3, "+", main3))   # sin pendiente aleatoria de SSS
+
+T2    <- list()
+lrt2  <- list()
+
+for (s in ss3) {
+  int_we <- paste0(s, "_we:traj_ingreso")
+  int_be <- paste0(s, "_be:traj_ingreso")
+  rs     <- re_B(s)
+
+  b_rs   <- fit3(paste(ctrl3, "+", main3), rs)                                  # base con la misma pendiente aleatoria
+  T2[[s]] <- fit3(paste(ctrl3, "+", main3, "+", int_we, "+", int_be), rs)
+  m_we   <- fit3(paste(ctrl3, "+", main3, "+", int_we), rs)
+
+  lrt2[[s]] <- c(
+    conj = anova(b_rs, T2[[s]])$`Pr(>Chisq)`[2],
+    we   = anova(b_rs, m_we)$`Pr(>Chisq)`[2],
+    rs   = anova(base_A3, b_rs)$`Pr(>Chisq)`[2])
+}
+```
+
+```{r}
+#| label: blocks-ingreso-2
+
+sss3_t <- c("og_we", "og_be", "own_we", "own_be", "hij_we", "hij_be")
+sss3_l <- c("Origen WE", "Origen BE", "Propio WE", "Propio BE", "Hijos WE", "Hijos BE")
+
+traj_t <- paste0("traj_ingreso", tl[-1])
+
+int3_t <- int3_l <- character()
+for (s in ss3) {
+  etq <- names(ss3)[ss3 == s]
+  int3_t <- c(int3_t, paste0(s, "_we:traj_ingreso", tl[-1]), paste0(s, "_be:traj_ingreso", tl[-1]))
+  int3_l <- c(int3_l, paste0(etq, " WE × ", tl[-1]), paste0(etq, " BE × ", tl[-1]))
+}
+
+blocks_ing2 <- list(
+  list(name = "Efectos principales de estatus", terms = sss3_t, labels = sss3_l),
+  list(name = "Trayectoria de ingreso (ref.: Stable low)", terms = traj_t, labels = tl[-1]),
+  list(name = "Interacciones trayectoria × estatus", terms = int3_t, labels = int3_l),
+  list(name = "Controles", terms = ctrl_t, labels = ctrl_l))   # controls at the end
+
+note_ing2 <- paste("Coeficientes con errores estándar entre paréntesis.",
+                   "*** p < 0,001; ** p < 0,01; * p < 0,05; + p < 0,1.",
+                   "Los coeficientes de interacción son diferencias respecto de Stable low;",
+                   "la pendiente de cada trayectoria es el efecto principal más su interacción.",
+                   "Los efectos principales de cada trayectoria se leen con los efectos BE en 0,",
+                   "un valor que casi nadie tiene, y no son interpretables por sí solos.",
+                   "Las categorías Low -> Top y Top -> Low tienen muy pocas personas.",
+                   "Missings agrupa a quienes no tienen trayectoria de ingreso válida.")
+```
+
+```{r}
+#| label: tbl-ingreso-2
+
+make_texreg(unname(T2),
+           c("Origen × Trayectoria", "Propio × Trayectoria", "Hijos × Trayectoria"),
+           blocks_ing2,
+           extra_rows = list(
+             "LRT interacción WE + BE (p)" = sapply(ss3, function(s) p_fmt(lrt2[[s]]["conj"])),
+             "LRT interacción solo WE (p)" = sapply(ss3, function(s) p_fmt(lrt2[[s]]["we"])),
+             "LRT pendiente aleatoria vs. sin ella (p)" = sapply(ss3, function(s) p_fmt(lrt2[[s]]["rs"]))),
+           note = note_ing2,
+           caption = "Trayectoria de ingreso × estatus subjetivo (índice MJP), con pendiente aleatoria del estatus WE interactuado")
+```
+
+::: {.callout-note collapse="true" title="Optional: same table without political ideology"}
+
+Same model as the table above, but **without political ideology** among the controls (same sample), to compare both.
+
+```{r}
+#| label: tbl-ingreso-2-noideo
+
+base_A3n <- fit3(paste(ctrl3n, "+", main3))
+
+T2n   <- list()
+lrt2n <- list()
+
+for (s in ss3) {
+  int_we <- paste0(s, "_we:traj_ingreso")
+  int_be <- paste0(s, "_be:traj_ingreso")
+  rs     <- re_B(s)
+
+  b_rs    <- fit3(paste(ctrl3n, "+", main3), rs)
+  T2n[[s]] <- fit3(paste(ctrl3n, "+", main3, "+", int_we, "+", int_be), rs)
+  m_we    <- fit3(paste(ctrl3n, "+", main3, "+", int_we), rs)
+
+  lrt2n[[s]] <- c(
+    conj = anova(b_rs, T2n[[s]])$`Pr(>Chisq)`[2],
+    we   = anova(b_rs, m_we)$`Pr(>Chisq)`[2],
+    rs   = anova(base_A3n, b_rs)$`Pr(>Chisq)`[2])
+}
+
+blocks_ing2n <- blocks_ing2
+blocks_ing2n[[4]] <- list(name = "Controles (sin ideología)", terms = ctrl_tn, labels = ctrl_ln)
+
+make_texreg(unname(T2n),
+            c("Origen × Trayectoria", "Propio × Trayectoria", "Hijos × Trayectoria"),
+            blocks_ing2n,
+            extra_rows = list(
+              "LRT interacción WE + BE (p)" = sapply(ss3, function(s) p_fmt(lrt2n[[s]]["conj"])),
+              "LRT interacción solo WE (p)" = sapply(ss3, function(s) p_fmt(lrt2n[[s]]["we"])),
+              "LRT pendiente aleatoria vs. sin ella (p)" = sapply(ss3, function(s) p_fmt(lrt2n[[s]]["rs"]))),
+            note = note_ing2,
+            caption = "Sin ideología política: trayectoria de ingreso × estatus subjetivo (índice MJP), con pendiente aleatoria del estatus WE interactuado")
+```
+
+:::
+
+## Subjective mobility and income trajectory
+
+Same structure as the previous section, but the subjective social status is replaced by the subjective mobility **children - origin** (`mov_exp_og`), decomposed into its within-person (WE) and between-person (BE, uncentred) components. There are no interactions and the random-effects structure is `(1 + ola_num | idencuesta)` (no random slope for the WE mobility). The reference is **Stable low**.
+
+- **Model 1:** only the trend (linear and quadratic) and the trajectory.
+- **Model 2 (base):** adds the controls (ideology, sex, age and university education BE).
+- **Model 3:** adds the mobility WE and BE to the base model.
+
+```{r}
+#| label: models-ingreso-mov
+
+rhs_m <- list(tiempo = "ola_num + ola_2",
+              base   = ctrl3,
+              mov    = paste(ctrl3, "+ mov_exp_og_cwc + mov_exp_og_mean"))
+
+Tm  <- lapply(rhs_m, function(r) fit3(paste(r, "+ traj_ingreso")))   # with trajectory
+Tmr <- lapply(rhs_m, fit3)                                           # without trajectory
+
+lrt_bloque_m <- c("", "", p_fmt(anova(Tm$base, Tm$mov)$`Pr(>Chisq)`[2]))
+lrt_traj_m   <- sapply(names(Tm), function(k)
+  p_fmt(anova(Tmr[[k]], Tm[[k]])$`Pr(>Chisq)`[2]))
+```
+
+```{r}
+#| label: blocks-ingreso-mov
+
+blocks_ingm <- list(
+  list(name = "Movilidad subjetiva: hijos - origen", terms = c("mov_exp_og_cwc", "mov_exp_og_mean"),
+       labels = c("Movilidad WE", "Movilidad BE")),
+  blocks_ing1[[2]],   # trajectory
+  blocks_ing1[[3]])   # controls
+
+note_ingm <- paste("Coeficientes con errores estándar entre paréntesis.",
+                   "*** p < 0,001; ** p < 0,01; * p < 0,05; + p < 0,1.",
+                   "Referencia de la trayectoria: Stable low. Efectos BE sin centrar.",
+                   "Missings agrupa a quienes no tienen trayectoria de ingreso válida.",
+                   "'LRT movilidad' compara el Modelo 3 contra el Modelo 2;",
+                   "'LRT trayectorias' compara cada modelo contra el mismo modelo sin las trayectorias.")
+```
+
+```{r}
+#| label: tbl-ingreso-mov
+
+make_texreg(unname(Tm),
+           c("Modelo 1: solo tiempo", "Modelo 2: base", "Modelo 3: + Movilidad"),
+           blocks_ingm,
+           extra_rows = list("LRT movilidad vs. Modelo 2 (p)" = lrt_bloque_m,
+                             "LRT trayectorias (p)" = lrt_traj_m),
+           note = note_ingm,
+           caption = "Trayectoria de ingreso y preferencias de justicia de mercado (índice MJP), con controles y movilidad subjetiva (hijos - origen)")
+```
+
+::: {.callout-note collapse="true" title="Optional: same table without political ideology"}
+
+Same model as the table above, but **without political ideology** among the controls (same sample), to compare both.
+
+```{r}
+#| label: tbl-ingreso-mov-noideo
+
+rhs_mn <- list(tiempo = "ola_num + ola_2",
+               base   = ctrl3n,
+               mov    = paste(ctrl3n, "+ mov_exp_og_cwc + mov_exp_og_mean"))
+
+Tmn  <- lapply(rhs_mn, function(r) fit3(paste(r, "+ traj_ingreso")))
+Tmrn <- lapply(rhs_mn, fit3)
+
+lrt_bloque_mn <- c("", "", p_fmt(anova(Tmn$base, Tmn$mov)$`Pr(>Chisq)`[2]))
+lrt_traj_mn   <- sapply(names(Tmn), function(k)
+  p_fmt(anova(Tmrn[[k]], Tmn[[k]])$`Pr(>Chisq)`[2]))
+
+blocks_ingmn <- blocks_ingm
+blocks_ingmn[[3]] <- list(name = "Controles (sin ideología)", terms = ctrl_tn, labels = ctrl_ln)
+
+make_texreg(unname(Tmn),
+            c("Modelo 1: solo tiempo", "Modelo 2: base", "Modelo 3: + Movilidad"),
+            blocks_ingmn,
+            extra_rows = list("LRT movilidad vs. Modelo 2 (p)" = lrt_bloque_mn,
+                              "LRT trayectorias (p)" = lrt_traj_mn),
+            note = note_ingm,
+            caption = "Sin ideología política: trayectoria de ingreso y preferencias de justicia de mercado (índice MJP), con controles y movilidad subjetiva (hijos - origen)")
+```
+
+:::
+
+## Subjective mobility x income trajectory
+
+Same structure as the *Income trajectory × subjective social status* section, but the subjective social status is replaced by the subjective mobility **children - origin** (`mov_exp_og`, WE and BE). The model includes the controls, the mobility main effects (WE and BE), the income trajectory and the interaction of the trajectory with the mobility **WE** and **BE**. The **slope of the mobility WE is random**: `(1 + ola_num + mov_exp_og_cwc | idencuesta)`. Each likelihood-ratio test compares the model with interactions against a base model with the same random slope but no interactions.
+
+```{r}
+#| label: models-ingreso-mov-int
+
+mv_we <- "mov_exp_og_cwc"
+mv_be <- "mov_exp_og_mean"
+main_m <- paste(mv_we, "+", mv_be, "+ traj_ingreso")
+re_Bm  <- paste0("(1 + ola_num + ", mv_we, " | idencuesta)")
+
+int_we_m <- paste0(mv_we, ":traj_ingreso")
+int_be_m <- paste0(mv_be, ":traj_ingreso")
+
+base_Am <- fit3(paste(ctrl3, "+", main_m))                 # without random slope of mobility
+b_rsm   <- fit3(paste(ctrl3, "+", main_m), re_Bm)          # base with the same random slope
+Tmi     <- fit3(paste(ctrl3, "+", main_m, "+", int_we_m, "+", int_be_m), re_Bm)
+m_wem   <- fit3(paste(ctrl3, "+", main_m, "+", int_we_m), re_Bm)
+
+lrt_mi <- c(
+  conj = anova(b_rsm, Tmi)$`Pr(>Chisq)`[2],
+  we   = anova(b_rsm, m_wem)$`Pr(>Chisq)`[2],
+  rs   = anova(base_Am, b_rsm)$`Pr(>Chisq)`[2])
+```
+
+```{r}
+#| label: blocks-ingreso-mov-int
+
+blocks_ingmi <- list(
+  list(name = "Movilidad subjetiva: hijos - origen", terms = c(mv_we, mv_be),
+       labels = c("Movilidad WE", "Movilidad BE")),
+  blocks_ing2[[2]],   # trajectory
+  list(name = "Interacciones trayectoria × movilidad",
+       terms  = c(paste0(int_we_m, tl[-1]), paste0(int_be_m, tl[-1])),
+       labels = c(paste0("Movilidad WE × ", tl[-1]), paste0("Movilidad BE × ", tl[-1]))),
+  blocks_ing2[[4]])   # controls
+```
+
+```{r}
+#| label: tbl-ingreso-mov-int
+
+make_texreg(list(Tmi), "Movilidad × Trayectoria", blocks_ingmi,
+           extra_rows = list(
+             "LRT interacción WE + BE (p)" = p_fmt(lrt_mi["conj"]),
+             "LRT interacción solo WE (p)" = p_fmt(lrt_mi["we"]),
+             "LRT pendiente aleatoria vs. sin ella (p)" = p_fmt(lrt_mi["rs"])),
+           note = note_ing2,
+           caption = "Trayectoria de ingreso × movilidad subjetiva hijos - origen (índice MJP), con pendiente aleatoria de la movilidad WE")
+```
+
+::: {.callout-note collapse="true" title="Optional: same table without political ideology"}
+
+Same model as the table above, but **without political ideology** among the controls (same sample), to compare both.
+
+```{r}
+#| label: tbl-ingreso-mov-int-noideo
+
+base_Amn <- fit3(paste(ctrl3n, "+", main_m))
+b_rsmn   <- fit3(paste(ctrl3n, "+", main_m), re_Bm)
+Tmin     <- fit3(paste(ctrl3n, "+", main_m, "+", int_we_m, "+", int_be_m), re_Bm)
+m_wemn   <- fit3(paste(ctrl3n, "+", main_m, "+", int_we_m), re_Bm)
+
+lrt_min <- c(
+  conj = anova(b_rsmn, Tmin)$`Pr(>Chisq)`[2],
+  we   = anova(b_rsmn, m_wemn)$`Pr(>Chisq)`[2],
+  rs   = anova(base_Amn, b_rsmn)$`Pr(>Chisq)`[2])
+
+blocks_ingmin <- blocks_ingmi
+blocks_ingmin[[4]] <- list(name = "Controles (sin ideología)", terms = ctrl_tn, labels = ctrl_ln)
+
+make_texreg(list(Tmin), "Movilidad × Trayectoria", blocks_ingmin,
+            extra_rows = list(
+              "LRT interacción WE + BE (p)" = p_fmt(lrt_min["conj"]),
+              "LRT interacción solo WE (p)" = p_fmt(lrt_min["we"]),
+              "LRT pendiente aleatoria vs. sin ella (p)" = p_fmt(lrt_min["rs"])),
+            note = note_ing2,
+            caption = "Sin ideología política: trayectoria de ingreso × movilidad subjetiva hijos - origen (índice MJP), con pendiente aleatoria de la movilidad WE")
+```
+
+:::
+

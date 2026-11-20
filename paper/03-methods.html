@@ -142,8 +142,10 @@ window.Quarto = {
   <li><a href="#market-justice-preferences" id="toc-market-justice-preferences" class="nav-link" data-scroll-target="#market-justice-preferences">Market justice preferences</a></li>
   <li><a href="#static-social-subjective-status" id="toc-static-social-subjective-status" class="nav-link" data-scroll-target="#static-social-subjective-status">Static Social Subjective Status</a></li>
   <li><a href="#dinamic-subjective-social-status" id="toc-dinamic-subjective-social-status" class="nav-link" data-scroll-target="#dinamic-subjective-social-status">Dinamic Subjective Social Status</a></li>
-  <li><a href="#social-objective-status" id="toc-social-objective-status" class="nav-link" data-scroll-target="#social-objective-status">Social Objective Status</a></li>
+  <li><a href="#static-social-objective-status" id="toc-static-social-objective-status" class="nav-link" data-scroll-target="#static-social-objective-status">Static Social Objective Status</a></li>
+  <li><a href="#dinamic-social-objective-status" id="toc-dinamic-social-objective-status" class="nav-link" data-scroll-target="#dinamic-social-objective-status">Dinamic Social Objective Status</a></li>
   <li><a href="#controls" id="toc-controls" class="nav-link" data-scroll-target="#controls">Controls</a></li>
+  <li><a href="#valid-cases" id="toc-valid-cases" class="nav-link" data-scroll-target="#valid-cases">Valid cases</a></li>
   </ul></li>
   <li><a href="#analytical-strategy" id="toc-analytical-strategy" class="nav-link" data-scroll-target="#analytical-strategy">Analytical Strategy</a>
   <ul class="collapse">
@@ -196,10 +198,21 @@ window.Quarto = {
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"input/data/proc/df_final.RData"</span>))</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_model <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(prev_salud, dir_ingreso, inc_origen, inc_destino)) <span class="sc">%&gt;%</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">traj_ingreso =</span> forcats<span class="sc">::</span><span class="fu">fct_na_value_to_level</span>(traj_ingreso, <span class="at">level =</span> <span class="st">"Missings"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>vars_mod <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"idencuesta"</span>, <span class="st">"ola"</span>, <span class="st">"mjp_index"</span>, <span class="st">"ola_num"</span>, <span class="st">"ola_2"</span>, <span class="st">"ideo"</span>, <span class="st">"sex"</span>, <span class="st">"age"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">"dummy_educ_mean"</span>, <span class="st">"traj_ingreso"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>              <span class="st">"ess_og_cwc"</span>, <span class="st">"ess_og_mean"</span>, <span class="st">"ess_cwc"</span>, <span class="st">"ess_mean"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">"ess_hijos_cwc"</span>, <span class="st">"ess_hijos_mean"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>              <span class="st">"mov_exp_og_cwc"</span>, <span class="st">"mov_exp_og_mean"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>              <span class="co"># variables of the descriptive figures</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>              <span class="st">"ess"</span>, <span class="st">"ess_og"</span>, <span class="st">"ess_hijos"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>              <span class="st">"mov_exp_og"</span>, <span class="st">"educ"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>              <span class="co"># market justice items (used in the MJP figures)</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>              <span class="st">"just_educ"</span>, <span class="st">"just_salud"</span>, <span class="st">"just_pension"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>df_model <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(vars_mod)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">traj_ingreso =</span> forcats<span class="sc">::</span><span class="fu">fct_na_value_to_level</span>(traj_ingreso, <span class="at">level =</span> <span class="st">"Missings"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -208,13 +221,13 @@ window.Quarto = {
 <section id="data" class="level2">
 <h2 class="anchored" data-anchor-id="data">Data</h2>
 <p>This research draws on the Chilean Longitudinal Social Survey (ELSOC), a national panel study fielded between 2016 and 2023 to examine attitudes, emotions, and behaviors among adults aged 18 to 75 in relation to social cohesion and conflict. ELSOC uses a probabilistic, stratified, clustered, multistage sampling design covering urban centers and small towns. The sampling frame is proportionally stratified into six categories of urban population size; within these strata, households were selected through multistage procedures based on 1,067 sampled blocks.</p>
-<p>ELSOC has been administered annually since 2016, except in 2020 when fieldwork was suspended due to the COVID-19 pandemic. For this study, we use waves 2016, 2017, 2018, 2019, 2022, and 2023. The 2021 wave is excluded because the questionnaire version omitted key variables for the analysis. By wave 6, cumulative panel attrition was approximately 40%; we therefore restrict the analysis to a balanced panel, yielding a two-level data set of <em>N</em> = 6,662 observations nested within <em>N</em> = 1,196 individuals. Additional documentation on sampling, attrition, and weighting is available from the ELSOC study team, and the data are publicly accessible through the ELSOC Dataverse.</p>
+<p>ELSOC has been administered annually since 2016, except in 2020 when fieldwork was suspended due to the COVID-19 pandemic. For this study, we use waves 2016, 2017, 2018, 2019, 2022, and 2023. The 2021 wave is excluded because the questionnaire version omitted key variables for the analysis. By wave 6, cumulative panel attrition was approximately 40%; we therefore restrict the analysis to a balanced panel, yielding a two-level data set of <em>N</em> = 7,133 observations nested within <em>N</em> = 1,210 individuals. Additional documentation on sampling, attrition, and weighting is available from the ELSOC study team, and the data are publicly accessible through the ELSOC Dataverse.</p>
 </section>
 <section id="variables" class="level2">
 <h2 class="anchored" data-anchor-id="variables">Variables</h2>
 <section id="market-justice-preferences" class="level3">
 <h3 class="anchored" data-anchor-id="market-justice-preferences">Market justice preferences</h3>
-<p>The dependent variable in this study is preferences for market justice (MJP). This construct is measured by three items that capture how strongly individuals endorse conditioning access to pensions, education and health care on income. The original items asks: “Is it fair that high-income individuals have better (education, health or pensions) than lower-income individuals?”. The response options range from 1 (“Strongly disagree”) to 5 (“Strongly agree”), so that higher values indicate stronger support for market-justified inequality in the provision of social services.</p>
+<p>The dependent variable in this study is market justice preferences (MJP). This construct is measured by three items that capture how strongly individuals endorse conditioning access to pensions, education and health care on income. The original items asks: “Is it fair that high-income individuals have better (education, health or pensions) than lower-income individuals?”. The response options range from 1 (“Strongly disagree”) to 5 (“Strongly agree”), so that higher values indicate stronger support for market-justified inequality in the provision of social services.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
@@ -300,68 +313,11 @@ Figure&nbsp;2: Spearman correlations between the three market justice items (ana
 </div>
 </div>
 <div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mjp_items <span class="ot">&lt;-</span> df_model <span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">just_educ    =</span> <span class="fu">as.numeric</span>(just_educ),</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">just_salud   =</span> <span class="fu">as.numeric</span>(just_salud),</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">just_pension =</span> <span class="fu">as.numeric</span>(just_pension))</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>alpha_mjp <span class="ot">&lt;-</span> performance<span class="sc">::</span><span class="fu">cronbachs_alpha</span>(mjp_items)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(alpha_mjp, <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.83</code></pre>
 </div>
 </div>
-<p>We construct the MJP index as the mean of the three items, which ranges from 1 to 5. The index is computed only for respondents with valid answers on all three items and is treated as a continuous variable in the models. <a href="#fig-mjp-dist" class="quarto-xref">Figure&nbsp;3</a> shows its distribution by wave.</p>
-<div class="cell" data-layout-align="center">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df_mjp <span class="ot">&lt;-</span> df_model <span class="sc">%&gt;%</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(mjp_index)) <span class="sc">%&gt;%</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mjp_bin =</span> <span class="fu">cut</span>(mjp_index, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="at">by =</span> <span class="fl">0.5</span>),</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">right =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>df_mjp_mean <span class="ot">&lt;-</span> df_mjp <span class="sc">%&gt;%</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ola) <span class="sc">%&gt;%</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">m =</span> <span class="fu">mean</span>(mjp_index), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lab =</span> <span class="fu">paste0</span>(<span class="st">"Mean = "</span>, <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, m)))</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_mjp, <span class="fu">aes</span>(<span class="at">x =</span> mjp_index)) <span class="sc">+</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(count <span class="sc">/</span> <span class="fu">tapply</span>(count, PANEL, sum)[PANEL])),</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="fl">0.75</span>, <span class="fl">5.25</span>, <span class="at">by =</span> <span class="fl">0.5</span>), <span class="at">closed =</span> <span class="st">"right"</span>,</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="fu">met.brewer</span>(<span class="st">"Hiroshige"</span>, <span class="dv">1</span>, <span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>)[<span class="dv">1</span>],</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colour =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">data =</span> df_mjp_mean, <span class="fu">aes</span>(<span class="at">xintercept =</span> m),</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">colour =</span> <span class="st">"grey20"</span>) <span class="sc">+</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> df_mjp_mean, <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> lab),</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">size =</span> <span class="fl">3.2</span>, <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">percent_format</span>(<span class="at">accuracy =</span> <span class="dv">1</span>),</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>                     <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>))) <span class="sc">+</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> ola, <span class="at">nrow =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"MJP index (1 = strongly disagree, 5 = strongly agree)"</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">"Bins of width 0.5 centred on 1, 1.5, ..., 5. Dashed line: wave mean."</span>) <span class="sc">+</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<div id="fig-mjp-dist" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-mjp-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="03-methods_files/figure-html/fig-mjp-dist-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mjp-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Distribution of the market justice preferences (MJP) index by wave
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
+<p>Therefore, we construct the MJP index as the mean of the three items, which ranges from 1 to 5. To validate the index, we estimated the Spearman correlations between the three market justice items (see <a href="#fig-mjp-corr" class="quarto-xref">Figure&nbsp;2</a>) and computed Cronbach’s alpha to assess their internal consistency (0.83). The index is computed only for respondents with valid answers on all three items and is treated as a continuous variable in the models.</p>
 </section>
 <section id="static-social-subjective-status" class="level3">
 <h3 class="anchored" data-anchor-id="static-social-subjective-status">Static Social Subjective Status</h3>
@@ -369,7 +325,7 @@ Figure&nbsp;3: Distribution of the market justice preferences (MJP) index by wav
 </section>
 <section id="dinamic-subjective-social-status" class="level3">
 <h3 class="anchored" data-anchor-id="dinamic-subjective-social-status">Dinamic Subjective Social Status</h3>
-<p>Based on the original variables of subjective social status (origin, own and children), a variable were generated from all the combinations betweeen origin and children SSS items. The composite variable operationalize subjective mobility as follows: <span class="math inline">\(t_{2} - t_{1}\)</span>. Thus, positive values indicate upward subjective mobility.The variable is treated as continuous and, in the models, is decomposed into their within-person and between-person components. All the subjective social mobility variables are displayed in <a href="#tbl-mobility-vars" class="quarto-xref">Table&nbsp;1</a>:</p>
+<p>Based on the original variables of subjective social status (origin, own and children), a variable were generated from all the combinations betweeen origin and children SSS items. The composite variable operationalize subjective mobility as follows: <span class="math inline">\(t_{2} - t_{1}\)</span>. Thus, positive values indicate upward subjective mobility.The variable is treated as continuous and, in the models, is decomposed into their within-person and between-person components. All the subjective social variables are displayed in <a href="#tbl-mobility-vars" class="quarto-xref">Table&nbsp;1</a>:</p>
 <div class="cell" data-tbl-cap-location="top">
 <div id="tbl-mobility-vars" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -422,19 +378,639 @@ Table&nbsp;1: Subjective social mobility variables constructed from the subjecti
 </div>
 </div>
 </section>
-<section id="social-objective-status" class="level3">
-<h3 class="anchored" data-anchor-id="social-objective-status">Social Objective Status</h3>
-<p>Objective social status is measured through education and household income. Education is the respondent’s highest educational level, reported on a ten-category scale ranging from no schooling to postgraduate studies. We use it in three versions: (1) years of education, obtained by assigning to each level the average years of schooling; (2) four categories (primary or less, secondary, technical, and university or postgraduate); and (3) a dichotomous indicator of university education (university or postgraduate vs.&nbsp;lower levels). Years of education were descomposed into their within-person and between-person effects, while the categorical and dichotomous measures are treated as time-invariant and only include a between-person component.</p>
-<p>Income is the total monthly household income reported by the respondent. When the amount is missing, we impute the midpoint of the income bracket answered in the follow-up question. Household income is deflated to constant December 2023 prices using the consumer price index and divided by the square root of household size to obtain an equivalised income, which is used in three versions: (1) its natural logarithm; (2) three groups defined by within-wave deciles (bottom: deciles 1-4, middle: deciles 5-9, top: decile 10); and (3) a dichotomous indicator for the top decile. The logarithm of equivalised income is decomposed into its within-person and between-person effects, while the categorical and dichotomous measures only include a between-person component.</p>
+<section id="static-social-objective-status" class="level3">
+<h3 class="anchored" data-anchor-id="static-social-objective-status">Static Social Objective Status</h3>
+<p>Objective social status is measured through education and household income. Education is the respondent’s highest educational level, reported on a ten-category scale ranging from no schooling to postgraduate studies. For analysis we use a dichotomous indicator of university education (university or postgraduate vs.&nbsp;lower levels).</p>
+<p>Income is the total monthly household income reported by the respondent. When the amount is missing, we impute the midpoint of the income bracket answered in the follow-up question. Household income is deflated to constant December 2023 prices using the consumer price index and divided by the square root of household size to obtain an equivalised income. For analysis we constructed a dichotomous indicator for the top decile (top decile vs lower deciles).</p>
+</section>
+<section id="dinamic-social-objective-status" class="level3">
+<h3 class="anchored" data-anchor-id="dinamic-social-objective-status">Dinamic Social Objective Status</h3>
+<p>The income trajectory compares where each person stood in the income distribution at the beginning of the panel (origin) with where they stand at the end (destination). It is a person-fixed variable: it takes the same value in all waves of each individual. The <a href="#tbl-traj-resumen" class="quarto-xref">Table&nbsp;2</a> provides a more detailed description of how this variable was calculated.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Aspect =</span> <span class="fu">c</span>(<span class="st">"What it is"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Basis of the calculation"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Groups"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Origin and destination"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Trajectory"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Stable"</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Upward"</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Downward"</span>),</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Description =</span> <span class="fu">c</span>(</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"A measure of income mobility that compares where each person stood at the beginning of the panel with where they stand at the end. It is fixed per person."</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Equivalized household income at constant prices, ordered into deciles within each wave among all respondents. It is a relative position, not an amount."</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Low: lowest incomes. Middle: intermediate incomes. Top: highest incomes. They are formed by grouping deciles."</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The origin is the group in the first wave; the destination is the group in the last wave."</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The combination of origin and destination. There is one category for each possible pair."</span>,</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Same group at the beginning and at the end: Stable low, Stable middle and Stable top."</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Moves to a higher group: Low -&gt; Middle, Low -&gt; Top and Middle -&gt; Top."</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Moves to a lower group: Middle -&gt; Low, Top -&gt; Low and Top -&gt; Middle."</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">"html"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">"striped"</span>, <span class="st">"condensed"</span>), <span class="at">full_width =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_spec</span>(<span class="dv">1</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>, <span class="at">width =</span> <span class="st">"14em"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="tbl-traj-resumen" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-traj-resumen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: The income mobility trajectory, in summary
+</figcaption>
+<div aria-describedby="tbl-traj-resumen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed do-not-create-environment cell caption-top table-sm small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Aspect</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left; width: 14em; font-weight: bold;">What it is</td>
+<td style="text-align: left;">A measure of income mobility that compares where each person stood at the beginning of the panel with where they stand at the end. It is fixed per person.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; width: 14em; font-weight: bold;">Basis of the calculation</td>
+<td style="text-align: left;">Equivalized household income at constant prices, ordered into deciles within each wave among all respondents. It is a relative position, not an amount.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; width: 14em; font-weight: bold;">Groups</td>
+<td style="text-align: left;">Low: lowest incomes. Middle: intermediate incomes. Top: highest incomes. They are formed by grouping deciles.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; width: 14em; font-weight: bold;">Origin and destination</td>
+<td style="text-align: left;">The origin is the group in the first wave; the destination is the group in the last wave.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; width: 14em; font-weight: bold;">Trajectory</td>
+<td style="text-align: left;">The combination of origin and destination. There is one category for each possible pair.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; width: 14em; font-weight: bold;">Stable</td>
+<td style="text-align: left;">Same group at the beginning and at the end: Stable low, Stable middle and Stable top.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; width: 14em; font-weight: bold;">Upward</td>
+<td style="text-align: left;">Moves to a higher group: Low -&gt; Middle, Low -&gt; Top and Middle -&gt; Top.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; width: 14em; font-weight: bold;">Downward</td>
+<td style="text-align: left;">Moves to a lower group: Middle -&gt; Low, Top -&gt; Low and Top -&gt; Middle.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>With this variable, keep the following in mind: Someone who moves up a group did not necessarily earn more in pesos. Income is measured in a single wave, so part of the mobility may be noise. The extreme jumps (from Low to Top and from Top to Low) have very few cases. There is no trajectory for those without valid income in either of the two waves, nor for those who did not participate in the first one. Also, as a measure to recover missing cases, a new category was created to group the missing cases</p>
 </section>
 <section id="controls" class="level3">
 <h3 class="anchored" data-anchor-id="controls">Controls</h3>
 <p>Based on previous research <span class="citation" data-cites="castillo_perceptions_2025 lindh_public_2015 jaime-castillo_public_2013">(<a href="#ref-castillo_perceptions_2025" role="doc-biblioref">Castillo et al. 2025</a>; <a href="#ref-lindh_public_2015" role="doc-biblioref">Lindh 2015</a>; <a href="#ref-jaime-castillo_public_2013" role="doc-biblioref">Jaime-Castillo 2013</a>)</span>, the statistical models include sociodemographic and attitudinal controls to account for potential compositional effects in the population. We adjust for sex (1 = male, 2 = female), age (in years) and political identification (1 = left, 2 = centre, 3 = right, 4 = no identification).</p>
+<p><a href="#tbl-descriptives" class="quarto-xref">Table&nbsp;3</a> summarizes the variables used in the studie.</p>
+<div id="tbl-descriptives" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-descriptives-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Descriptive statistics of the analysis variables (analytical sample, person-wave observations)
+</figcaption>
+<div aria-describedby="tbl-descriptives-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="container st-container">
+<table class="table table-striped table-bordered st-table st-table-striped st-table-bordered st-multiline cell caption-top table-sm small">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th class="st-protect-top-border" style="text-align: center;" data-quarto-table-cell-role="th"><strong>Variable</strong></th>
+<th class="st-protect-top-border" style="text-align: center;" data-quarto-table-cell-role="th"><strong>Stats / Values</strong></th>
+<th class="st-protect-top-border" style="text-align: center;" data-quarto-table-cell-role="th"><strong>Freqs (% of Valid)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">MJP index (1-5) [numeric]</td>
+<td style="text-align: left; padding: 8; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">Mean (sd) : 2 (0.9)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">min ≤ med ≤ max:</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">1 ≤ 2 ≤ 5</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">IQR (CV) : 1 (0.4)</td>
+</tr>
+</tbody>
+</table></td>
+<td style="text-align: left; vertical-align: middle;">13 distinct values</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SSS own (0-10) [numeric]</td>
+<td style="text-align: left; padding: 8; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">Mean (sd) : 4.4 (1.5)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">min ≤ med ≤ max:</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">0 ≤ 5 ≤ 10</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">IQR (CV) : 1 (0.3)</td>
+</tr>
+</tbody>
+</table></td>
+<td style="text-align: left; vertical-align: middle;">11 distinct values</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SSS family of origin (0-10) [numeric]</td>
+<td style="text-align: left; padding: 8; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">Mean (sd) : 4 (2)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">min ≤ med ≤ max:</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">0 ≤ 4 ≤ 10</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">IQR (CV) : 2 (0.5)</td>
+</tr>
+</tbody>
+</table></td>
+<td style="text-align: left; vertical-align: middle;">11 distinct values</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SSS children (0-10) [numeric]</td>
+<td style="text-align: left; padding: 8; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">Mean (sd) : 6.4 (2)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">min ≤ med ≤ max:</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">0 ≤ 6 ≤ 10</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">IQR (CV) : 3 (0.3)</td>
+</tr>
+</tbody>
+</table></td>
+<td style="text-align: left; vertical-align: middle;">11 distinct values</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Subjective mobility: children - origin [numeric]</td>
+<td style="text-align: left; padding: 8; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">Mean (sd) : 2.5 (2.4)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">min ≤ med ≤ max:</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">-8 ≤ 2 ≤ 10</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">IQR (CV) : 3 (1)</td>
+</tr>
+</tbody>
+</table></td>
+<td style="text-align: left; vertical-align: middle;">19 distinct values</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Education [factor]</td>
+<td style="text-align: left; padding: 8; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">1. Less than Universitary</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">2. Universitary</td>
+</tr>
+</tbody>
+</table></td>
+<td style="text-align: left; padding: 0; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">5964</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">83.6%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">1169</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">16.4%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+</tbody>
+</table></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Income trajectory [factor]</td>
+<td style="text-align: left; padding: 8; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">1. Stable low</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">2. Low -&gt; Middle</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">3. Low -&gt; Top</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">4. Middle -&gt; Low</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">5. Stable middle</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">6. Middle -&gt; Top</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">7. Top -&gt; Low</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">8. Top -&gt; Middle</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">9. Stable top</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">10. Missings</td>
+</tr>
+</tbody>
+</table></td>
+<td style="text-align: left; padding: 0; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">621</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">8.7%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">770</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">10.8%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">53</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">0.7%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">810</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">11.4%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">2781</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">39.0%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">528</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">7.4%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">28</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">0.4%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">511</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">7.2%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">542</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">7.6%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">489</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">6.9%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+</tbody>
+</table></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sex [factor]</td>
+<td style="text-align: left; padding: 8; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">1. Male</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">2. Female</td>
+</tr>
+</tbody>
+</table></td>
+<td style="text-align: left; padding: 0; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">2319</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">32.5%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">4814</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">67.5%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+</tbody>
+</table></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Age (years) [numeric]</td>
+<td style="text-align: left; padding: 8; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">Mean (sd) : 50.4 (14.7)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">min ≤ med ≤ max:</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">18 ≤ 51 ≤ 84</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">IQR (CV) : 22 (0.3)</td>
+</tr>
+</tbody>
+</table></td>
+<td style="text-align: left; vertical-align: middle;">67 distinct values</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Political identification [factor]</td>
+<td style="text-align: left; padding: 8; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">1. Left</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">2. Center</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">3. Right</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: left; padding: 0; margin: 0; border: 0;">4. Does not identify</td>
+</tr>
+</tbody>
+</table></td>
+<td style="text-align: left; padding: 0; vertical-align: middle;"><table class="cell caption-top table table-sm table-striped small">
+<tbody>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">1494</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">20.9%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">1794</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">25.2%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="odd" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">1140</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">16.0%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+<tr class="even" style="background-color:transparent">
+<td style="text-align: right; padding: 0 5px 0 7px; margin: 0; border: 0;">2705</td>
+<td style="text-align: left; padding: 0 2px 0 0; border: 0;">(</td>
+<td style="text-align: right; padding: 0; border: 0;">37.9%</td>
+<td style="text-align: left; padding: 0 4px 0 2px; border: 0;">)</td>
+</tr>
+</tbody>
+</table></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</section>
+<section id="valid-cases" class="level3">
+<h3 class="anchored" data-anchor-id="valid-cases">Valid cases</h3>
+<p><a href="#tbl-na" class="quarto-xref">Table&nbsp;4</a> reports the valid (non-missing) cases of each variable of <code>df_model</code> before keeping complete cases, that is, in the balanced panel (<code>df_study1</code>). Only <code>NA</code> counts as missing. For the income trajectory, which is fixed per person, missing values are the <em>Missings</em> category of the models.</p>
+<div class="cell">
+<div id="tbl-na" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-na-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Valid cases by variable: n (%) per wave, and persons with valid responses in all waves
+</figcaption>
+<div aria-describedby="tbl-na-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed do-not-create-environment cell caption-top table-sm small">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; empty-cells: hide; border-bottom: hidden;"></th>
+<th colspan="6" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Wave
+</div></th>
+<th data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Persons
+</div></th>
+</tr>
+<tr class="even">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Variable</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">2016</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">2017</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">2018</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">2019</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">2022</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">2023</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">All waves</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Market justice preferences index</td>
+<td style="text-align: center;">1324 (99.7%)</td>
+<td style="text-align: center;">1323 (99.6%)</td>
+<td style="text-align: center;">1322 (99.5%)</td>
+<td style="text-align: center;">1324 (99.7%)</td>
+<td style="text-align: center;">1320 (99.4%)</td>
+<td style="text-align: center;">1325 (99.8%)</td>
+<td style="text-align: center;">1301 (98.0%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Market justice: education</td>
+<td style="text-align: center;">1325 (99.8%)</td>
+<td style="text-align: center;">1326 (99.8%)</td>
+<td style="text-align: center;">1323 (99.6%)</td>
+<td style="text-align: center;">1327 (99.9%)</td>
+<td style="text-align: center;">1325 (99.8%)</td>
+<td style="text-align: center;">1327 (99.9%)</td>
+<td style="text-align: center;">1315 (99.0%)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Market justice: pensions</td>
+<td style="text-align: center;">1326 (99.8%)</td>
+<td style="text-align: center;">1323 (99.6%)</td>
+<td style="text-align: center;">1325 (99.8%)</td>
+<td style="text-align: center;">1324 (99.7%)</td>
+<td style="text-align: center;">1322 (99.5%)</td>
+<td style="text-align: center;">1325 (99.8%)</td>
+<td style="text-align: center;">1307 (98.4%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Market justice: healthcare</td>
+<td style="text-align: center;">1327 (99.9%)</td>
+<td style="text-align: center;">1326 (99.8%)</td>
+<td style="text-align: center;">1325 (99.8%)</td>
+<td style="text-align: center;">1327 (99.9%)</td>
+<td style="text-align: center;">1324 (99.7%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1318 (99.2%)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Subjective social status (own)</td>
+<td style="text-align: center;">1325 (99.8%)</td>
+<td style="text-align: center;">1325 (99.8%)</td>
+<td style="text-align: center;">1319 (99.3%)</td>
+<td style="text-align: center;">1326 (99.8%)</td>
+<td style="text-align: center;">1322 (99.5%)</td>
+<td style="text-align: center;">1323 (99.6%)</td>
+<td style="text-align: center;">1304 (98.2%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Subjective social status (family of origin)</td>
+<td style="text-align: center;">1325 (99.8%)</td>
+<td style="text-align: center;">1323 (99.6%)</td>
+<td style="text-align: center;">1320 (99.4%)</td>
+<td style="text-align: center;">1327 (99.9%)</td>
+<td style="text-align: center;">1322 (99.5%)</td>
+<td style="text-align: center;">1324 (99.7%)</td>
+<td style="text-align: center;">1302 (98.0%)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Subjective social status (children)</td>
+<td style="text-align: center;">1299 (97.8%)</td>
+<td style="text-align: center;">1302 (98.0%)</td>
+<td style="text-align: center;">1301 (98.0%)</td>
+<td style="text-align: center;">1305 (98.3%)</td>
+<td style="text-align: center;">1303 (98.1%)</td>
+<td style="text-align: center;">1300 (97.9%)</td>
+<td style="text-align: center;">1217 (91.6%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Subjective mobility: children - origin</td>
+<td style="text-align: center;">1298 (97.7%)</td>
+<td style="text-align: center;">1300 (97.9%)</td>
+<td style="text-align: center;">1299 (97.8%)</td>
+<td style="text-align: center;">1305 (98.3%)</td>
+<td style="text-align: center;">1301 (98.0%)</td>
+<td style="text-align: center;">1298 (97.7%)</td>
+<td style="text-align: center;">1210 (91.1%)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Education</td>
+<td style="text-align: center;">1327 (99.9%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1327 (99.9%)</td>
+<td style="text-align: center;">1327 (99.9%)</td>
+<td style="text-align: center;">1326 (99.8%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1323 (99.6%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Income trajectory</td>
+<td style="text-align: center;">1231 (92.7%)</td>
+<td style="text-align: center;">1231 (92.7%)</td>
+<td style="text-align: center;">1231 (92.7%)</td>
+<td style="text-align: center;">1231 (92.7%)</td>
+<td style="text-align: center;">1231 (92.7%)</td>
+<td style="text-align: center;">1231 (92.7%)</td>
+<td style="text-align: center;">1231 (92.7%)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sex</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Age</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+<td style="text-align: center;">1328 (100.0%)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Political ideology</td>
+<td style="text-align: center;">1301 (98.0%)</td>
+<td style="text-align: center;">1308 (98.5%)</td>
+<td style="text-align: center;">1298 (97.7%)</td>
+<td style="text-align: center;">1317 (99.2%)</td>
+<td style="text-align: center;">1317 (99.2%)</td>
+<td style="text-align: center;">1317 (99.2%)</td>
+<td style="text-align: center;">1227 (92.4%)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
 </section>
 </section>
 <section id="analytical-strategy" class="level2">
 <h2 class="anchored" data-anchor-id="analytical-strategy">Analytical Strategy</h2>
-<p>The analysis proceeds in two steps. First, we describe the distribution of each status variable by wave and examine the bivariate association between the status measures and market justice preferences using Spearman correlations, computed within each wave and, for the within/between-person components, on the pooled sample. Second, we estimate linear longitudinal multilevel models for the market justice preferences (MJP) index, which is the mean of the pension, education and health items (range 1-5). Because the index is an average of several items and is treated as a continuous outcome, we use linear mixed models rather than cumulative link models. This approach accounts for the hierarchical structure of the panel data, with repeated observations (Level 1) nested within individuals (Level 2), and enables the decomposition of the variance of the predictors into within-person (WE) and between-person (BE) components, allowing us to distinguish temporal changes within individuals from stable differences between individuals <span class="citation" data-cites="singer_applied_2003 bell_fixed_2019">(<a href="#ref-singer_applied_2003" role="doc-biblioref">Singer 2003</a>; <a href="#ref-bell_fixed_2019" role="doc-biblioref">Bell, Fairbrother, and Jones 2019</a>)</span>. All descriptive figures, correlations and models are based on the same analytical sample (complete cases on all analysis variables; <em>N</em> = 6,699 observations from <em>N</em> = 1,203 individuals).</p>
+<p>The analysis proceeds in two steps. First, we describe the distribution of each status variable by wave and examine the bivariate association between the status measures and market justice preferences using Spearman correlations, computed within each wave and, for the within/between-person components, on the pooled sample. Second, we estimate linear longitudinal multilevel models for the market justice preferences (MJP) index, which is the mean of the pension, education and health items (range 1-5). Because the index is an average of several items and is treated as a continuous outcome, we use linear mixed models rather than cumulative link models. This approach accounts for the hierarchical structure of the panel data, with repeated observations (Level 1) nested within individuals (Level 2), and enables the decomposition of the variance of the predictors into within-person (WE) and between-person (BE) components, allowing us to distinguish temporal changes within individuals from stable differences between individuals <span class="citation" data-cites="singer_applied_2003 bell_fixed_2019">(<a href="#ref-singer_applied_2003" role="doc-biblioref">Singer 2003</a>; <a href="#ref-bell_fixed_2019" role="doc-biblioref">Bell, Fairbrother, and Jones 2019</a>)</span>. All descriptive figures, correlations and models are based on the same analytical sample (complete cases on all analysis variables; <em>N</em> = 7,133 observations from <em>N</em> = 1,210 individuals).</p>
 <section id="within-person-and-between-person-random-effects-models" class="level3">
 <h3 class="anchored" data-anchor-id="within-person-and-between-person-random-effects-models">Within-Person and Between-Person Random Effects Models</h3>
 <p>Following the recommendations of <span class="citation" data-cites="bell_explaining_2015">Bell and Jones (<a href="#ref-bell_explaining_2015" role="doc-biblioref">2015</a>)</span>, we decompose time-varying predictors into their within-person and between-person components using person-mean centering:</p>
@@ -444,8 +1020,8 @@ X_{WE_{it}} = X_{it} - \bar{X}_i
 <p><span class="math display">\[
 X_{BE_i} = \bar{X}_i
 \]</span></p>
-<p>where <span class="math inline">\(X_{it}\)</span> represents the observed value for individual <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span>, <span class="math inline">\(\bar{X}_i\)</span> is the person-specific mean across all observations, <span class="math inline">\(X_{WE_{it}}\)</span> captures within-person deviations from the individual mean (representing temporal fluctuations), and <span class="math inline">\(X_{BE_i}\)</span> represents stable between-person differences (time-invariant characteristics). The decomposition is applied to the continuous measures: the three subjective status measures (origin, own and children), the subjective mobility measures, years of education and log equivalised household income.</p>
-<p>For the dichotomous and categorical measures of objective status only a between-person component is included, since they vary little within individuals. For the dichotomous measures, the BE component indicates whether the person was ever observed with a university degree or in the top income decile. For the categorical measures (education in four categories and income in three groups), the BE component is the person’s modal category across waves, with ties assigned to the higher category; the reference categories are primary education or less and the bottom income group (deciles 1-4), respectively.</p>
+<p>where <span class="math inline">\(X_{it}\)</span> represents the observed value for individual <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span>, <span class="math inline">\(\bar{X}_i\)</span> is the person-specific mean across all observations, <span class="math inline">\(X_{WE_{it}}\)</span> captures within-person deviations from the individual mean (representing temporal fluctuations), and <span class="math inline">\(X_{BE_i}\)</span> represents stable between-person differences (time-invariant characteristics). The decomposition is applied to the continuous measures: the three subjective status measures (origin, own and children) and the subjective mobility.</p>
+<p>For the dichotomous and categorical measures of objective status only a between-person component is included, since they vary little within individuals. Therefore, the BE component indicates whether the person was ever observed with a university degree or in the top income decile.</p>
 <p>This decomposition allows us to distinguish two theoretically distinct processes: (1) Within-person effects capture how changes in an individual’s subjective and objective status over time relate to changes in their market justice preferences, controlling for stable individual characteristics. (2) Between-person effects capture how individuals with different average levels of subjective and objective status differ in their market justice preferences, net of temporal fluctuations.</p>
 </section>
 <section id="model-specification" class="level3">
@@ -462,14 +1038,20 @@ X_{BE_i} = \bar{X}_i
 </section>
 <section id="model-building-strategy" class="level3">
 <h3 class="anchored" data-anchor-id="model-building-strategy">Model Building Strategy</h3>
-<p>The same specification (time terms and random effects) is kept in all models, and the status measures are entered in blocks. Within each block, we first enter each measure on its own, then add the controls, and finally estimate a model including all the measures of the block:</p>
+<p>All models share the same base specification: the linear and quadratic time terms, a random intercept and a random slope for wave, <span class="math inline">\((1 + \text{wave} \mid \text{individual})\)</span>. They are estimated by maximum likelihood (not REML), so that models with different fixed effects can be compared through likelihood-ratio tests (LRT). The income trajectory enters as a categorical predictor with the reference category <em>Stable low</em>; individuals without a valid trajectory are kept in the sample as an additional <em>Missings</em> category, so that no observations are lost. Whenever controls are included, they are sex, age, political identification and the between-person component of university education. All status and mobility measures enter through their within-person (WE) and between-person (BE) components. We build the models in two steps, first without and then with interactions, and repeat each step for the subjective status measures and for the subjective mobility measure.</p>
+<p><strong>Step 1: main effects of subjective status/mobility and income trajectory.</strong> We estimate nested models in which the trajectory enters only as a main effect:</p>
 <ol type="1">
-<li><strong>Subjective social status (Models 1-8)</strong>: own, origin and children’s subjective status (WE/BE), each entered separately (Models 1-3) and with controls (Models 4-6); a model with the origin and children’s status and controls (Model 7); and a model with the three measures and controls (Model 8).</li>
-<li><strong>Subjective social mobility (Models 9-25)</strong>: each mobility measure (own - origin, own - mean origin, children - own, intergenerational, children - origin, the trajectory slope and the trajectory curve; WE/BE) entered separately (Models 9-16; the slope and the curve are entered each on their own and together) and with controls (Models 17-24), and a model with all measures and controls (Model 25). The models that include the trajectory slope or curve also control for the SSS index (WE/BE). Since the mobility measures are linear combinations of the three subjective status measures, the full model is rank deficient and the aliased terms are dropped.</li>
-<li><strong>Objective social status (Models 26-38)</strong>: education and income, each in its three operationalizations (dichotomous BE; four categories for education and three groups for income, BE; and continuous, years of education and log income, WE/BE). Each operationalization is entered separately for education (Models 26-28) and for income (Models 29-31); the same models are estimated with controls (Models 32-37); and a final model includes all the education and income measures with controls (Model 38).</li>
-<li><strong>Subjective mobility and objective status (Models 39-56)</strong>: each of the mobility measures children - own, intergenerational, children - origin and trajectory slope (WE/BE) is entered together with education and income, first with continuous measures (years of education and log income, WE/BE; Models 39-42), then with controls (Models 43-46), and finally with all the variables and controls (Model 47). As in the previous block, the models that include the trajectory slope also control for the SSS index (WE/BE). The same sequence is repeated replacing the education and income measures with dichotomous education (BE) and income in three categories (BE; Models 48-56).</li>
+<li><em>Model 1</em> includes only the time terms and the income trajectory.</li>
+<li><em>Model 2 (base)</em> adds the controls.</li>
+<li>In the status models, <em>Models 3 to 5</em> add to the base model, one at a time, the WE and BE components of each subjective status (origin, own and children). The blocks are not entered cumulatively, so each model isolates the contribution of a single status measure. In the mobility models, <em>Model 3</em> adds the WE and BE components of the subjective mobility between children and origin (<code>mov_exp_og</code>) to the base model.</li>
 </ol>
-<p>All models are estimated by maximum likelihood (not REML), so that models with different fixed effects can be compared. Models are unweighted and are estimated on the analytical sample described above using the <code>lmer()</code> function from the <code>lme4</code> package in R, and the results are presented in tables with the regression coefficients and their standard errors (<code>texreg</code>).</p>
+<p>Each block of status or mobility is compared with the base model, and each model is compared with the same model without the trajectory, through LRT. In this step the random-effects structure is the one described above.</p>
+<p><strong>Step 2: interactions between income trajectory and subjective status/mobility.</strong> To test whether the association between subjective status (or mobility) and market justice preferences depends on the income trajectory, we interact the trajectory with the WE and the BE component of the measure:</p>
+<p><span class="math display">\[
+\text{MJP}_{it} = \dots + \boldsymbol{\delta}_1' (\text{Trajectory}_i \times X_{WE_{it}}) + \boldsymbol{\delta}_2' (\text{Trajectory}_i \times X_{BE_i}) + u_{0i} + u_{1i}\,\text{wave}_{it} + u_{2i} X_{WE_{it}} + \varepsilon_{it}
+\]</span></p>
+<p>We estimate one model for each subjective status (origin, own and children), which includes the controls, the six main effects of status (WE and BE), the trajectory and the interactions of the trajectory with the WE and the BE of the status of that model. A separate model, with the same structure, is estimated for the subjective mobility. Because the interaction with the WE component assumes that the within-person association may vary across individuals, in these models the slope of the interacted WE component is also random, <span class="math inline">\((1 + \text{wave} + X_{WE} \mid \text{individual})\)</span>, which adds the term <span class="math inline">\(u_{2i} X_{WE_{it}}\)</span> to the specification.</p>
+<p>For each interaction model we report three LRT: (i) the whole block of interactions (WE and BE) against a base model with the same random slope but no interactions; (ii) the interactions with the WE component only against that same base model; and (iii) the model with the random slope against the model without it. The coefficients of the interactions are differences with respect to the reference category (<em>Stable low</em>), and the slope of each trajectory is the sum of the main effect and its interaction. Since the BE components are not centred, the main effects of the trajectory are read at a BE value of zero, which almost nobody has, and are not interpretable on their own. The categories with very few individuals (Low -&gt; Top and Top -&gt; Low) yield unstable estimates and should be interpreted with caution.</p>
 
 </section>
 </section>

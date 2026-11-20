@@ -6,5 +6,7 @@ format:
 code-fold: true
 editor_options: 
   chunk_output_type: console
-bibliography: ../input/bib/jusmer.bib
+bibliography:
+  - "../input/bib/jusmer.bib"
+  - "../input/bib/references.bib"
 ---

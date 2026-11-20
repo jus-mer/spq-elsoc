@@ -1,5 +1,7 @@
 ---
-bibliography: ../input/bib/jusmer.bib
+bibliography:
+  - "../input/bib/jusmer.bib"
+  - "../input/bib/references.bib"
 ---
 
 # Introduction

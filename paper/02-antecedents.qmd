@@ -1,9 +1,6 @@
 
-## Theory
 
-## Market justice
-
-## Objective and subjective status
+<!-- ## Objective and subjective status
 
 - what we know about the link between OSS and MJP
 
@@ -20,7 +17,11 @@ Little (or null) evidence on the longitudinal relationship between OSS, SSS and 
 
 [Hypotheses]
 
-[Conceptual Scheme]
+[Conceptual Scheme] -->
+
+{{< include 02-market.qmd >}}
+
+{{< include 02-subjective-status.qmd >}}
 
 {{< include 02-status.qmd >}}
 
