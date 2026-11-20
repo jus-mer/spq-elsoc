@@ -742,6 +742,236 @@ tibble(Variante = names(variantes),
   kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE)
 ```
 
+## Versión colapsada de la trayectoria (cinco categorías)
+
+Para evitar las categorías muy pequeñas, las seis trayectorias con movimiento se juntan según su dirección: todas las que suben de grupo forman **Upward** y todas las que bajan forman **Downward**. Las tres trayectorias estables se mantienen. Queda una variable de **cinco categorías**: Stable low, Stable middle, Stable top, Upward y Downward. La referencia sigue siendo **Stable low**. Las Tablas 3 y 4 repiten las Tablas 1 y 2 con esta versión.
+
+```{r}
+#| label: data-ingreso-5
+
+d5 <- d3 %>%
+  mutate(traj_ingreso = case_when(
+           dir_ingreso == "Upward"   ~ "Upward",
+           dir_ingreso == "Downward" ~ "Downward",
+           TRUE                      ~ as.character(traj_ingreso)),
+         traj_ingreso = factor(traj_ingreso,
+                               levels = c("Stable low", "Stable middle", "Stable top",
+                                          "Upward", "Downward")))
+stopifnot(!anyNA(d5$traj_ingreso))
+tl5 <- levels(d5$traj_ingreso)   # la referencia (Stable low) es el primer nivel
+```
+
+```{r}
+#| label: tbl-traj-col
+#| tbl-cap: "Trayectoria colapsada: qué incluye cada categoría y su tamaño"
+
+col5 <- function(traj, dir) {
+  factor(case_when(dir == "Upward" ~ "Upward", dir == "Downward" ~ "Downward",
+                   TRUE ~ as.character(traj)), levels = tl5)
+}
+p_panel5 <- df_study1 %>% distinct(idencuesta, traj_ingreso, dir_ingreso) %>%
+  filter(!is.na(traj_ingreso)) %>% mutate(c5 = col5(traj_ingreso, dir_ingreso))
+p_mod5   <- d5 %>% distinct(idencuesta, traj_ingreso)
+
+tab5 <- tibble(
+  Categoría = tl5,
+  `Incluye` = c("Low en la primera y en la última ola",
+                "Middle en la primera y en la última ola",
+                "Top en la primera y en la última ola",
+                "Low -> Middle, Low -> Top y Middle -> Top",
+                "Middle -> Low, Top -> Low y Top -> Middle"),
+  `Personas en el panel`    = sapply(tl5, function(l) sum(p_panel5$c5 == l)),
+  `Personas en los modelos` = sapply(tl5, function(l) sum(p_mod5$traj_ingreso == l)))
+
+bind_rows(tab5, tibble(Categoría = "Total", Incluye = "",
+                       `Personas en el panel` = nrow(p_panel5),
+                       `Personas en los modelos` = nrow(p_mod5))) %>%
+  kable(format = "html", format.args = list(big.mark = ".", decimal.mark = ","),
+        align = c("l", "l", "r", "r")) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+  row_spec(nrow(tab5) + 1, bold = TRUE)
+```
+
+## Tabla 3. Trayectoria colapsada, controles y estatus subjetivo
+
+Misma estructura que la Tabla 1 (intercepto y pendiente del tiempo aleatorios; cada bloque de estatus agregado por separado a la base), con la trayectoria de cinco categorías.
+
+```{r}
+#| label: models-ingreso-3
+
+T3  <- lapply(rhs1, function(r) fit3(paste(r, "+ traj_ingreso"), dat = d5))   # con trayectoria
+T3r <- lapply(rhs1, function(r) fit3(r, dat = d5))                            # sin trayectoria
+
+lrt_bloque3 <- c("", "", sapply(c("og", "own", "hij"), function(k)
+  p_fmt(anova(T3$base, T3[[k]])$`Pr(>Chisq)`[2])))
+lrt_traj3   <- sapply(names(T3), function(k)
+  p_fmt(anova(T3r[[k]], T3[[k]])$`Pr(>Chisq)`[2]))
+
+traj5_t <- paste0("traj_ingreso", tl5[-1])
+
+blocks_ing3 <- list(
+  blocks_ing1[[1]], blocks_ing1[[2]],
+  list(name = "Trayectoria de ingreso colapsada (ref.: Stable low)", terms = traj5_t, labels = tl5[-1]))
+```
+
+```{r}
+#| label: tbl-ingreso-3
+#| tbl-cap: "Trayectoria de ingreso colapsada y preferencias de justicia de mercado (índice MJP), con controles y estatus subjetivo"
+
+make_table(unname(T3),
+           c("Modelo 1: solo tiempo", "Modelo 2: base", "Modelo 3: + Origen",
+             "Modelo 4: + Propio", "Modelo 5: + Hijos"),
+           blocks_ing3,
+           extra_rows = list("LRT bloque de estatus vs. Modelo 2 (p)" = lrt_bloque3,
+                             "LRT trayectorias (p)" = lrt_traj3),
+           note = note_ing1)
+```
+
+## Tabla 4. Trayectoria colapsada × estatus subjetivo (WE y BE)
+
+Misma estructura que la Tabla 2: un modelo por estatus, con los controles, los seis efectos principales de estatus, la trayectoria colapsada y su interacción con el WE y el BE del estatus de la columna, y **pendiente aleatoria del estatus WE interactuado**.
+
+```{r}
+#| label: models-ingreso-4
+
+base_A5 <- fit3(paste(ctrl3, "+", main3), dat = d5)   # sin pendiente aleatoria de SSS
+
+T4    <- list()
+lrt4  <- list()
+
+for (s in ss3) {
+  int_we <- paste0(s, "_we:traj_ingreso")
+  int_be <- paste0(s, "_be:traj_ingreso")
+  rs     <- re_B(s)
+
+  b_rs    <- fit3(paste(ctrl3, "+", main3), rs, d5)
+  T4[[s]] <- fit3(paste(ctrl3, "+", main3, "+", int_we, "+", int_be), rs, d5)
+  m_we    <- fit3(paste(ctrl3, "+", main3, "+", int_we), rs, d5)
+
+  lrt4[[s]] <- c(
+    conj = anova(b_rs, T4[[s]])$`Pr(>Chisq)`[2],
+    we   = anova(b_rs, m_we)$`Pr(>Chisq)`[2],
+    rs   = anova(base_A5, b_rs)$`Pr(>Chisq)`[2])
+}
+
+int4_t <- int4_l <- character()
+for (s in ss3) {
+  etq <- names(ss3)[ss3 == s]
+  int4_t <- c(int4_t, paste0(s, "_we:traj_ingreso", tl5[-1]), paste0(s, "_be:traj_ingreso", tl5[-1]))
+  int4_l <- c(int4_l, paste0(etq, " WE × ", tl5[-1]), paste0(etq, " BE × ", tl5[-1]))
+}
+
+blocks_ing4 <- list(
+  blocks_ing2[[1]], blocks_ing2[[2]],
+  list(name = "Trayectoria de ingreso colapsada (ref.: Stable low)", terms = traj5_t, labels = tl5[-1]),
+  list(name = "Interacciones trayectoria × estatus", terms = int4_t, labels = int4_l))
+
+note_ing4 <- paste("Coeficientes con errores estándar entre paréntesis.",
+                   "*** p < 0,001; ** p < 0,01; * p < 0,05; + p < 0,1.",
+                   "Los coeficientes de interacción son diferencias respecto de Stable low;",
+                   "la pendiente de cada categoría es el efecto principal más su interacción.",
+                   "Los efectos principales de cada categoría se leen con los efectos BE en 0,",
+                   "un valor que casi nadie tiene, y no son interpretables por sí solos.")
+```
+
+```{r}
+#| label: tbl-ingreso-4
+#| tbl-cap: "Trayectoria de ingreso colapsada × estatus subjetivo (índice MJP), con pendiente aleatoria del estatus WE interactuado"
+
+make_table(unname(T4),
+           c("Origen × Trayectoria", "Propio × Trayectoria", "Hijos × Trayectoria"),
+           blocks_ing4,
+           extra_rows = list(
+             "LRT interacción WE + BE (p)" = sapply(ss3, function(s) p_fmt(lrt4[[s]]["conj"])),
+             "LRT interacción solo WE (p)" = sapply(ss3, function(s) p_fmt(lrt4[[s]]["we"])),
+             "LRT pendiente aleatoria vs. sin ella (p)" = sapply(ss3, function(s) p_fmt(lrt4[[s]]["rs"]))),
+           note = note_ing4)
+```
+
+## Tabla 5. Trayectoria de ingreso (nueve categorías) × movilidad subjetiva
+
+La tabla estima la interacción entre la **trayectoria de ingreso de nueve categorías** (referencia: Stable low) y cada **medida de movilidad subjetiva**, igual que en la parte 2 pero con la trayectoria de ingreso en lugar de la previsión de salud. **Cada medida entra en un modelo distinto**, nunca juntas (ver la tabla de definiciones en la parte 2).
+
+Cada modelo incluye los controles, el índice de estatus subjetivo (WE y BE), **una** medida de movilidad (WE y BE), la trayectoria de ingreso y la interacción de la trayectoria con la movilidad WE y con la movilidad BE. **La pendiente de la movilidad WE es aleatoria**: `(1 + ola_num + mov_we | idencuesta)`. Cada prueba de razón de verosimilitud compara el modelo con interacciones contra un modelo base que tiene la misma pendiente aleatoria pero no tiene interacciones.
+
+Como `ess_traj` es exactamente `mov_exp_og / 2`, esas dos columnas tienen el mismo ajuste y los coeficientes de `ess_traj` son el doble. Además, las categorías Low -> Top y Top -> Low tienen muy pocas personas, por lo que los coeficientes asociados a ellas son inestables.
+
+```{r}
+#| label: models-ingreso-5
+
+# Índice de estatus subjetivo (control de los modelos de movilidad), con su
+# descomposición intra-persona (WE) y entre personas (BE)
+d3m <- d3 %>%
+  mutate(sss_index = (ess + ess_og + ess_hijos) / 3) %>%
+  group_by(idencuesta) %>%
+  mutate(sss_index_mean = mean(sss_index),
+         sss_index_cwc  = sss_index - sss_index_mean) %>%
+  ungroup()
+
+main5 <- "sss_index_cwc + sss_index_mean + mov_we + mov_be + traj_ingreso"
+
+# Columnas genéricas mov_we y mov_be con la medida de movilidad elegida
+fit_m5 <- function(mv, rhs, re) {
+  dd <- d3m
+  dd$mov_we <- d3m[[paste0(mv, "_cwc")]]
+  dd$mov_be <- d3m[[paste0(mv, "_mean")]]
+  lmer(as.formula(paste("mjp_index ~", ctrl3, "+", main5, rhs, "+", re)),
+       data = dd, REML = FALSE, control = oc)
+}
+
+re_B5 <- "(1 + ola_num + mov_we | idencuesta)"
+
+T5   <- list()
+lrt5 <- list()
+
+for (mv in movs) {
+  a_base <- fit_m5(mv, "", re_A)       # sin pendiente aleatoria de movilidad
+  b_rs   <- fit_m5(mv, "", re_B5)      # base con la misma pendiente aleatoria
+  T5[[mv]] <- fit_m5(mv, "+ mov_we:traj_ingreso + mov_be:traj_ingreso", re_B5)
+  m_we   <- fit_m5(mv, "+ mov_we:traj_ingreso", re_B5)
+
+  lrt5[[mv]] <- c(
+    conj = anova(b_rs, T5[[mv]])$`Pr(>Chisq)`[2],
+    we   = anova(b_rs, m_we)$`Pr(>Chisq)`[2],
+    rs   = anova(a_base, b_rs)$`Pr(>Chisq)`[2])
+}
+```
+
+```{r}
+#| label: blocks-ingreso-5
+
+blocks_ing5 <- list(
+  blocks_ing1[[1]],
+  list(name = "Índice de estatus subjetivo", terms = c("sss_index_cwc", "sss_index_mean"),
+       labels = c("Índice SSS WE", "Índice SSS BE")),
+  list(name = "Movilidad subjetiva (la medida de cada columna)", terms = c("mov_we", "mov_be"),
+       labels = c("Movilidad WE", "Movilidad BE")),
+  blocks_ing1[[3]],
+  list(name = "Interacciones trayectoria × movilidad",
+       terms  = c(paste0("mov_we:traj_ingreso", tl[-1]), paste0("mov_be:traj_ingreso", tl[-1])),
+       labels = c(paste0("Movilidad WE × ", tl[-1]), paste0("Movilidad BE × ", tl[-1]))))
+
+note_ing5 <- paste("Coeficientes con errores estándar entre paréntesis.",
+                   "*** p < 0,001; ** p < 0,01; * p < 0,05; + p < 0,1.",
+                   "Los coeficientes de interacción son diferencias respecto de Stable low;",
+                   "la pendiente de cada trayectoria es el efecto principal más su interacción.",
+                   "Los efectos principales de cada trayectoria se leen con los efectos BE en 0,",
+                   "un valor que casi nadie tiene, y no son interpretables por sí solos.",
+                   "Las categorías Low -> Top y Top -> Low tienen muy pocas personas.")
+```
+
+```{r}
+#| label: tbl-ingreso-5
+#| tbl-cap: "Trayectoria de ingreso (nueve categorías) × movilidad subjetiva (índice MJP), con pendiente aleatoria de la movilidad WE"
+
+make_table(unname(T5), movs, blocks_ing5,
+           extra_rows = list(
+             "LRT interacción WE + BE (p)" = sapply(movs, function(mv) p_fmt(lrt5[[mv]]["conj"])),
+             "LRT interacción solo WE (p)" = sapply(movs, function(mv) p_fmt(lrt5[[mv]]["we"])),
+             "LRT pendiente aleatoria vs. sin ella (p)" = sapply(movs, function(mv) p_fmt(lrt5[[mv]]["rs"]))),
+           note = note_ing5)
+```
+
 # Información de la sesión
 
 ```{r}

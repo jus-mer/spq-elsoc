@@ -2455,6 +2455,10 @@ border: 0;
   <li><a href="#datos-de-la-parte-3" id="toc-datos-de-la-parte-3" class="nav-link" data-scroll-target="#datos-de-la-parte-3">Datos de la parte 3</a></li>
   <li><a href="#tabla-1.-trayectoria-de-ingreso-controles-y-estatus-subjetivo" id="toc-tabla-1.-trayectoria-de-ingreso-controles-y-estatus-subjetivo" class="nav-link" data-scroll-target="#tabla-1.-trayectoria-de-ingreso-controles-y-estatus-subjetivo">Tabla 1. Trayectoria de ingreso, controles y estatus subjetivo</a></li>
   <li><a href="#tabla-2.-trayectoria-de-ingreso-estatus-subjetivo-we-y-be" id="toc-tabla-2.-trayectoria-de-ingreso-estatus-subjetivo-we-y-be" class="nav-link" data-scroll-target="#tabla-2.-trayectoria-de-ingreso-estatus-subjetivo-we-y-be">Tabla 2. Trayectoria de ingreso × estatus subjetivo (WE y BE)</a></li>
+  <li><a href="#versión-colapsada-de-la-trayectoria-cinco-categorías" id="toc-versión-colapsada-de-la-trayectoria-cinco-categorías" class="nav-link" data-scroll-target="#versión-colapsada-de-la-trayectoria-cinco-categorías">Versión colapsada de la trayectoria (cinco categorías)</a></li>
+  <li><a href="#tabla-3.-trayectoria-colapsada-controles-y-estatus-subjetivo" id="toc-tabla-3.-trayectoria-colapsada-controles-y-estatus-subjetivo" class="nav-link" data-scroll-target="#tabla-3.-trayectoria-colapsada-controles-y-estatus-subjetivo">Tabla 3. Trayectoria colapsada, controles y estatus subjetivo</a></li>
+  <li><a href="#tabla-4.-trayectoria-colapsada-estatus-subjetivo-we-y-be" id="toc-tabla-4.-trayectoria-colapsada-estatus-subjetivo-we-y-be" class="nav-link" data-scroll-target="#tabla-4.-trayectoria-colapsada-estatus-subjetivo-we-y-be">Tabla 4. Trayectoria colapsada × estatus subjetivo (WE y BE)</a></li>
+  <li><a href="#tabla-5.-trayectoria-de-ingreso-nueve-categorías-movilidad-subjetiva" id="toc-tabla-5.-trayectoria-de-ingreso-nueve-categorías-movilidad-subjetiva" class="nav-link" data-scroll-target="#tabla-5.-trayectoria-de-ingreso-nueve-categorías-movilidad-subjetiva">Tabla 5. Trayectoria de ingreso (nueve categorías) × movilidad subjetiva</a></li>
   </ul></li>
   <li><a href="#información-de-la-sesión" id="toc-información-de-la-sesión" class="nav-link" data-scroll-target="#información-de-la-sesión">Información de la sesión</a></li>
   </ul>
@@ -6123,13 +6127,1426 @@ Tabla 14: Hijos × trayectoria de ingreso: sensibilidad a las categorías más 
 </div>
 </section>
 </section>
+<section id="versión-colapsada-de-la-trayectoria-cinco-categorías" class="level2">
+<h2 class="anchored" data-anchor-id="versión-colapsada-de-la-trayectoria-cinco-categorías">Versión colapsada de la trayectoria (cinco categorías)</h2>
+<p>Para evitar las categorías muy pequeñas, las seis trayectorias con movimiento se juntan según su dirección: todas las que suben de grupo forman <strong>Upward</strong> y todas las que bajan forman <strong>Downward</strong>. Las tres trayectorias estables se mantienen. Queda una variable de <strong>cinco categorías</strong>: Stable low, Stable middle, Stable top, Upward y Downward. La referencia sigue siendo <strong>Stable low</strong>. Las Tablas 3 y 4 repiten las Tablas 1 y 2 con esta versión.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>d5 <span class="ot">&lt;-</span> d3 <span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">traj_ingreso =</span> <span class="fu">case_when</span>(</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>           dir_ingreso <span class="sc">==</span> <span class="st">&quot;Upward&quot;</span>   <span class="sc">~</span> <span class="st">&quot;Upward&quot;</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>           dir_ingreso <span class="sc">==</span> <span class="st">&quot;Downward&quot;</span> <span class="sc">~</span> <span class="st">&quot;Downward&quot;</span>,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>           <span class="cn">TRUE</span>                      <span class="sc">~</span> <span class="fu">as.character</span>(traj_ingreso)),</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">traj_ingreso =</span> <span class="fu">factor</span>(traj_ingreso,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>                               <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;Stable low&quot;</span>, <span class="st">&quot;Stable middle&quot;</span>, <span class="st">&quot;Stable top&quot;</span>,</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">&quot;Upward&quot;</span>, <span class="st">&quot;Downward&quot;</span>)))</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="sc">!</span><span class="fu">anyNA</span>(d5<span class="sc">$</span>traj_ingreso))</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>tl5 <span class="ot">&lt;-</span> <span class="fu">levels</span>(d5<span class="sc">$</span>traj_ingreso)   <span class="co"># la referencia (Stable low) es el primer nivel</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>col5 <span class="ot">&lt;-</span> <span class="cf">function</span>(traj, dir) {</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">factor</span>(<span class="fu">case_when</span>(dir <span class="sc">==</span> <span class="st">&quot;Upward&quot;</span> <span class="sc">~</span> <span class="st">&quot;Upward&quot;</span>, dir <span class="sc">==</span> <span class="st">&quot;Downward&quot;</span> <span class="sc">~</span> <span class="st">&quot;Downward&quot;</span>,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                   <span class="cn">TRUE</span> <span class="sc">~</span> <span class="fu">as.character</span>(traj)), <span class="at">levels =</span> tl5)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>p_panel5 <span class="ot">&lt;-</span> df_study1 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(idencuesta, traj_ingreso, dir_ingreso) <span class="sc">%&gt;%</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(traj_ingreso)) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">c5 =</span> <span class="fu">col5</span>(traj_ingreso, dir_ingreso))</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>p_mod5   <span class="ot">&lt;-</span> d5 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(idencuesta, traj_ingreso)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>tab5 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  Categoría <span class="ot">=</span> tl5,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Incluye</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;Low en la primera y en la última ola&quot;</span>,</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;Middle en la primera y en la última ola&quot;</span>,</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;Top en la primera y en la última ola&quot;</span>,</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;Low -&gt; Middle, Low -&gt; Top y Middle -&gt; Top&quot;</span>,</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;Middle -&gt; Low, Top -&gt; Low y Top -&gt; Middle&quot;</span>),</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Personas en el panel</span><span class="st">`</span>    <span class="ot">=</span> <span class="fu">sapply</span>(tl5, <span class="cf">function</span>(l) <span class="fu">sum</span>(p_panel5<span class="sc">$</span>c5 <span class="sc">==</span> l)),</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Personas en los modelos</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sapply</span>(tl5, <span class="cf">function</span>(l) <span class="fu">sum</span>(p_mod5<span class="sc">$</span>traj_ingreso <span class="sc">==</span> l)))</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(tab5, <span class="fu">tibble</span>(Categoría <span class="ot">=</span> <span class="st">&quot;Total&quot;</span>, <span class="at">Incluye =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>                       <span class="st">`</span><span class="at">Personas en el panel</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">nrow</span>(p_panel5),</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>                       <span class="st">`</span><span class="at">Personas en los modelos</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">nrow</span>(p_mod5))) <span class="sc">%&gt;%</span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>, <span class="at">format.args =</span> <span class="fu">list</span>(<span class="at">big.mark =</span> <span class="st">&quot;.&quot;</span>, <span class="at">decimal.mark =</span> <span class="st">&quot;,&quot;</span>),</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">align =</span> <span class="fu">c</span>(<span class="st">&quot;l&quot;</span>, <span class="st">&quot;l&quot;</span>, <span class="st">&quot;r&quot;</span>, <span class="st">&quot;r&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;condensed&quot;</span>), <span class="at">full_width =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="fu">nrow</span>(tab5) <span class="sc">+</span> <span class="dv">1</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="tbl-traj-col" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-traj-col-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla 15: Trayectoria colapsada: qué incluye cada categoría y su tamaño
+</figcaption>
+<div aria-describedby="tbl-traj-col-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed do-not-create-environment cell caption-top table-sm small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Categoría</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Incluye</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Personas en el panel</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Personas en los modelos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Stable low</td>
+<td style="text-align: left;">Low en la primera y en la última ola</td>
+<td style="text-align: right;">119</td>
+<td style="text-align: right;">106</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Stable middle</td>
+<td style="text-align: left;">Middle en la primera y en la última ola</td>
+<td style="text-align: right;">505</td>
+<td style="text-align: right;">467</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Stable top</td>
+<td style="text-align: left;">Top en la primera y en la última ola</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">90</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Upward</td>
+<td style="text-align: left;">Low -&gt; Middle, Low -&gt; Top y Middle -&gt; Top</td>
+<td style="text-align: right;">255</td>
+<td style="text-align: right;">229</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Downward</td>
+<td style="text-align: left;">Middle -&gt; Low, Top -&gt; Low y Top -&gt; Middle</td>
+<td style="text-align: right;">253</td>
+<td style="text-align: right;">227</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold;">Total</td>
+<td style="text-align: left; font-weight: bold;"></td>
+<td style="text-align: right; font-weight: bold;">1.231</td>
+<td style="text-align: right; font-weight: bold;">1.119</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="tabla-3.-trayectoria-colapsada-controles-y-estatus-subjetivo" class="level2">
+<h2 class="anchored" data-anchor-id="tabla-3.-trayectoria-colapsada-controles-y-estatus-subjetivo">Tabla 3. Trayectoria colapsada, controles y estatus subjetivo</h2>
+<p>Misma estructura que la Tabla 1 (intercepto y pendiente del tiempo aleatorios; cada bloque de estatus agregado por separado a la base), con la trayectoria de cinco categorías.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>T3  <span class="ot">&lt;-</span> <span class="fu">lapply</span>(rhs1, <span class="cf">function</span>(r) <span class="fu">fit3</span>(<span class="fu">paste</span>(r, <span class="st">&quot;+ traj_ingreso&quot;</span>), <span class="at">dat =</span> d5))   <span class="co"># con trayectoria</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>T3r <span class="ot">&lt;-</span> <span class="fu">lapply</span>(rhs1, <span class="cf">function</span>(r) <span class="fu">fit3</span>(r, <span class="at">dat =</span> d5))                            <span class="co"># sin trayectoria</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>lrt_bloque3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="fu">sapply</span>(<span class="fu">c</span>(<span class="st">&quot;og&quot;</span>, <span class="st">&quot;own&quot;</span>, <span class="st">&quot;hij&quot;</span>), <span class="cf">function</span>(k)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p_fmt</span>(<span class="fu">anova</span>(T3<span class="sc">$</span>base, T3[[k]])<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;Chisq)</span><span class="st">`</span>[<span class="dv">2</span>])))</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>lrt_traj3   <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">names</span>(T3), <span class="cf">function</span>(k)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p_fmt</span>(<span class="fu">anova</span>(T3r[[k]], T3[[k]])<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;Chisq)</span><span class="st">`</span>[<span class="dv">2</span>]))</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>traj5_t <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;traj_ingreso&quot;</span>, tl5[<span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>blocks_ing3 <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  blocks_ing1[[<span class="dv">1</span>]], blocks_ing1[[<span class="dv">2</span>]],</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">name =</span> <span class="st">&quot;Trayectoria de ingreso colapsada (ref.: Stable low)&quot;</span>, <span class="at">terms =</span> traj5_t, <span class="at">labels =</span> tl5[<span class="sc">-</span><span class="dv">1</span>]))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(<span class="fu">unname</span>(T3),</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>           <span class="fu">c</span>(<span class="st">&quot;Modelo 1: solo tiempo&quot;</span>, <span class="st">&quot;Modelo 2: base&quot;</span>, <span class="st">&quot;Modelo 3: + Origen&quot;</span>,</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;Modelo 4: + Propio&quot;</span>, <span class="st">&quot;Modelo 5: + Hijos&quot;</span>),</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>           blocks_ing3,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">extra_rows =</span> <span class="fu">list</span>(<span class="st">&quot;LRT bloque de estatus vs. Modelo 2 (p)&quot;</span> <span class="ot">=</span> lrt_bloque3,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                             <span class="st">&quot;LRT trayectorias (p)&quot;</span> <span class="ot">=</span> lrt_traj3),</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">note =</span> note_ing1)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="tbl-ingreso-3" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ingreso-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla 16: Trayectoria de ingreso colapsada y preferencias de justicia de mercado (índice MJP), con controles y estatus subjetivo
+</figcaption>
+<div aria-describedby="tbl-ingreso-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed do-not-create-environment cell caption-top table-sm small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Modelo 1: solo tiempo</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Modelo 2: base</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Modelo 3: + Origen</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Modelo 4: + Propio</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Modelo 5: + Hijos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd" data-grouplength="9">
+<td colspan="6" style="border-bottom: 1px solid"><strong>Controles</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Intercepto</td>
+<td style="text-align: left;">1,922 (0,062)***</td>
+<td style="text-align: right;">1,740 (0,086)***</td>
+<td style="text-align: right;">1,687 (0,092)***</td>
+<td style="text-align: right;">1,656 (0,102)***</td>
+<td style="text-align: right;">1,776 (0,118)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Tendencia lineal (ola_num)</td>
+<td style="text-align: left;">-0,145 (0,025)***</td>
+<td style="text-align: right;">-0,146 (0,025)***</td>
+<td style="text-align: right;">-0,145 (0,025)***</td>
+<td style="text-align: right;">-0,146 (0,025)***</td>
+<td style="text-align: right;">-0,147 (0,025)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Tendencia cuadrática (ola_2)</td>
+<td style="text-align: left;">0,031 (0,004)***</td>
+<td style="text-align: right;">0,031 (0,004)***</td>
+<td style="text-align: right;">0,031 (0,004)***</td>
+<td style="text-align: right;">0,030 (0,004)***</td>
+<td style="text-align: right;">0,031 (0,004)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ideología: centro</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0,137 (0,031)***</td>
+<td style="text-align: right;">0,133 (0,031)***</td>
+<td style="text-align: right;">0,134 (0,031)***</td>
+<td style="text-align: right;">0,138 (0,031)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ideología: derecha</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0,253 (0,037)***</td>
+<td style="text-align: right;">0,247 (0,037)***</td>
+<td style="text-align: right;">0,247 (0,037)***</td>
+<td style="text-align: right;">0,256 (0,037)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ideología: no se identifica</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0,143 (0,030)***</td>
+<td style="text-align: right;">0,140 (0,030)***</td>
+<td style="text-align: right;">0,141 (0,030)***</td>
+<td style="text-align: right;">0,145 (0,030)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Mujer</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">-0,158 (0,031)***</td>
+<td style="text-align: right;">-0,159 (0,031)***</td>
+<td style="text-align: right;">-0,158 (0,031)***</td>
+<td style="text-align: right;">-0,156 (0,031)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Edad</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0,004 (0,001)***</td>
+<td style="text-align: right;">0,004 (0,001)***</td>
+<td style="text-align: right;">0,004 (0,001)***</td>
+<td style="text-align: right;">0,004 (0,001)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Universitaria BE</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0,110 (0,039)**</td>
+<td style="text-align: right;">0,098 (0,040)*</td>
+<td style="text-align: right;">0,101 (0,040)*</td>
+<td style="text-align: right;">0,110 (0,039)**</td>
+</tr>
+<tr class="odd" data-grouplength="6">
+<td colspan="6" style="border-bottom: 1px solid"><strong>Estatus subjetivo (cada bloque por separado)</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen WE</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">0,011 (0,006)+</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen BE</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">0,017 (0,011)</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio WE</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">0,008 (0,008)</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio BE</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">0,024 (0,015)</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos WE</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-0,011 (0,006)+</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos BE</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-0,006 (0,012)</td>
+</tr>
+<tr class="even" data-grouplength="4">
+<td colspan="6" style="border-bottom: 1px solid"><strong>Trayectoria de ingreso colapsada (ref.: Stable low)</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Stable middle</td>
+<td style="text-align: left;">0,080 (0,054)</td>
+<td style="text-align: right;">0,039 (0,053)</td>
+<td style="text-align: right;">0,034 (0,053)</td>
+<td style="text-align: right;">0,023 (0,054)</td>
+<td style="text-align: right;">0,042 (0,053)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Stable top</td>
+<td style="text-align: left;">0,266 (0,072)***</td>
+<td style="text-align: right;">0,187 (0,074)*</td>
+<td style="text-align: right;">0,176 (0,074)*</td>
+<td style="text-align: right;">0,157 (0,076)*</td>
+<td style="text-align: right;">0,192 (0,074)**</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Upward</td>
+<td style="text-align: left;">0,132 (0,059)*</td>
+<td style="text-align: right;">0,095 (0,058)</td>
+<td style="text-align: right;">0,089 (0,058)</td>
+<td style="text-align: right;">0,077 (0,059)</td>
+<td style="text-align: right;">0,098 (0,058)+</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Downward</td>
+<td style="text-align: left;">0,123 (0,059)*</td>
+<td style="text-align: right;">0,064 (0,058)</td>
+<td style="text-align: right;">0,057 (0,058)</td>
+<td style="text-align: right;">0,047 (0,059)</td>
+<td style="text-align: right;">0,067 (0,058)</td>
+</tr>
+<tr class="odd" data-grouplength="12">
+<td colspan="6" style="border-bottom: 1px solid"><strong>Ajuste y efectos aleatorios</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">N_i (observaciones)</td>
+<td style="text-align: left;">6322</td>
+<td style="text-align: right;">6322</td>
+<td style="text-align: right;">6322</td>
+<td style="text-align: right;">6322</td>
+<td style="text-align: right;">6322</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">N_j (personas)</td>
+<td style="text-align: left;">1119</td>
+<td style="text-align: right;">1119</td>
+<td style="text-align: right;">1119</td>
+<td style="text-align: right;">1119</td>
+<td style="text-align: right;">1119</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">AIC</td>
+<td style="text-align: left;">14995,6</td>
+<td style="text-align: right;">14916,6</td>
+<td style="text-align: right;">14915,2</td>
+<td style="text-align: right;">14917,3</td>
+<td style="text-align: right;">14916,8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">BIC</td>
+<td style="text-align: left;">15069,9</td>
+<td style="text-align: right;">15031,4</td>
+<td style="text-align: right;">15043,4</td>
+<td style="text-align: right;">15045,5</td>
+<td style="text-align: right;">15045,1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. intercepto (persona)</td>
+<td style="text-align: left;">0,193</td>
+<td style="text-align: right;">0,181</td>
+<td style="text-align: right;">0,179</td>
+<td style="text-align: right;">0,181</td>
+<td style="text-align: right;">0,180</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. pendiente ola_num</td>
+<td style="text-align: left;">0,009</td>
+<td style="text-align: right;">0,008</td>
+<td style="text-align: right;">0,008</td>
+<td style="text-align: right;">0,008</td>
+<td style="text-align: right;">0,008</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. pendiente aleatoria del WE interactuado</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. residual</td>
+<td style="text-align: left;">0,498</td>
+<td style="text-align: right;">0,498</td>
+<td style="text-align: right;">0,498</td>
+<td style="text-align: right;">0,498</td>
+<td style="text-align: right;">0,498</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ajuste singular</td>
+<td style="text-align: left;">no</td>
+<td style="text-align: right;">no</td>
+<td style="text-align: right;">no</td>
+<td style="text-align: right;">no</td>
+<td style="text-align: right;">no</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Convergencia</td>
+<td style="text-align: left;">ok</td>
+<td style="text-align: right;">ok</td>
+<td style="text-align: right;">ok</td>
+<td style="text-align: right;">ok</td>
+<td style="text-align: right;">ok</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">LRT bloque de estatus vs. Modelo 2 (p)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">0,066</td>
+<td style="text-align: right;">0,189</td>
+<td style="text-align: right;">0,150</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">LRT trayectorias (p)</td>
+<td style="text-align: left;">0,003</td>
+<td style="text-align: right;">0,068</td>
+<td style="text-align: right;">0,097</td>
+<td style="text-align: right;">0,160</td>
+<td style="text-align: right;">0,062</td>
+</tr>
+</tbody><tfoot>
+<tr class="odd">
+<td style="padding: 0"><span style="font-style: italic;">Nota: </span> <sup></sup> Coeficientes con errores estándar entre paréntesis. *** p &lt; 0,001; ** p &lt; 0,01; * p &lt; 0,05; + p &lt; 0,1. Referencia de la trayectoria: Stable low. Efectos BE sin centrar. &#39;LRT bloque de estatus&#39; compara cada modelo contra el Modelo 2; &#39;LRT trayectorias&#39; compara cada modelo contra el mismo modelo sin las trayectorias.</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tfoot>
+
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="tabla-4.-trayectoria-colapsada-estatus-subjetivo-we-y-be" class="level2">
+<h2 class="anchored" data-anchor-id="tabla-4.-trayectoria-colapsada-estatus-subjetivo-we-y-be">Tabla 4. Trayectoria colapsada × estatus subjetivo (WE y BE)</h2>
+<p>Misma estructura que la Tabla 2: un modelo por estatus, con los controles, los seis efectos principales de estatus, la trayectoria colapsada y su interacción con el WE y el BE del estatus de la columna, y <strong>pendiente aleatoria del estatus WE interactuado</strong>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>base_A5 <span class="ot">&lt;-</span> <span class="fu">fit3</span>(<span class="fu">paste</span>(ctrl3, <span class="st">&quot;+&quot;</span>, main3), <span class="at">dat =</span> d5)   <span class="co"># sin pendiente aleatoria de SSS</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>T4    <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>lrt4  <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (s <span class="cf">in</span> ss3) {</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  int_we <span class="ot">&lt;-</span> <span class="fu">paste0</span>(s, <span class="st">&quot;_we:traj_ingreso&quot;</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  int_be <span class="ot">&lt;-</span> <span class="fu">paste0</span>(s, <span class="st">&quot;_be:traj_ingreso&quot;</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  rs     <span class="ot">&lt;-</span> <span class="fu">re_B</span>(s)</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  b_rs    <span class="ot">&lt;-</span> <span class="fu">fit3</span>(<span class="fu">paste</span>(ctrl3, <span class="st">&quot;+&quot;</span>, main3), rs, d5)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  T4[[s]] <span class="ot">&lt;-</span> <span class="fu">fit3</span>(<span class="fu">paste</span>(ctrl3, <span class="st">&quot;+&quot;</span>, main3, <span class="st">&quot;+&quot;</span>, int_we, <span class="st">&quot;+&quot;</span>, int_be), rs, d5)</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  m_we    <span class="ot">&lt;-</span> <span class="fu">fit3</span>(<span class="fu">paste</span>(ctrl3, <span class="st">&quot;+&quot;</span>, main3, <span class="st">&quot;+&quot;</span>, int_we), rs, d5)</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>  lrt4[[s]] <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">conj =</span> <span class="fu">anova</span>(b_rs, T4[[s]])<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;Chisq)</span><span class="st">`</span>[<span class="dv">2</span>],</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">we   =</span> <span class="fu">anova</span>(b_rs, m_we)<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;Chisq)</span><span class="st">`</span>[<span class="dv">2</span>],</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">rs   =</span> <span class="fu">anova</span>(base_A5, b_rs)<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;Chisq)</span><span class="st">`</span>[<span class="dv">2</span>])</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>int4_t <span class="ot">&lt;-</span> int4_l <span class="ot">&lt;-</span> <span class="fu">character</span>()</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (s <span class="cf">in</span> ss3) {</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>  etq <span class="ot">&lt;-</span> <span class="fu">names</span>(ss3)[ss3 <span class="sc">==</span> s]</span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>  int4_t <span class="ot">&lt;-</span> <span class="fu">c</span>(int4_t, <span class="fu">paste0</span>(s, <span class="st">&quot;_we:traj_ingreso&quot;</span>, tl5[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">paste0</span>(s, <span class="st">&quot;_be:traj_ingreso&quot;</span>, tl5[<span class="sc">-</span><span class="dv">1</span>]))</span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>  int4_l <span class="ot">&lt;-</span> <span class="fu">c</span>(int4_l, <span class="fu">paste0</span>(etq, <span class="st">&quot; WE × &quot;</span>, tl5[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">paste0</span>(etq, <span class="st">&quot; BE × &quot;</span>, tl5[<span class="sc">-</span><span class="dv">1</span>]))</span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>blocks_ing4 <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>  blocks_ing2[[<span class="dv">1</span>]], blocks_ing2[[<span class="dv">2</span>]],</span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">name =</span> <span class="st">&quot;Trayectoria de ingreso colapsada (ref.: Stable low)&quot;</span>, <span class="at">terms =</span> traj5_t, <span class="at">labels =</span> tl5[<span class="sc">-</span><span class="dv">1</span>]),</span>
+<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">name =</span> <span class="st">&quot;Interacciones trayectoria × estatus&quot;</span>, <span class="at">terms =</span> int4_t, <span class="at">labels =</span> int4_l))</span>
+<span id="cb30-32"><a href="#cb30-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-33"><a href="#cb30-33" aria-hidden="true" tabindex="-1"></a>note_ing4 <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;Coeficientes con errores estándar entre paréntesis.&quot;</span>,</span>
+<span id="cb30-34"><a href="#cb30-34" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;*** p &lt; 0,001; ** p &lt; 0,01; * p &lt; 0,05; + p &lt; 0,1.&quot;</span>,</span>
+<span id="cb30-35"><a href="#cb30-35" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;Los coeficientes de interacción son diferencias respecto de Stable low;&quot;</span>,</span>
+<span id="cb30-36"><a href="#cb30-36" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;la pendiente de cada categoría es el efecto principal más su interacción.&quot;</span>,</span>
+<span id="cb30-37"><a href="#cb30-37" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;Los efectos principales de cada categoría se leen con los efectos BE en 0,&quot;</span>,</span>
+<span id="cb30-38"><a href="#cb30-38" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;un valor que casi nadie tiene, y no son interpretables por sí solos.&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(<span class="fu">unname</span>(T4),</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>           <span class="fu">c</span>(<span class="st">&quot;Origen × Trayectoria&quot;</span>, <span class="st">&quot;Propio × Trayectoria&quot;</span>, <span class="st">&quot;Hijos × Trayectoria&quot;</span>),</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>           blocks_ing4,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">extra_rows =</span> <span class="fu">list</span>(</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;LRT interacción WE + BE (p)&quot;</span> <span class="ot">=</span> <span class="fu">sapply</span>(ss3, <span class="cf">function</span>(s) <span class="fu">p_fmt</span>(lrt4[[s]][<span class="st">&quot;conj&quot;</span>])),</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;LRT interacción solo WE (p)&quot;</span> <span class="ot">=</span> <span class="fu">sapply</span>(ss3, <span class="cf">function</span>(s) <span class="fu">p_fmt</span>(lrt4[[s]][<span class="st">&quot;we&quot;</span>])),</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;LRT pendiente aleatoria vs. sin ella (p)&quot;</span> <span class="ot">=</span> <span class="fu">sapply</span>(ss3, <span class="cf">function</span>(s) <span class="fu">p_fmt</span>(lrt4[[s]][<span class="st">&quot;rs&quot;</span>]))),</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">note =</span> note_ing4)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="tbl-ingreso-4" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ingreso-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla 17: Trayectoria de ingreso colapsada × estatus subjetivo (índice MJP), con pendiente aleatoria del estatus WE interactuado
+</figcaption>
+<div aria-describedby="tbl-ingreso-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed do-not-create-environment cell caption-top table-sm small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Origen × Trayectoria</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Propio × Trayectoria</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Hijos × Trayectoria</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd" data-grouplength="9">
+<td colspan="4" style="border-bottom: 1px solid"><strong>Controles</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Intercepto</td>
+<td style="text-align: left;">1,621 (0,160)***</td>
+<td style="text-align: right;">1,807 (0,194)***</td>
+<td style="text-align: right;">1,649 (0,221)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Tendencia lineal (ola_num)</td>
+<td style="text-align: left;">-0,144 (0,025)***</td>
+<td style="text-align: right;">-0,144 (0,025)***</td>
+<td style="text-align: right;">-0,144 (0,025)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Tendencia cuadrática (ola_2)</td>
+<td style="text-align: left;">0,030 (0,004)***</td>
+<td style="text-align: right;">0,030 (0,004)***</td>
+<td style="text-align: right;">0,030 (0,004)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ideología: centro</td>
+<td style="text-align: left;">0,134 (0,031)***</td>
+<td style="text-align: right;">0,133 (0,031)***</td>
+<td style="text-align: right;">0,136 (0,031)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ideología: derecha</td>
+<td style="text-align: left;">0,243 (0,037)***</td>
+<td style="text-align: right;">0,247 (0,037)***</td>
+<td style="text-align: right;">0,250 (0,037)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ideología: no se identifica</td>
+<td style="text-align: left;">0,141 (0,030)***</td>
+<td style="text-align: right;">0,142 (0,030)***</td>
+<td style="text-align: right;">0,143 (0,030)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Mujer</td>
+<td style="text-align: left;">-0,152 (0,031)***</td>
+<td style="text-align: right;">-0,153 (0,031)***</td>
+<td style="text-align: right;">-0,153 (0,031)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Edad</td>
+<td style="text-align: left;">0,003 (0,001)**</td>
+<td style="text-align: right;">0,003 (0,001)**</td>
+<td style="text-align: right;">0,004 (0,001)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Universitaria BE</td>
+<td style="text-align: left;">0,092 (0,040)*</td>
+<td style="text-align: right;">0,090 (0,040)*</td>
+<td style="text-align: right;">0,090 (0,040)*</td>
+</tr>
+<tr class="odd" data-grouplength="6">
+<td colspan="4" style="border-bottom: 1px solid"><strong>Efectos principales de estatus</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen WE</td>
+<td style="text-align: left;">0,004 (0,019)</td>
+<td style="text-align: right;">0,012 (0,007)+</td>
+<td style="text-align: right;">0,012 (0,007)+</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen BE</td>
+<td style="text-align: left;">0,049 (0,034)</td>
+<td style="text-align: right;">0,012 (0,013)</td>
+<td style="text-align: right;">0,012 (0,013)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio WE</td>
+<td style="text-align: left;">0,010 (0,010)</td>
+<td style="text-align: right;">0,005 (0,022)</td>
+<td style="text-align: right;">0,008 (0,010)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio BE</td>
+<td style="text-align: left;">0,028 (0,020)</td>
+<td style="text-align: right;">0,011 (0,047)</td>
+<td style="text-align: right;">0,028 (0,020)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos WE</td>
+<td style="text-align: left;">-0,017 (0,006)**</td>
+<td style="text-align: right;">-0,017 (0,006)**</td>
+<td style="text-align: right;">-0,007 (0,018)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos BE</td>
+<td style="text-align: left;">-0,023 (0,014)</td>
+<td style="text-align: right;">-0,021 (0,014)</td>
+<td style="text-align: right;">-0,007 (0,034)</td>
+</tr>
+<tr class="even" data-grouplength="4">
+<td colspan="4" style="border-bottom: 1px solid"><strong>Trayectoria de ingreso colapsada (ref.: Stable low)</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Stable middle</td>
+<td style="text-align: left;">0,090 (0,142)</td>
+<td style="text-align: right;">-0,107 (0,201)</td>
+<td style="text-align: right;">0,042 (0,239)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Stable top</td>
+<td style="text-align: left;">0,508 (0,225)*</td>
+<td style="text-align: right;">0,375 (0,328)</td>
+<td style="text-align: right;">0,518 (0,384)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Upward</td>
+<td style="text-align: left;">0,276 (0,160)+</td>
+<td style="text-align: right;">-0,057 (0,229)</td>
+<td style="text-align: right;">0,302 (0,275)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Downward</td>
+<td style="text-align: left;">0,262 (0,162)</td>
+<td style="text-align: right;">0,071 (0,227)</td>
+<td style="text-align: right;">0,123 (0,266)</td>
+</tr>
+<tr class="odd" data-grouplength="24">
+<td colspan="4" style="border-bottom: 1px solid"><strong>Interacciones trayectoria × estatus</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen WE × Stable middle</td>
+<td style="text-align: left;">0,012 (0,021)</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen WE × Stable top</td>
+<td style="text-align: left;">-0,004 (0,033)</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen WE × Upward</td>
+<td style="text-align: left;">-0,005 (0,023)</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen WE × Downward</td>
+<td style="text-align: left;">0,020 (0,023)</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen BE × Stable middle</td>
+<td style="text-align: left;">-0,020 (0,037)</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen BE × Stable top</td>
+<td style="text-align: left;">-0,086 (0,051)+</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen BE × Upward</td>
+<td style="text-align: left;">-0,053 (0,041)</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Origen BE × Downward</td>
+<td style="text-align: left;">-0,058 (0,041)</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio WE × Stable middle</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0,020 (0,025)</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio WE × Stable top</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0,009 (0,043)</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio WE × Upward</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">-0,023 (0,027)</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio WE × Downward</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0,010 (0,027)</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio BE × Stable middle</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0,033 (0,051)</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio BE × Stable top</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">-0,037 (0,070)</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio BE × Upward</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0,034 (0,056)</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Propio BE × Downward</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">-0,002 (0,056)</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos WE × Stable middle</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-0,010 (0,020)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos WE × Stable top</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-0,032 (0,032)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos WE × Upward</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-0,030 (0,022)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos WE × Downward</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">0,018 (0,022)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos BE × Stable middle</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-0,004 (0,038)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos BE × Stable top</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-0,056 (0,059)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos BE × Upward</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-0,035 (0,043)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Hijos BE × Downward</td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-0,013 (0,042)</td>
+</tr>
+<tr class="even" data-grouplength="13">
+<td colspan="4" style="border-bottom: 1px solid"><strong>Ajuste y efectos aleatorios</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">N_i (observaciones)</td>
+<td style="text-align: left;">6322</td>
+<td style="text-align: right;">6322</td>
+<td style="text-align: right;">6322</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">N_j (personas)</td>
+<td style="text-align: left;">1119</td>
+<td style="text-align: right;">1119</td>
+<td style="text-align: right;">1119</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">AIC</td>
+<td style="text-align: left;">14923,8</td>
+<td style="text-align: right;">14927,0</td>
+<td style="text-align: right;">14919,6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">BIC</td>
+<td style="text-align: left;">15153,3</td>
+<td style="text-align: right;">15156,5</td>
+<td style="text-align: right;">15149,2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. intercepto (persona)</td>
+<td style="text-align: left;">0,177</td>
+<td style="text-align: right;">0,177</td>
+<td style="text-align: right;">0,173</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. pendiente ola_num</td>
+<td style="text-align: left;">0,008</td>
+<td style="text-align: right;">0,008</td>
+<td style="text-align: right;">0,008</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. pendiente aleatoria del WE interactuado</td>
+<td style="text-align: left;">0,0015</td>
+<td style="text-align: right;">0,0019</td>
+<td style="text-align: right;">0,0024</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. residual</td>
+<td style="text-align: left;">0,493</td>
+<td style="text-align: right;">0,494</td>
+<td style="text-align: right;">0,490</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ajuste singular</td>
+<td style="text-align: left;">no</td>
+<td style="text-align: right;">no</td>
+<td style="text-align: right;">no</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Convergencia</td>
+<td style="text-align: left;">ok</td>
+<td style="text-align: right;">ok</td>
+<td style="text-align: right;">ok</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">LRT interacción WE + BE (p)</td>
+<td style="text-align: left;">0,502</td>
+<td style="text-align: right;">0,619</td>
+<td style="text-align: right;">0,300</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">LRT interacción solo WE (p)</td>
+<td style="text-align: left;">0,695</td>
+<td style="text-align: right;">0,397</td>
+<td style="text-align: right;">0,101</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">LRT pendiente aleatoria vs. sin ella (p)</td>
+<td style="text-align: left;">0,260</td>
+<td style="text-align: right;">0,600</td>
+<td style="text-align: right;">0,115</td>
+</tr>
+</tbody><tfoot>
+<tr class="odd">
+<td style="padding: 0"><span style="font-style: italic;">Nota: </span> <sup></sup> Coeficientes con errores estándar entre paréntesis. *** p &lt; 0,001; ** p &lt; 0,01; * p &lt; 0,05; + p &lt; 0,1. Los coeficientes de interacción son diferencias respecto de Stable low; la pendiente de cada categoría es el efecto principal más su interacción. Los efectos principales de cada categoría se leen con los efectos BE en 0, un valor que casi nadie tiene, y no son interpretables por sí solos.</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tfoot>
+
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="tabla-5.-trayectoria-de-ingreso-nueve-categorías-movilidad-subjetiva" class="level2">
+<h2 class="anchored" data-anchor-id="tabla-5.-trayectoria-de-ingreso-nueve-categorías-movilidad-subjetiva">Tabla 5. Trayectoria de ingreso (nueve categorías) × movilidad subjetiva</h2>
+<p>La tabla estima la interacción entre la <strong>trayectoria de ingreso de nueve categorías</strong> (referencia: Stable low) y cada <strong>medida de movilidad subjetiva</strong>, igual que en la parte 2 pero con la trayectoria de ingreso en lugar de la previsión de salud. <strong>Cada medida entra en un modelo distinto</strong>, nunca juntas (ver la tabla de definiciones en la parte 2).</p>
+<p>Cada modelo incluye los controles, el índice de estatus subjetivo (WE y BE), <strong>una</strong> medida de movilidad (WE y BE), la trayectoria de ingreso y la interacción de la trayectoria con la movilidad WE y con la movilidad BE. <strong>La pendiente de la movilidad WE es aleatoria</strong>: <code>(1 + ola_num + mov_we | idencuesta)</code>. Cada prueba de razón de verosimilitud compara el modelo con interacciones contra un modelo base que tiene la misma pendiente aleatoria pero no tiene interacciones.</p>
+<p>Como <code>ess_traj</code> es exactamente <code>mov_exp_og / 2</code>, esas dos columnas tienen el mismo ajuste y los coeficientes de <code>ess_traj</code> son el doble. Además, las categorías Low -&gt; Top y Top -&gt; Low tienen muy pocas personas, por lo que los coeficientes asociados a ellas son inestables.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Índice de estatus subjetivo (control de los modelos de movilidad), con su</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co"># descomposición intra-persona (WE) y entre personas (BE)</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>d3m <span class="ot">&lt;-</span> d3 <span class="sc">%&gt;%</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sss_index =</span> (ess <span class="sc">+</span> ess_og <span class="sc">+</span> ess_hijos) <span class="sc">/</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(idencuesta) <span class="sc">%&gt;%</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sss_index_mean =</span> <span class="fu">mean</span>(sss_index),</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">sss_index_cwc  =</span> sss_index <span class="sc">-</span> sss_index_mean) <span class="sc">%&gt;%</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>main5 <span class="ot">&lt;-</span> <span class="st">&quot;sss_index_cwc + sss_index_mean + mov_we + mov_be + traj_ingreso&quot;</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Columnas genéricas mov_we y mov_be con la medida de movilidad elegida</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>fit_m5 <span class="ot">&lt;-</span> <span class="cf">function</span>(mv, rhs, re) {</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>  dd <span class="ot">&lt;-</span> d3m</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>  dd<span class="sc">$</span>mov_we <span class="ot">&lt;-</span> d3m[[<span class="fu">paste0</span>(mv, <span class="st">&quot;_cwc&quot;</span>)]]</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>  dd<span class="sc">$</span>mov_be <span class="ot">&lt;-</span> d3m[[<span class="fu">paste0</span>(mv, <span class="st">&quot;_mean&quot;</span>)]]</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lmer</span>(<span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;mjp_index ~&quot;</span>, ctrl3, <span class="st">&quot;+&quot;</span>, main5, rhs, <span class="st">&quot;+&quot;</span>, re)),</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">data =</span> dd, <span class="at">REML =</span> <span class="cn">FALSE</span>, <span class="at">control =</span> oc)</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>re_B5 <span class="ot">&lt;-</span> <span class="st">&quot;(1 + ola_num + mov_we | idencuesta)&quot;</span></span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>T5   <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>lrt5 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (mv <span class="cf">in</span> movs) {</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>  a_base <span class="ot">&lt;-</span> <span class="fu">fit_m5</span>(mv, <span class="st">&quot;&quot;</span>, re_A)       <span class="co"># sin pendiente aleatoria de movilidad</span></span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>  b_rs   <span class="ot">&lt;-</span> <span class="fu">fit_m5</span>(mv, <span class="st">&quot;&quot;</span>, re_B5)      <span class="co"># base con la misma pendiente aleatoria</span></span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>  T5[[mv]] <span class="ot">&lt;-</span> <span class="fu">fit_m5</span>(mv, <span class="st">&quot;+ mov_we:traj_ingreso + mov_be:traj_ingreso&quot;</span>, re_B5)</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>  m_we   <span class="ot">&lt;-</span> <span class="fu">fit_m5</span>(mv, <span class="st">&quot;+ mov_we:traj_ingreso&quot;</span>, re_B5)</span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>  lrt5[[mv]] <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">conj =</span> <span class="fu">anova</span>(b_rs, T5[[mv]])<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;Chisq)</span><span class="st">`</span>[<span class="dv">2</span>],</span>
+<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">we   =</span> <span class="fu">anova</span>(b_rs, m_we)<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;Chisq)</span><span class="st">`</span>[<span class="dv">2</span>],</span>
+<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">rs   =</span> <span class="fu">anova</span>(a_base, b_rs)<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;Chisq)</span><span class="st">`</span>[<span class="dv">2</span>])</span>
+<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>blocks_ing5 <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  blocks_ing1[[<span class="dv">1</span>]],</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">name =</span> <span class="st">&quot;Índice de estatus subjetivo&quot;</span>, <span class="at">terms =</span> <span class="fu">c</span>(<span class="st">&quot;sss_index_cwc&quot;</span>, <span class="st">&quot;sss_index_mean&quot;</span>),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Índice SSS WE&quot;</span>, <span class="st">&quot;Índice SSS BE&quot;</span>)),</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">name =</span> <span class="st">&quot;Movilidad subjetiva (la medida de cada columna)&quot;</span>, <span class="at">terms =</span> <span class="fu">c</span>(<span class="st">&quot;mov_we&quot;</span>, <span class="st">&quot;mov_be&quot;</span>),</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Movilidad WE&quot;</span>, <span class="st">&quot;Movilidad BE&quot;</span>)),</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  blocks_ing1[[<span class="dv">3</span>]],</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">name =</span> <span class="st">&quot;Interacciones trayectoria × movilidad&quot;</span>,</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">terms  =</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">&quot;mov_we:traj_ingreso&quot;</span>, tl[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">paste0</span>(<span class="st">&quot;mov_be:traj_ingreso&quot;</span>, tl[<span class="sc">-</span><span class="dv">1</span>])),</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">&quot;Movilidad WE × &quot;</span>, tl[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">paste0</span>(<span class="st">&quot;Movilidad BE × &quot;</span>, tl[<span class="sc">-</span><span class="dv">1</span>]))))</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>note_ing5 <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;Coeficientes con errores estándar entre paréntesis.&quot;</span>,</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;*** p &lt; 0,001; ** p &lt; 0,01; * p &lt; 0,05; + p &lt; 0,1.&quot;</span>,</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;Los coeficientes de interacción son diferencias respecto de Stable low;&quot;</span>,</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;la pendiente de cada trayectoria es el efecto principal más su interacción.&quot;</span>,</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;Los efectos principales de cada trayectoria se leen con los efectos BE en 0,&quot;</span>,</span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;un valor que casi nadie tiene, y no son interpretables por sí solos.&quot;</span>,</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;Las categorías Low -&gt; Top y Top -&gt; Low tienen muy pocas personas.&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Ver código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(<span class="fu">unname</span>(T5), movs, blocks_ing5,</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">extra_rows =</span> <span class="fu">list</span>(</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;LRT interacción WE + BE (p)&quot;</span> <span class="ot">=</span> <span class="fu">sapply</span>(movs, <span class="cf">function</span>(mv) <span class="fu">p_fmt</span>(lrt5[[mv]][<span class="st">&quot;conj&quot;</span>])),</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;LRT interacción solo WE (p)&quot;</span> <span class="ot">=</span> <span class="fu">sapply</span>(movs, <span class="cf">function</span>(mv) <span class="fu">p_fmt</span>(lrt5[[mv]][<span class="st">&quot;we&quot;</span>])),</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;LRT pendiente aleatoria vs. sin ella (p)&quot;</span> <span class="ot">=</span> <span class="fu">sapply</span>(movs, <span class="cf">function</span>(mv) <span class="fu">p_fmt</span>(lrt5[[mv]][<span class="st">&quot;rs&quot;</span>]))),</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">note =</span> note_ing5)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="tbl-ingreso-5" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ingreso-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla 18: Trayectoria de ingreso (nueve categorías) × movilidad subjetiva (índice MJP), con pendiente aleatoria de la movilidad WE
+</figcaption>
+<div aria-describedby="tbl-ingreso-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed do-not-create-environment cell caption-top table-sm small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">mov_dir</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mov_exp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mov_inter</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mov_exp_og</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ess_traj</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd" data-grouplength="9">
+<td colspan="6" style="border-bottom: 1px solid"><strong>Controles</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Intercepto</td>
+<td style="text-align: left;">1,689 (0,113)***</td>
+<td style="text-align: right;">1,673 (0,138)***</td>
+<td style="text-align: right;">1,746 (0,120)***</td>
+<td style="text-align: right;">1,794 (0,135)***</td>
+<td style="text-align: right;">1,794 (0,135)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Tendencia lineal (ola_num)</td>
+<td style="text-align: left;">-0,143 (0,025)***</td>
+<td style="text-align: right;">-0,146 (0,025)***</td>
+<td style="text-align: right;">-0,145 (0,025)***</td>
+<td style="text-align: right;">-0,145 (0,025)***</td>
+<td style="text-align: right;">-0,145 (0,025)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Tendencia cuadrática (ola_2)</td>
+<td style="text-align: left;">0,030 (0,004)***</td>
+<td style="text-align: right;">0,031 (0,004)***</td>
+<td style="text-align: right;">0,031 (0,004)***</td>
+<td style="text-align: right;">0,031 (0,004)***</td>
+<td style="text-align: right;">0,031 (0,004)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ideología: centro</td>
+<td style="text-align: left;">0,134 (0,031)***</td>
+<td style="text-align: right;">0,134 (0,031)***</td>
+<td style="text-align: right;">0,129 (0,031)***</td>
+<td style="text-align: right;">0,129 (0,031)***</td>
+<td style="text-align: right;">0,129 (0,031)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ideología: derecha</td>
+<td style="text-align: left;">0,246 (0,037)***</td>
+<td style="text-align: right;">0,255 (0,037)***</td>
+<td style="text-align: right;">0,247 (0,037)***</td>
+<td style="text-align: right;">0,247 (0,037)***</td>
+<td style="text-align: right;">0,247 (0,037)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ideología: no se identifica</td>
+<td style="text-align: left;">0,141 (0,030)***</td>
+<td style="text-align: right;">0,148 (0,030)***</td>
+<td style="text-align: right;">0,145 (0,030)***</td>
+<td style="text-align: right;">0,142 (0,030)***</td>
+<td style="text-align: right;">0,142 (0,030)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Mujer</td>
+<td style="text-align: left;">-0,150 (0,031)***</td>
+<td style="text-align: right;">-0,143 (0,031)***</td>
+<td style="text-align: right;">-0,145 (0,031)***</td>
+<td style="text-align: right;">-0,146 (0,031)***</td>
+<td style="text-align: right;">-0,146 (0,031)***</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Edad</td>
+<td style="text-align: left;">0,004 (0,001)***</td>
+<td style="text-align: right;">0,004 (0,001)***</td>
+<td style="text-align: right;">0,004 (0,001)**</td>
+<td style="text-align: right;">0,004 (0,001)***</td>
+<td style="text-align: right;">0,004 (0,001)***</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Universitaria BE</td>
+<td style="text-align: left;">0,078 (0,041)+</td>
+<td style="text-align: right;">0,061 (0,041)</td>
+<td style="text-align: right;">0,058 (0,041)</td>
+<td style="text-align: right;">0,061 (0,041)</td>
+<td style="text-align: right;">0,061 (0,041)</td>
+</tr>
+<tr class="odd" data-grouplength="2">
+<td colspan="6" style="border-bottom: 1px solid"><strong>Índice de estatus subjetivo</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Índice SSS WE</td>
+<td style="text-align: left;">-0,001 (0,009)</td>
+<td style="text-align: right;">0,008 (0,009)</td>
+<td style="text-align: right;">-0,008 (0,009)</td>
+<td style="text-align: right;">0,003 (0,008)</td>
+<td style="text-align: right;">0,003 (0,008)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Índice SSS BE</td>
+<td style="text-align: left;">0,010 (0,016)</td>
+<td style="text-align: right;">0,016 (0,016)</td>
+<td style="text-align: right;">-0,006 (0,019)</td>
+<td style="text-align: right;">0,009 (0,016)</td>
+<td style="text-align: right;">0,009 (0,016)</td>
+</tr>
+<tr class="even" data-grouplength="2">
+<td colspan="6" style="border-bottom: 1px solid"><strong>Movilidad subjetiva (la medida de cada columna)</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad WE</td>
+<td style="text-align: left;">0,008 (0,023)</td>
+<td style="text-align: right;">-0,004 (0,017)</td>
+<td style="text-align: right;">-0,004 (0,012)</td>
+<td style="text-align: right;">0,001 (0,017)</td>
+<td style="text-align: right;">0,002 (0,034)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad BE</td>
+<td style="text-align: left;">-0,066 (0,038)+</td>
+<td style="text-align: right;">-0,001 (0,035)</td>
+<td style="text-align: right;">-0,028 (0,024)</td>
+<td style="text-align: right;">-0,036 (0,029)</td>
+<td style="text-align: right;">-0,072 (0,058)</td>
+</tr>
+<tr class="odd" data-grouplength="8">
+<td colspan="6" style="border-bottom: 1px solid"><strong>Trayectoria de ingreso (ref.: Stable low)</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Low -&gt; Middle</td>
+<td style="text-align: left;">0,027 (0,066)</td>
+<td style="text-align: right;">0,060 (0,129)</td>
+<td style="text-align: right;">0,100 (0,075)</td>
+<td style="text-align: right;">-0,077 (0,120)</td>
+<td style="text-align: right;">-0,077 (0,120)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Low -&gt; Top</td>
+<td style="text-align: left;">0,255 (0,209)</td>
+<td style="text-align: right;">-0,178 (0,462)</td>
+<td style="text-align: right;">0,389 (0,231)+</td>
+<td style="text-align: right;">-0,017 (0,400)</td>
+<td style="text-align: right;">-0,017 (0,400)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Middle -&gt; Low</td>
+<td style="text-align: left;">-0,003 (0,064)</td>
+<td style="text-align: right;">0,033 (0,131)</td>
+<td style="text-align: right;">0,056 (0,078)</td>
+<td style="text-align: right;">-0,056 (0,116)</td>
+<td style="text-align: right;">-0,056 (0,116)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Stable middle</td>
+<td style="text-align: left;">0,043 (0,055)</td>
+<td style="text-align: right;">0,091 (0,108)</td>
+<td style="text-align: right;">0,032 (0,063)</td>
+<td style="text-align: right;">0,017 (0,097)</td>
+<td style="text-align: right;">0,017 (0,097)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Middle -&gt; Top</td>
+<td style="text-align: left;">0,126 (0,080)</td>
+<td style="text-align: right;">0,484 (0,148)**</td>
+<td style="text-align: right;">0,045 (0,101)</td>
+<td style="text-align: right;">0,259 (0,136)+</td>
+<td style="text-align: right;">0,259 (0,136)+</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Top -&gt; Low</td>
+<td style="text-align: left;">0,203 (0,269)</td>
+<td style="text-align: right;">-0,517 (0,791)</td>
+<td style="text-align: right;">1,637 (0,779)*</td>
+<td style="text-align: right;">-0,213 (0,750)</td>
+<td style="text-align: right;">-0,213 (0,750)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Top -&gt; Middle</td>
+<td style="text-align: left;">0,142 (0,075)+</td>
+<td style="text-align: right;">0,100 (0,141)</td>
+<td style="text-align: right;">0,218 (0,109)*</td>
+<td style="text-align: right;">0,015 (0,125)</td>
+<td style="text-align: right;">0,015 (0,125)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Stable top</td>
+<td style="text-align: left;">0,179 (0,081)*</td>
+<td style="text-align: right;">0,246 (0,137)+</td>
+<td style="text-align: right;">0,272 (0,116)*</td>
+<td style="text-align: right;">0,125 (0,127)</td>
+<td style="text-align: right;">0,125 (0,127)</td>
+</tr>
+<tr class="even" data-grouplength="16">
+<td colspan="6" style="border-bottom: 1px solid"><strong>Interacciones trayectoria × movilidad</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad WE × Low -&gt; Middle</td>
+<td style="text-align: left;">-0,022 (0,030)</td>
+<td style="text-align: right;">-0,003 (0,023)</td>
+<td style="text-align: right;">0,003 (0,016)</td>
+<td style="text-align: right;">-0,012 (0,022)</td>
+<td style="text-align: right;">-0,023 (0,044)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad WE × Low -&gt; Top</td>
+<td style="text-align: left;">-0,039 (0,082)</td>
+<td style="text-align: right;">-0,202 (0,082)*</td>
+<td style="text-align: right;">-0,100 (0,063)</td>
+<td style="text-align: right;">-0,180 (0,074)*</td>
+<td style="text-align: right;">-0,360 (0,148)*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad WE × Middle -&gt; Low</td>
+<td style="text-align: left;">-0,035 (0,030)</td>
+<td style="text-align: right;">0,008 (0,024)</td>
+<td style="text-align: right;">-0,004 (0,016)</td>
+<td style="text-align: right;">-0,011 (0,022)</td>
+<td style="text-align: right;">-0,022 (0,044)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad WE × Stable middle</td>
+<td style="text-align: left;">-0,013 (0,025)</td>
+<td style="text-align: right;">-0,021 (0,020)</td>
+<td style="text-align: right;">-0,015 (0,014)</td>
+<td style="text-align: right;">-0,019 (0,019)</td>
+<td style="text-align: right;">-0,038 (0,037)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad WE × Middle -&gt; Top</td>
+<td style="text-align: left;">-0,020 (0,035)</td>
+<td style="text-align: right;">-0,045 (0,029)</td>
+<td style="text-align: right;">-0,021 (0,020)</td>
+<td style="text-align: right;">-0,037 (0,025)</td>
+<td style="text-align: right;">-0,073 (0,051)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad WE × Top -&gt; Low</td>
+<td style="text-align: left;">0,099 (0,117)</td>
+<td style="text-align: right;">0,049 (0,169)</td>
+<td style="text-align: right;">-0,064 (0,080)</td>
+<td style="text-align: right;">0,115 (0,120)</td>
+<td style="text-align: right;">0,229 (0,241)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad WE × Top -&gt; Middle</td>
+<td style="text-align: left;">-0,030 (0,037)</td>
+<td style="text-align: right;">0,030 (0,032)</td>
+<td style="text-align: right;">0,003 (0,021)</td>
+<td style="text-align: right;">0,005 (0,027)</td>
+<td style="text-align: right;">0,011 (0,053)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad WE × Stable top</td>
+<td style="text-align: left;">0,004 (0,040)</td>
+<td style="text-align: right;">-0,039 (0,032)</td>
+<td style="text-align: right;">-0,016 (0,022)</td>
+<td style="text-align: right;">-0,025 (0,028)</td>
+<td style="text-align: right;">-0,050 (0,057)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad BE × Low -&gt; Middle</td>
+<td style="text-align: left;">0,111 (0,054)*</td>
+<td style="text-align: right;">-0,002 (0,049)</td>
+<td style="text-align: right;">0,030 (0,031)</td>
+<td style="text-align: right;">0,053 (0,040)</td>
+<td style="text-align: right;">0,106 (0,079)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad BE × Low -&gt; Top</td>
+<td style="text-align: left;">0,081 (0,188)</td>
+<td style="text-align: right;">0,242 (0,238)</td>
+<td style="text-align: right;">0,070 (0,089)</td>
+<td style="text-align: right;">0,119 (0,147)</td>
+<td style="text-align: right;">0,238 (0,295)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad BE × Middle -&gt; Low</td>
+<td style="text-align: left;">0,057 (0,053)</td>
+<td style="text-align: right;">-0,014 (0,052)</td>
+<td style="text-align: right;">0,035 (0,032)</td>
+<td style="text-align: right;">0,024 (0,039)</td>
+<td style="text-align: right;">0,049 (0,078)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad BE × Stable middle</td>
+<td style="text-align: left;">0,046 (0,043)</td>
+<td style="text-align: right;">-0,024 (0,041)</td>
+<td style="text-align: right;">-0,001 (0,026)</td>
+<td style="text-align: right;">0,011 (0,032)</td>
+<td style="text-align: right;">0,022 (0,065)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad BE × Middle -&gt; Top</td>
+<td style="text-align: left;">0,078 (0,063)</td>
+<td style="text-align: right;">-0,175 (0,061)**</td>
+<td style="text-align: right;">-0,036 (0,037)</td>
+<td style="text-align: right;">-0,044 (0,045)</td>
+<td style="text-align: right;">-0,088 (0,090)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad BE × Top -&gt; Low</td>
+<td style="text-align: left;">0,055 (0,377)</td>
+<td style="text-align: right;">0,444 (0,460)</td>
+<td style="text-align: right;">0,454 (0,228)*</td>
+<td style="text-align: right;">0,223 (0,350)</td>
+<td style="text-align: right;">0,445 (0,701)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad BE × Top -&gt; Middle</td>
+<td style="text-align: left;">0,085 (0,055)</td>
+<td style="text-align: right;">0,035 (0,061)</td>
+<td style="text-align: right;">0,030 (0,039)</td>
+<td style="text-align: right;">0,064 (0,044)</td>
+<td style="text-align: right;">0,128 (0,088)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Movilidad BE × Stable top</td>
+<td style="text-align: left;">0,087 (0,058)</td>
+<td style="text-align: right;">-0,027 (0,063)</td>
+<td style="text-align: right;">0,031 (0,037)</td>
+<td style="text-align: right;">0,034 (0,045)</td>
+<td style="text-align: right;">0,069 (0,090)</td>
+</tr>
+<tr class="odd" data-grouplength="13">
+<td colspan="6" style="border-bottom: 1px solid"><strong>Ajuste y efectos aleatorios</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">N_i (observaciones)</td>
+<td style="text-align: left;">6322</td>
+<td style="text-align: right;">6322</td>
+<td style="text-align: right;">6322</td>
+<td style="text-align: right;">6322</td>
+<td style="text-align: right;">6322</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">N_j (personas)</td>
+<td style="text-align: left;">1119</td>
+<td style="text-align: right;">1119</td>
+<td style="text-align: right;">1119</td>
+<td style="text-align: right;">1119</td>
+<td style="text-align: right;">1119</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">AIC</td>
+<td style="text-align: left;">14938,6</td>
+<td style="text-align: right;">14917,3</td>
+<td style="text-align: right;">14924,2</td>
+<td style="text-align: right;">14918,9</td>
+<td style="text-align: right;">14918,9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">BIC</td>
+<td style="text-align: left;">15235,6</td>
+<td style="text-align: right;">15214,4</td>
+<td style="text-align: right;">15221,2</td>
+<td style="text-align: right;">15216,0</td>
+<td style="text-align: right;">15216,0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. intercepto (persona)</td>
+<td style="text-align: left;">0,172</td>
+<td style="text-align: right;">0,168</td>
+<td style="text-align: right;">0,176</td>
+<td style="text-align: right;">0,174</td>
+<td style="text-align: right;">0,174</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. pendiente ola_num</td>
+<td style="text-align: left;">0,008</td>
+<td style="text-align: right;">0,008</td>
+<td style="text-align: right;">0,008</td>
+<td style="text-align: right;">0,008</td>
+<td style="text-align: right;">0,008</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. pendiente aleatoria del WE interactuado</td>
+<td style="text-align: left;">0,0057</td>
+<td style="text-align: right;">0,0014</td>
+<td style="text-align: right;">0,0007</td>
+<td style="text-align: right;">0,0027</td>
+<td style="text-align: right;">0,0110</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Var. residual</td>
+<td style="text-align: left;">0,486</td>
+<td style="text-align: right;">0,493</td>
+<td style="text-align: right;">0,493</td>
+<td style="text-align: right;">0,485</td>
+<td style="text-align: right;">0,485</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Ajuste singular</td>
+<td style="text-align: left;">no</td>
+<td style="text-align: right;">no</td>
+<td style="text-align: right;">no</td>
+<td style="text-align: right;">no</td>
+<td style="text-align: right;">no</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">Convergencia</td>
+<td style="text-align: left;">ok</td>
+<td style="text-align: right;">ok</td>
+<td style="text-align: right;">ok</td>
+<td style="text-align: right;">ok</td>
+<td style="text-align: right;">ok</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">LRT interacción WE + BE (p)</td>
+<td style="text-align: left;">0,915</td>
+<td style="text-align: right;">0,035</td>
+<td style="text-align: right;">0,346</td>
+<td style="text-align: right;">0,292</td>
+<td style="text-align: right;">0,292</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">LRT interacción solo WE (p)</td>
+<td style="text-align: left;">0,910</td>
+<td style="text-align: right;">0,086</td>
+<td style="text-align: right;">0,633</td>
+<td style="text-align: right;">0,259</td>
+<td style="text-align: right;">0,259</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">LRT pendiente aleatoria vs. sin ella (p)</td>
+<td style="text-align: left;">0,005</td>
+<td style="text-align: right;">0,125</td>
+<td style="text-align: right;">0,104</td>
+<td style="text-align: right;">0,007</td>
+<td style="text-align: right;">0,007</td>
+</tr>
+</tbody><tfoot>
+<tr class="odd">
+<td style="padding: 0"><span style="font-style: italic;">Nota: </span> <sup></sup> Coeficientes con errores estándar entre paréntesis. *** p &lt; 0,001; ** p &lt; 0,01; * p &lt; 0,05; + p &lt; 0,1. Los coeficientes de interacción son diferencias respecto de Stable low; la pendiente de cada trayectoria es el efecto principal más su interacción. Los efectos principales de cada trayectoria se leen con los efectos BE en 0, un valor que casi nadie tiene, y no son interpretables por sí solos. Las categorías Low -&gt; Top y Top -&gt; Low tienen muy pocas personas.</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tfoot>
+
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
 </section>
 <section id="información-de-la-sesión" class="level1">
 <h1>Información de la sesión</h1>
 <div class="cell">
 <details class="code-fold">
 <summary>Ver código</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.4.2 (2024-10-31 ucrt)
