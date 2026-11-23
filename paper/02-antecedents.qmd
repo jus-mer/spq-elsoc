@@ -21,9 +21,10 @@ Little (or null) evidence on the longitudinal relationship between OSS, SSS and 
 
 {{< include 02-market.qmd >}}
 
+{{< include 02-objective-status.qmd >}}
+
 {{< include 02-subjective-status.qmd >}}
 
-{{< include 02-status.qmd >}}
-
+{{< include 02-mobility.qmd >}}
 
 
