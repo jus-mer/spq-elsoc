@@ -2,20 +2,27 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Juan Carlos Castillo">
 <meta name="author" content="Julio Iturra">
 <meta name="author" content="Tomás Urzúa">
+<meta name="author" content="René Canales Sellés">
 
 <title>Market Justice Preferences and the Dynamic Role of Objective and Subjective Status: A Longitudinal Multilevel Approach</title>
 <style>
-code{white-space: pre-wrap;}
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -84,20 +91,21 @@ div.csl-indent {
 <script src="paper_files/libs/clipboard/clipboard.min.js"></script>
 <script src="paper_files/libs/quarto-html/quarto.js" type="module"></script>
 <script src="paper_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="paper_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="paper_files/libs/quarto-html/popper.min.js"></script>
 <script src="paper_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="paper_files/libs/quarto-html/anchor.min.js"></script>
 <link href="paper_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="paper_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="paper_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="paper_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="paper_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="paper_files/libs/bootstrap/bootstrap-f37747eef45b660d2eafbe557ca8f7a1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="paper_files/libs/bootstrap/bootstrap-b4600433290fa9835d8dd696f6106aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="paper_files/libs/kePrint-0.0.1/kePrint.js"></script>
+
 <link href="paper_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 
+
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -147,7 +155,7 @@ window.Quarto = {
   <div class="quarto-title-meta-heading">Affiliations</div>
   
     <div class="quarto-title-meta-contents">
-    <p class="author">Juan Carlos Castillo <a href="mailto:juancastillov@uchile.cl" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> <a href="https://orcid.org/0000-0003-1265-7854" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+    <p class="author">Juan Carlos Castillo <a href="mailto:juancastillov@uchile.cl" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> <a href="https://orcid.org/0000-0003-1265-7854" class="quarto-title-author-orcid" aria-label="ORCID profile for Juan Carlos Castillo"> <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
   </div>
   <div class="quarto-title-meta-contents">
         <p class="affiliation">
@@ -155,7 +163,7 @@ window.Quarto = {
           </p>
       </div>
     <div class="quarto-title-meta-contents">
-    <p class="author">Julio Iturra <a href="mailto:jiturra@uni-bremen.de" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> <a href="https://orcid.org/0000-0003-1993-3479" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+    <p class="author">Julio Iturra <a href="mailto:jiturra@uni-bremen.de" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> <a href="https://orcid.org/0000-0003-1993-3479" class="quarto-title-author-orcid" aria-label="ORCID profile for Julio Iturra"> <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
   </div>
   <div class="quarto-title-meta-contents">
         <p class="affiliation">
@@ -163,11 +171,19 @@ window.Quarto = {
           </p>
       </div>
     <div class="quarto-title-meta-contents">
-    <p class="author">Tomás Urzúa <a href="mailto:tomas.urzua@ug.uchile.cl" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> <a href="https://orcid.org/0009-0008-3167-6819" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+    <p class="author">Tomás Urzúa <a href="mailto:tomas.urzua@ug.uchile.cl" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> <a href="https://orcid.org/0009-0008-3167-6819" class="quarto-title-author-orcid" aria-label="ORCID profile for Tomás Urzúa"> <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
   </div>
   <div class="quarto-title-meta-contents">
         <p class="affiliation">
             Departament of Sociology, University of Chile
+          </p>
+      </div>
+    <div class="quarto-title-meta-contents">
+    <p class="author">René Canales Sellés <a href="mailto:rcanales@uni-bremen.de" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> <a href="https://orcid.org/0009-0002-4299-2725" class="quarto-title-author-orcid" aria-label="ORCID profile for René Canales Sellés"> <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Bremen International Graduate School of Social Sciences
           </p>
       </div>
   </div>
@@ -227,32 +243,25 @@ Little (or null) evidence on the longitudinal relationship between OSS, SSS and 
 </section>
 <section id="subjective-social-status" class="level2">
 <h2 class="anchored" data-anchor-id="subjective-social-status">Subjective social status</h2>
-<p>Subjective social status (SSS) refers to individuals’ perception of their own position in the social hierarchy <span class="citation" data-cites="jackman_interpretation_1973 evans_subjective_2004">(<a href="#ref-evans_subjective_2004" role="doc-biblioref">M. D. R. Evans &amp; Kelley, 2004</a>; <a href="#ref-jackman_interpretation_1973" role="doc-biblioref">Jackman &amp; Jackman, 1973</a>)</span>. Because information about the overall distribution is limited, people rely on heuristics to establish their own position, drawing on a subjective sample of their close reference groups <span class="citation" data-cites="evans_images_1992 cruces_biased_2013">(<a href="#ref-cruces_biased_2013" role="doc-biblioref">Cruces, Pérez Truglia, et al., 2013</a>; <a href="#ref-evans_images_1992" role="doc-biblioref">M. D. R. Evans et al., 1992</a>)</span>. Rather than mirroring objective resources, SSS results from a social comparison process: people assess their standing against the reference groups available to them, typically family, friends, neighbours and co-workers <span class="citation" data-cites="evans_images_1992 kelley_class_1995">(<a href="#ref-evans_images_1992" role="doc-biblioref">M. D. R. Evans et al., 1992</a>; <a href="#ref-kelley_class_1995" role="doc-biblioref">Kelley &amp; Evans, 1995</a>)</span>. Because personal networks are strongly homophilous in education, occupation and income <span class="citation" data-cites="mcpherson_birds_2001">(<a href="#ref-mcpherson_birds_2001" role="doc-biblioref">McPherson et al., 2001</a>)</span>, these reference groups are a socially skewed sample of the wider distribution. The result is a well-documented compression towards the middle: those at the bottom tend to overestimate their position, those at the top to underestimate it, and most people identify with the middle <span class="citation" data-cites="kelley_class_1995 castillo_todos_2013">(<a href="#ref-castillo_todos_2013" role="doc-biblioref">Castillo et al., 2013</a>; <a href="#ref-kelley_class_1995" role="doc-biblioref">Kelley &amp; Evans, 1995</a>)</span>. What is observed as SSS is therefore a blend of one’s objective position and the position of those against whom it is judged. The literature refers to the concept as subjective social status, subjective social position <span class="citation" data-cites="lindemann_contextual_2014">(<a href="#ref-lindemann_contextual_2014" role="doc-biblioref">Lindemann &amp; Saar, 2014</a>)</span>, subjective social location <span class="citation" data-cites="evans_subjective_2004">(<a href="#ref-evans_subjective_2004" role="doc-biblioref">M. D. R. Evans &amp; Kelley, 2004</a>)</span> or subjective evaluation of social status <span class="citation" data-cites="slomczynski_subjective_1986">(<a href="#ref-slomczynski_subjective_1986" role="doc-biblioref">Słomczyński &amp; Kacprowicz, 1986</a>)</span>, and measures it in different ways. The most widespread instrument is the MacArthur Scale of Subjective Social Status, a ten-rung ladder on which respondents place themselves relative to others in society <span class="citation" data-cites="adler_relationship_2000">(<a href="#ref-adler_relationship_2000" role="doc-biblioref">Adler et al., 2000</a>)</span>, alongside analogous top–bottom self-placement items in comparative surveys such as the ISSP <span class="citation" data-cites="evans_subjective_2004 anderson_unreliable_2025">(<a href="#ref-anderson_unreliable_2025" role="doc-biblioref">Anderson &amp; Aussant, 2025</a>; <a href="#ref-evans_subjective_2004" role="doc-biblioref">M. D. R. Evans &amp; Kelley, 2004</a>)</span>.</p>
-<p>SSS is systematically patterned by individual and contextual socioeconomic factors. At the individual level, income, educational attainment and occupational status are consistently associated with higher self-placement <span class="citation" data-cites="andersson_odd_2018 chen_subjective_2018 iturra_subjective_2018">(<a href="#ref-andersson_odd_2018" role="doc-biblioref">M. A. Andersson, 2018</a>; <a href="#ref-chen_subjective_2018" role="doc-biblioref">Chen &amp; Williams, 2018</a>; <a href="#ref-iturra_subjective_2018" role="doc-biblioref">Iturra &amp; Mellado, 2018</a>)</span>. More recently, attention has turned to the content of work. Across 25 European countries, <span class="citation" data-cites="andersson_occupational_2023">A. B. Andersson &amp; Lindh (<a href="#ref-andersson_occupational_2023" role="doc-biblioref">2023</a>)</span> show that a substantial share of the variation in SSS lies between occupations, that the occupational status gradient closely follows the educational requirements of jobs, and that non-manual work carries an additional status premium over manual work. At the interpersonal level, network composition also matters: knowing more people in high-status occupations is associated with higher SSS <span class="citation" data-cites="kim_social_2021">(<a href="#ref-kim_social_2021" role="doc-biblioref">Kim &amp; Lee, 2021</a>)</span>, and related evidence on subjective class identification shows the same pattern <span class="citation" data-cites="huang_subjective_2021">(<a href="#ref-huang_subjective_2021" role="doc-biblioref">Huang, 2021</a>)</span>. At the contextual level, economic prosperity tends to raise SSS and make societies appear more egalitarian <span class="citation" data-cites="evans_communism_2017 lindemann_contextual_2014 wiesner_knowing_2025">(<a href="#ref-evans_communism_2017" role="doc-biblioref">M. D. R. Evans &amp; Kelley, 2017</a>; <a href="#ref-lindemann_contextual_2014" role="doc-biblioref">Lindemann &amp; Saar, 2014</a>; <a href="#ref-wiesner_knowing_2025" role="doc-biblioref">Wiesner &amp; Iturra-Sanhueza, 2025</a>)</span>, while income inequality depresses it, particularly among the working class, and distorts how people locate themselves in the distribution <span class="citation" data-cites="nolan_rising_2022 wiesner_knowing_2025">(<a href="#ref-nolan_rising_2022" role="doc-biblioref">Nolan &amp; Weisstanner, 2022</a>; <a href="#ref-wiesner_knowing_2025" role="doc-biblioref">Wiesner &amp; Iturra-Sanhueza, 2025</a>)</span>.</p>
-<p>SSS is in turn linked to attitudes towards economic inequality, particularly distributive perceptions and preferences. People who place themselves higher tend to perceive smaller income gaps and a less unequal social structure <span class="citation" data-cites="castillo_perception_2022 melli_uncovering_2025">(<a href="#ref-castillo_perception_2022" role="doc-biblioref">Castillo et al., 2022</a>; <a href="#ref-melli_uncovering_2025" role="doc-biblioref">Melli &amp; Azzollini, 2025a</a>)</span>, to attribute poverty to individual rather than structural causes <span class="citation" data-cites="schneider_poverty_2015">(<a href="#ref-schneider_poverty_2015" role="doc-biblioref">Schneider &amp; Castillo, 2015</a>)</span>, to legitimise existing inequalities <span class="citation" data-cites="buchel_objective_2021">(<a href="#ref-buchel_objective_2021" role="doc-biblioref">Buchel et al., 2021</a>)</span>, to perceive society as more meritocratic <span class="citation" data-cites="iturra-sanhueza_social_2026">(<a href="#ref-iturra-sanhueza_social_2026" role="doc-biblioref">Iturra-Sanhueza et al., 2026</a>)</span> and to support redistribution less <span class="citation" data-cites="brown-iannuzzi_subjective_2015 duman_subjective_2020 kirsten_impact_2022">(<a href="#ref-brown-iannuzzi_subjective_2015" role="doc-biblioref">Brown-Iannuzzi et al., 2015</a>; <a href="#ref-duman_subjective_2020" role="doc-biblioref">Duman, 2020</a>; <a href="#ref-kirsten_impact_2022" role="doc-biblioref">Kirsten et al., 2022</a>)</span>. A recurrent finding is that SSS explains these attitudes over and above objective position precisely because it captures the social comparison mechanism; when objective and subjective status diverge, the latter tends to prevail <span class="citation" data-cites="melli_uncovering_2025 iturra-sanhueza_social_2026">(<a href="#ref-iturra-sanhueza_social_2026" role="doc-biblioref">Iturra-Sanhueza et al., 2026</a>; <a href="#ref-melli_uncovering_2025" role="doc-biblioref">Melli &amp; Azzollini, 2025a</a>)</span>. Research has nonetheless focused on respondents’ own SSS, leaving largely unexplored how people evaluate the status of their reference groups. The reference group and reality blend hypothesis holds that status perceptions are anchored in the social position of close ties such as friends and family members <span class="citation" data-cites="kelley_class_1995 evans_subjective_2004">(<a href="#ref-evans_subjective_2004" role="doc-biblioref">M. D. R. Evans &amp; Kelley, 2004</a>; <a href="#ref-kelley_class_1995" role="doc-biblioref">Kelley &amp; Evans, 1995</a>)</span>. In a study of SSS and perceived meritocracy in Chile, <span class="citation" data-cites="iturrasanhueza_estatus_2022">Iturra-Sanhueza (<a href="#ref-iturrasanhueza_estatus_2022" role="doc-biblioref">2022</a>)</span> shows that the association with one’s own SSS weakens once the subjective status of the family of origin and, especially, the expected future status of one’s children are taken into account. Higher expected status for one’s children is associated with lower perceived meritocracy, a pattern interpreted as relative deprivation stemming from spurious mobility: dissatisfaction with status attainment arising from a perceived mismatch between efforts and rewards. Market justice preferences, the view that access to social services such as education, healthcare and pensions may legitimately depend on income <span class="citation" data-cites="castillo_perceptions_2025">(<a href="#ref-castillo_perceptions_2025" role="doc-biblioref">Castillo et al., 2025</a>)</span>, remain particularly underexplored in this respect. Little is known about how one’s own SSS relates to them, and even less about the role of the subjective status of close ties, leaving a gap still to be addressed.</p>
+<p>Subjective social status (SSS) refers to individuals’ perception of their own position in the social hierarchy <span class="citation" data-cites="jackman_interpretation_1973 evans_subjective_2004">(<a href="#ref-evans_subjective_2004" role="doc-biblioref">Evans &amp; Kelley, 2004</a>; <a href="#ref-jackman_interpretation_1973" role="doc-biblioref">Jackman &amp; Jackman, 1973</a>)</span>. Because information about the overall distribution is limited, people rely on heuristics to establish their own position, drawing on a subjective sample of their close reference groups <span class="citation" data-cites="evans_images_1992 cruces_biased_2013">(<a href="#ref-cruces_biased_2013" role="doc-biblioref">Cruces et al., 2013</a>; <a href="#ref-evans_images_1992" role="doc-biblioref">Evans et al., 1992</a>)</span>. Rather than mirroring objective resources, SSS results from a social comparison process: people assess their standing against the reference groups available to them, typically family, friends, neighbours and co-workers <span class="citation" data-cites="evans_images_1992 kelley_class_1995">(<a href="#ref-evans_images_1992" role="doc-biblioref">Evans et al., 1992</a>; <a href="#ref-kelley_class_1995" role="doc-biblioref">Kelley &amp; Evans, 1995</a>)</span>. Because personal networks are strongly homophilous in education, occupation and income <span class="citation" data-cites="mcpherson_birds_2001">(<a href="#ref-mcpherson_birds_2001" role="doc-biblioref">McPherson et al., 2001</a>)</span>, these reference groups are a socially skewed sample of the wider distribution. The result is a well-documented compression towards the middle: those at the bottom tend to overestimate their position, those at the top to underestimate it, and most people identify with the middle <span class="citation" data-cites="kelley_class_1995 castillo_todos_2013">(<a href="#ref-castillo_todos_2013" role="doc-biblioref">Castillo et al., 2013</a>; <a href="#ref-kelley_class_1995" role="doc-biblioref">Kelley &amp; Evans, 1995</a>)</span>. What is observed as SSS is therefore a blend of one’s objective position and the position of those against whom it is judged. The literature refers to the concept as subjective social status, subjective social position <span class="citation" data-cites="lindemann_contextual_2014">(<a href="#ref-lindemann_contextual_2014" role="doc-biblioref">Lindemann &amp; Saar, 2014</a>)</span>, subjective social location <span class="citation" data-cites="evans_subjective_2004">(<a href="#ref-evans_subjective_2004" role="doc-biblioref">Evans &amp; Kelley, 2004</a>)</span> or subjective evaluation of social status <span class="citation" data-cites="slomczynski_subjective_1986">(<a href="#ref-slomczynski_subjective_1986" role="doc-biblioref">Słomczyński &amp; Kacprowicz, 1986</a>)</span>, and measures it in different ways. The most widespread instrument is the MacArthur Scale of Subjective Social Status, a ten-rung ladder on which respondents place themselves relative to others in society <span class="citation" data-cites="adler_relationship_2000">(<a href="#ref-adler_relationship_2000" role="doc-biblioref">Adler et al., 2000</a>)</span>, alongside analogous top–bottom self-placement items in comparative surveys such as the ISSP <span class="citation" data-cites="evans_subjective_2004 anderson_unreliable_2025">(<a href="#ref-anderson_unreliable_2025" role="doc-biblioref">Anderson &amp; Aussant, 2025</a>; <a href="#ref-evans_subjective_2004" role="doc-biblioref">Evans &amp; Kelley, 2004</a>)</span>.</p>
+<p>SSS is systematically patterned by individual and contextual socioeconomic factors. At the individual level, income, educational attainment and occupational status are consistently associated with higher self-placement <span class="citation" data-cites="andersson_odd_2018 chen_subjective_2018 iturra_subjective_2018">(<a href="#ref-andersson_odd_2018" role="doc-biblioref">M. A. Andersson, 2018</a>; <a href="#ref-chen_subjective_2018" role="doc-biblioref">Chen &amp; Williams, 2018</a>; <a href="#ref-iturra_subjective_2018" role="doc-biblioref">Iturra &amp; Mellado, 2018</a>)</span>. More recently, attention has turned to the content of work. Across 25 European countries, <span class="citation" data-cites="andersson_occupational_2023">A. B. Andersson &amp; Lindh (<a href="#ref-andersson_occupational_2023" role="doc-biblioref">2023</a>)</span> show that a substantial share of the variation in SSS lies between occupations, that the occupational status gradient closely follows the educational requirements of jobs, and that non-manual work carries an additional status premium over manual work. At the interpersonal level, network composition also matters: knowing more people in high-status occupations is associated with higher SSS <span class="citation" data-cites="kim_social_2021">(<a href="#ref-kim_social_2021" role="doc-biblioref">Kim &amp; Lee, 2021</a>)</span>, and related evidence on subjective class identification shows the same pattern <span class="citation" data-cites="huang_subjective_2021">(<a href="#ref-huang_subjective_2021" role="doc-biblioref">Huang, 2021</a>)</span>. At the contextual level, economic prosperity tends to raise SSS and make societies appear more egalitarian <span class="citation" data-cites="evans_communism_2017 lindemann_contextual_2014 wiesner_knowing_2025">(<a href="#ref-evans_communism_2017" role="doc-biblioref">Evans &amp; Kelley, 2017</a>; <a href="#ref-lindemann_contextual_2014" role="doc-biblioref">Lindemann &amp; Saar, 2014</a>; <a href="#ref-wiesner_knowing_2025" role="doc-biblioref">Wiesner &amp; Iturra-Sanhueza, 2025</a>)</span>, while income inequality depresses it, particularly among the working class, and distorts how people locate themselves in the distribution <span class="citation" data-cites="nolan_rising_2022 wiesner_knowing_2025">(<a href="#ref-nolan_rising_2022" role="doc-biblioref">Nolan &amp; Weisstanner, 2022</a>; <a href="#ref-wiesner_knowing_2025" role="doc-biblioref">Wiesner &amp; Iturra-Sanhueza, 2025</a>)</span>.</p>
+<p>SSS is in turn linked to attitudes towards economic inequality, particularly distributive perceptions and preferences. People who place themselves higher tend to perceive smaller income gaps and a less unequal social structure <span class="citation" data-cites="castillo_perception_2022 melli_uncovering_2025">(<a href="#ref-castillo_perception_2022" role="doc-biblioref">Castillo et al., 2022</a>; <a href="#ref-melli_uncovering_2025" role="doc-biblioref">Melli &amp; Azzollini, 2025a</a>)</span>, to attribute poverty to individual rather than structural causes <span class="citation" data-cites="schneider_poverty_2015">(<a href="#ref-schneider_poverty_2015" role="doc-biblioref">Schneider &amp; Castillo, 2015</a>)</span>, to legitimise existing inequalities <span class="citation" data-cites="buchel_objective_2021">(<a href="#ref-buchel_objective_2021" role="doc-biblioref">Buchel et al., 2021</a>)</span>, to perceive society as more meritocratic <span class="citation" data-cites="iturra-sanhueza_social_2026">(<a href="#ref-iturra-sanhueza_social_2026" role="doc-biblioref">Iturra-Sanhueza et al., 2026</a>)</span> and to support redistribution less <span class="citation" data-cites="brown-iannuzzi_subjective_2015 duman_subjective_2020 kirsten_impact_2022">(<a href="#ref-brown-iannuzzi_subjective_2015" role="doc-biblioref">Brown-Iannuzzi et al., 2015</a>; <a href="#ref-duman_subjective_2020" role="doc-biblioref">Duman, 2020</a>; <a href="#ref-kirsten_impact_2022" role="doc-biblioref">Kirsten et al., 2022</a>)</span>. A recurrent finding is that SSS explains these attitudes over and above objective position precisely because it captures the social comparison mechanism; when objective and subjective status diverge, the latter tends to prevail <span class="citation" data-cites="melli_uncovering_2025 iturra-sanhueza_social_2026">(<a href="#ref-iturra-sanhueza_social_2026" role="doc-biblioref">Iturra-Sanhueza et al., 2026</a>; <a href="#ref-melli_uncovering_2025" role="doc-biblioref">Melli &amp; Azzollini, 2025a</a>)</span>. Research has nonetheless focused on respondents’ own SSS, leaving largely unexplored how people evaluate the status of their reference groups. The reference group and reality blend hypothesis holds that status perceptions are anchored in the social position of close ties such as friends and family members <span class="citation" data-cites="kelley_class_1995 evans_subjective_2004">(<a href="#ref-evans_subjective_2004" role="doc-biblioref">Evans &amp; Kelley, 2004</a>; <a href="#ref-kelley_class_1995" role="doc-biblioref">Kelley &amp; Evans, 1995</a>)</span>. In a study of SSS and perceived meritocracy in Chile, <span class="citation" data-cites="iturrasanhueza_estatus_2022">Iturra-Sanhueza (<a href="#ref-iturrasanhueza_estatus_2022" role="doc-biblioref">2022</a>)</span> shows that the association with one’s own SSS weakens once the subjective status of the family of origin and, especially, the expected future status of one’s children are taken into account. Higher expected status for one’s children is associated with lower perceived meritocracy, a pattern interpreted as relative deprivation stemming from spurious mobility: dissatisfaction with status attainment arising from a perceived mismatch between efforts and rewards. Market justice preferences, the view that access to social services such as education, healthcare and pensions may legitimately depend on income <span class="citation" data-cites="castillo_perceptions_2025">(<a href="#ref-castillo_perceptions_2025" role="doc-biblioref">Castillo et al., 2025</a>)</span>, remain particularly underexplored in this respect. Little is known about how one’s own SSS relates to them, and even less about the role of the subjective status of close ties, leaving a gap still to be addressed.</p>
 </section>
 <section id="social-status-and-mobility" class="level2">
 <h2 class="anchored" data-anchor-id="social-status-and-mobility">Social Status and Mobility</h2>
 <section id="objective-and-subjective-social-status" class="level3">
 <h3 class="anchored" data-anchor-id="objective-and-subjective-social-status">Objective and subjective social status</h3>
-<p>Research on the social foundations of distributional preferences has traditionally relied on objective indicators of social position—such as income, education, and occupational class—and on a logic of self-interest, according to which those who benefit least from redistribution tend to support it the least <span class="citation" data-cites="alesina_intergenerational_2018 lindh_class_2020">(<a href="#ref-alesina_intergenerational_2018" role="doc-biblioref">Alesina et al., 2018</a>; <a href="#ref-lindh_class_2020" role="doc-biblioref">Lindh &amp; McCall, 2020</a>)</span>. A complementary tradition focuses on subjective social status (SSS), understood as the position people believe they occupy in the social hierarchy <span class="citation" data-cites="adler_relationship_2000">(<a href="#ref-adler_relationship_2000" role="doc-biblioref">Adler et al., 2000</a>)</span>. Both dimensions are related, but they are far from interchangeable, as the accumulated evidence shows that their correlation is only moderate <span class="citation" data-cites="tan_association_2020">(<a href="#ref-tan_association_2020" role="doc-biblioref">Tan et al., 2020</a>)</span>.</p>
-<p>However, the distance between these two dimensions is not random. People assess their position by comparing themselves to their reference groups, which tends to shift their self-placement toward the center of the hierarchy, both among those at the top and those at the bottom <span class="citation" data-cites="evans_conditional_2022 lindemann_contextual_2014">(<a href="#ref-evans_conditional_2022" role="doc-biblioref">G. Evans et al., 2022</a>; <a href="#ref-lindemann_contextual_2014" role="doc-biblioref">Lindemann &amp; Saar, 2014</a>)</span>. In the case of Chile, one of the most unequal countries, this compression is particularly pronounced, especially among those with higher objective status <span class="citation" data-cites="castillo_todos_2013">(<a href="#ref-castillo_todos_2013" role="doc-biblioref">Castillo et al., 2013</a>)</span>. Consequently, subjective status may contain its own information, distinct from objective position, but difficult to capture based solely on its levels: using the same data from this study, what predicts participation in the 2019 protests is not subjective status itself, but rather its mismatch with objective status <span class="citation" data-cites="bargain_social_2026">(<a href="#ref-bargain_social_2026" role="doc-biblioref">Bargain et al., 2026</a>)</span>. In other words, the more people perceive themselves as lower in the hierarchy than their objective position would suggest, the more likely they are to participate in collective action.</p>
-</section>
-<section id="subjective-social-status-and-distributive-preferences" class="level3">
-<h3 class="anchored" data-anchor-id="subjective-social-status-and-distributive-preferences">Subjective social status and distributive preferences</h3>
-<p>A growing body of literature argues that the subjective dimension of status matters for distributive attitudes beyond objective resources. The central mechanism is social comparison: people evaluate the fairness of a distribution based on where they believe they stand relative to others, such that feeling lower in the hierarchy increases support for redistribution, even when actual resources remain unchanged. Experimental evidence supports this causal interpretation <span class="citation" data-cites="cruces_Biased_2013 brown-iannuzzi_subjective_2015 condon_economic_2020">(<a href="#ref-brown-iannuzzi_subjective_2015" role="doc-biblioref">Brown-Iannuzzi et al., 2015</a>; <a href="#ref-condon_economic_2020" role="doc-biblioref">Condon &amp; Wichowsky, 2020</a>; <a href="#ref-cruces_Biased_2013" role="doc-biblioref">Cruces, Perez-Truglia, et al., 2013</a>)</span>, and comparative survey evidence shows that subjective status predicts support for redistribution and perceived inequality independently of objective class—and even more strongly than objective class does <span class="citation" data-cites="duman_subjective_2019 choi_individuals_2021 melli_uncovering_2025 melli_where_2025">(<a href="#ref-choi_individuals_2021" role="doc-biblioref">Choi, 2021</a>; <a href="#ref-duman_subjective_2019" role="doc-biblioref">Duman, 2019</a>; <a href="#ref-melli_uncovering_2025" role="doc-biblioref">Melli &amp; Azzollini, 2025a</a>, <a href="#ref-melli_where_2025" role="doc-biblioref">2025b</a>)</span>.</p>
-<p>Two caveats qualify this picture. First, the subjective gradient depends on the context. In the most unequal countries, people with high subjective status also show greater support for redistribution, which reduces the gap between status groups <span class="citation" data-cites="melli_uncovering_2025 melli_where_2025">(<a href="#ref-melli_uncovering_2025" role="doc-biblioref">Melli &amp; Azzollini, 2025a</a>, <a href="#ref-melli_where_2025" role="doc-biblioref">2025b</a>)</span>. Highly unequal and strongly market-oriented contexts, such as Chile, could therefore be cases where subjective status contributes less than expected. Second, most of this evidence is cross-sectional and relies on differences between individuals. Panel studies suggest that redistributive preferences are quite stable, anchored in long-term economic position and early socialization, and respond only to major changes in circumstances <span class="citation" data-cites="ogrady_how_2019">(<a href="#ref-ogrady_how_2019" role="doc-biblioref">O’Grady, 2019</a>)</span>. Even major shocks, such as job loss, produce changes that dissipate once the shock ends <span class="citation" data-cites="margalit_explaining_2013">(<a href="#ref-margalit_explaining_2013" role="doc-biblioref">Margalit, 2013</a>)</span>, although views on the justice of inequality do shift in response to individual events such as unemployment or a promotion <span class="citation" data-cites="hvidberg_social_2023">(<a href="#ref-hvidberg_social_2023" role="doc-biblioref">Hvidberg et al., 2023</a>)</span>. Therefore, the question remains open as to whether the association between status and distributive preferences reflects stable differences between individuals or an adjustment within each individual as their status changes, which requires distinguishing between intrapersonal variation and interpersonality variation <span class="citation" data-cites="bell_explaining_2015">(<a href="#ref-bell_explaining_2015" role="doc-biblioref">Bell &amp; Jones, 2015</a>)</span>.</p>
+<p>Research on the social foundations of distributive preferences has traditionally relied on objective indicators of position, such as income, education and occupational class, and on a self-interest logic according to which those who benefit least from redistribution support it least <span class="citation" data-cites="alesina_intergenerational_2018 lindh_class_2020">(<a href="#ref-alesina_intergenerational_2018" role="doc-biblioref">Alesina et al., 2018</a>; <a href="#ref-lindh_class_2020" role="doc-biblioref">Lindh &amp; McCall, 2020</a>)</span>. Because SSS only partly reflects these indicators <span class="citation" data-cites="tan_association_2020">(<a href="#ref-tan_association_2020" role="doc-biblioref">Tan et al., 2020</a>)</span>, the mismatch between them can be as informative as either level. Using the same panel data as this study, Bargain et al. <span class="citation" data-cites="bargain_social_2026">(<a href="#ref-bargain_social_2026" role="doc-biblioref">Bargain et al., 2026</a>)</span> show that what predicts participation in the 2019 protests is not SSS itself but its gap with objective position: the further people place themselves below what their objective position would suggest, the more likely they are to protest.</p>
+<p>Two caveats qualify the evidence linking SSS to distributive preferences. First, the subjective gradient depends on context: in more unequal countries, people with high SSS also support redistribution more, narrowing the gap between status groups <span class="citation" data-cites="melli_uncovering_2025">(<a href="#ref-melli_uncovering_2025" role="doc-biblioref">Melli &amp; Azzollini, 2025a</a>)</span>. Highly unequal and strongly commodified settings such as Chile may therefore be cases where SSS adds less than expected. Second, most of this evidence relies on differences between individuals. Panel studies suggest that redistributive preferences are fairly stable, anchored in long-term economic position and early socialisation, and shift mainly after large and often transitory shocks <span class="citation" data-cites="margalit_explaining_2013 ogrady_how_2019">(<a href="#ref-margalit_explaining_2013" role="doc-biblioref">Margalit, 2013</a>; <a href="#ref-ogrady_how_2019" role="doc-biblioref">O’Grady, 2019</a>)</span>, although fairness views do respond to individual events such as unemployment or promotion (Hvidberg et al., 2023). Whether the association between status and distributive preferences reflects stable between-person differences or within-person adjustment as status changes therefore remains open, and answering it requires separating the two sources of variation <span class="citation" data-cites="bell_explaining_2015">(<a href="#ref-bell_explaining_2015" role="doc-biblioref">Bell &amp; Jones, 2015</a>)</span>.</p>
 </section>
 <section id="past-and-expected-mobility" class="level3">
 <h3 class="anchored" data-anchor-id="past-and-expected-mobility">Past and expected mobility</h3>
-<p>Status is not just a position, but also a trajectory: where people come from and where they hope to go can matter just as much as where they are. The literature on mobility has suggested that prospects for upward mobility can moderate demands for redistribution <span class="citation" data-cites="benabou_social_2001 alesina_intergenerational_2018">(<a href="#ref-alesina_intergenerational_2018" role="doc-biblioref">Alesina et al., 2018</a>; <a href="#ref-benabou_social_2001" role="doc-biblioref">Benabou &amp; Ok, 2001</a>)</span> and that, as with status, perceived mobility has greater attitudinal consequences than objective mobility <span class="citation" data-cites="gugushvili_intergenerational_2016 hiltner_view_2024">(<a href="#ref-gugushvili_intergenerational_2016" role="doc-biblioref">Gugushvili, 2016</a>; <a href="#ref-hiltner_view_2024" role="doc-biblioref">Hiltner &amp; Cech, 2024</a>)</span>.</p>
-<p>These effects, however, are not uniform. They vary depending on the type of policy or social service in question <span class="citation" data-cites="gugushvili_multilevel_2019">(<a href="#ref-gugushvili_multilevel_2019" role="doc-biblioref">Gugushvili, 2019</a>)</span>, and when mobility is measured objectively, people tend to adopt the preferences of their destination position rather than those of their origin <span class="citation" data-cites="jaime-castillo_social_2019">(<a href="#ref-jaime-castillo_social_2019" role="doc-biblioref">Jaime‐Castillo &amp; Marqués‐Perales, 2019</a>)</span>.</p>
+<p>Status is not just a position, but also a trajectory: where people come from and where they hope to go can matter just as much as where they are. The literature on mobility has suggested that prospects for upward mobility can moderate demands for redistribution <span class="citation" data-cites="benabou_social_2001 alesina_intergenerational_2018">(<a href="#ref-alesina_intergenerational_2018" role="doc-biblioref">Alesina et al., 2018</a>; <a href="#ref-benabou_social_2001" role="doc-biblioref">Benabou &amp; Ok, 2001</a>)</span> and that, as with status, perceived mobility has greater attitudinal consequences than objective mobility <span class="citation" data-cites="gugushvili_intergenerational_2016 hiltner_view_2024">(<a href="#ref-gugushvili_intergenerational_2016" role="doc-biblioref">Gugushvili, 2016</a>; <a href="#ref-hiltner_view_2024" role="doc-biblioref">Hiltner &amp; Cech, 2024</a>)</span>. These effects, however, are not uniform. They vary depending on the type of policy or social service in question <span class="citation" data-cites="gugushvili_multilevel_2019">(<a href="#ref-gugushvili_multilevel_2019" role="doc-biblioref">Gugushvili, 2019</a>)</span>, and when mobility is measured objectively, people tend to adopt the preferences of their destination position rather than those of their origin <span class="citation" data-cites="jaime-castillo_social_2019">(<a href="#ref-jaime-castillo_social_2019" role="doc-biblioref">Jaime‐Castillo &amp; Marqués‐Perales, 2019</a>)</span>.</p>
 <p>Expectations about the future, in particular, seem to carry more weight than past mobility <span class="citation" data-cites="schuck_how_2019">(<a href="#ref-schuck_how_2019" role="doc-biblioref">Schuck &amp; Shore, 2019</a>)</span>, but the direction of their effect depends on how that upward mobility is expected to be achieved. If the next generation’s prospects are tied to public provision, optimism regarding one’s children may be accompanied by greater support for public services and less acceptance of the idea that access should depend on the ability to pay <span class="citation" data-cites="cojocaru_prospects_2014">(<a href="#ref-cojocaru_prospects_2014" role="doc-biblioref">Cojocaru, 2014</a>)</span>.</p>
 </section>
 <section id="status-mobility-and-inequality-preferences" class="level3">
 <h3 class="anchored" data-anchor-id="status-mobility-and-inequality-preferences">Status, Mobility and Inequality Preferences</h3>
-<p>These debates have rarely been applied to market justice preferences—that is, to the idea that it is fair for access to services such as pensions, health care, and education to depend on the ability to pay. Comparative evidence suggests that these preferences are reinforced where private provision is most widespread <span class="citation" data-cites="lindh_public_2015 immergut_it_2020">(<a href="#ref-immergut_it_2020" role="doc-biblioref">Immergut &amp; Schneider, 2020</a>; <a href="#ref-lindh_public_2015" role="doc-biblioref">Lindh, 2015</a>)</span>, making Chile—with its widely commercialized pensions, health care, and education—a paradigmatic case. Previous studies using the same panel data have examined the role of perceived inequality <span class="citation" data-cites="castillo_perceptions_2025">Castillo et al. (<a href="#ref-castillo_justification_2026" role="doc-biblioref">2026</a>)</span>, but the roles of objective and subjective status—and how they change over time—have not been addressed jointly.</p>
-<p>The question therefore remains open as to whether market justice preferences respond to the position people occupy, the one they believe they occupy, or the one they hope to attain—and whether they do so as stable differences between individuals or as changes within each individual. Answering this requires measuring subjective status in its past, present, and future dimensions (origin, self, and children) and separating these two sources of variation.</p>
+<p>These debates have rarely been applied to market justice preferences—that is, to the idea that it is fair for access to services such as pensions, health care, and education to depend on the ability to pay. Comparative evidence suggests that these preferences are reinforced where private provision is most widespread <span class="citation" data-cites="lindh_public_2015 immergut_it_2020">(<a href="#ref-immergut_it_2020" role="doc-biblioref">Immergut &amp; Schneider, 2020</a>; <a href="#ref-lindh_public_2015" role="doc-biblioref">Lindh, 2015</a>)</span>, making Chile—with its widely commercialized pensions, health care, and education—a paradigmatic case. Previous studies using the same panel data have examined the role of perceived inequality <span class="citation" data-cites="castillo_perceptions_2025">Castillo et al. (<a href="#ref-castillo_justification_2026" role="doc-biblioref">2026</a>)</span>, but the roles of objective and subjective status—and how they change over time—have not been addressed jointly. The question therefore remains open as to whether market justice preferences respond to the position people occupy, the one they believe they occupy, or the one they hope to attain—and whether they do so as stable differences between individuals or as changes within each individual. Answering this requires measuring subjective status in its past, present, and future dimensions (origin, self, and children) and separating these two sources of variation.</p>
 </section>
 </section>
 </section>
@@ -343,7 +352,7 @@ Table&nbsp;1: Subjective social mobility variables constructed from the subjecti
 </figcaption>
 <div aria-describedby="tbl-mobility-vars-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="table do-not-create-environment cell caption-top table-sm table-striped small">
+<table class="table cell caption-top table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">Concept</th>
@@ -403,7 +412,7 @@ Table&nbsp;2: The income mobility trajectory, in summary
 </figcaption>
 <div aria-describedby="tbl-traj-resumen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="table table-striped table-condensed do-not-create-environment cell caption-top table-sm small">
+<table class="table table-striped table-condensed cell caption-top table-sm small">
 <thead>
 <tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">Aspect</th>
@@ -821,7 +830,7 @@ Table&nbsp;4: Valid cases by variable: n (%) per wave, and persons with valid re
 </figcaption>
 <div aria-describedby="tbl-na-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="table table-striped table-condensed do-not-create-environment cell caption-top table-sm small">
+<table class="table table-striped table-condensed cell caption-top table-sm small">
 <colgroup>
 <col style="width: 12%">
 <col style="width: 12%">
@@ -1160,7 +1169,7 @@ Figure&nbsp;7: Distribution of education (university vs.&nbsp;less than universi
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-sub-w1" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-sub-w1" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-sub-w1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-sub-w1-1.png" id="fig-correlations-sub-w1" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1176,7 +1185,7 @@ Figure&nbsp;8
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-sub-w2" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-sub-w2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-sub-w2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-sub-w2-1.png" id="fig-correlations-sub-w2" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1192,7 +1201,7 @@ Figure&nbsp;9
 <div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-sub-w3" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-sub-w3" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-sub-w3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-sub-w3-1.png" id="fig-correlations-sub-w3" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1208,7 +1217,7 @@ Figure&nbsp;10
 <div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-sub-w4" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-sub-w4" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-sub-w4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-sub-w4-1.png" id="fig-correlations-sub-w4" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1224,7 +1233,7 @@ Figure&nbsp;11
 <div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-sub-w5" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-sub-w5" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-sub-w5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-sub-w5-1.png" id="fig-correlations-sub-w5" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1240,7 +1249,7 @@ Figure&nbsp;12
 <div id="tabset-2-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-6-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-sub-w6" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-sub-w6" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-sub-w6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-sub-w6-1.png" id="fig-correlations-sub-w6" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1265,7 +1274,7 @@ Figure&nbsp;13
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-obj-w1" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-obj-w1" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-obj-w1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-obj-w1-1.png" id="fig-correlations-obj-w1" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1281,7 +1290,7 @@ Figure&nbsp;14
 <div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-obj-w2" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-obj-w2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-obj-w2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-obj-w2-1.png" id="fig-correlations-obj-w2" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1297,7 +1306,7 @@ Figure&nbsp;15
 <div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-obj-w3" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-obj-w3" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-obj-w3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-obj-w3-1.png" id="fig-correlations-obj-w3" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1313,7 +1322,7 @@ Figure&nbsp;16
 <div id="tabset-3-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-4-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-obj-w4" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-obj-w4" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-obj-w4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-obj-w4-1.png" id="fig-correlations-obj-w4" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1329,7 +1338,7 @@ Figure&nbsp;17
 <div id="tabset-3-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-5-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-obj-w5" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-obj-w5" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-obj-w5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-obj-w5-1.png" id="fig-correlations-obj-w5" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1345,7 +1354,7 @@ Figure&nbsp;18
 <div id="tabset-3-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-6-tab">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div id="fig-correlations-obj-w6" class="quarto-float quarto-figure quarto-figure-center anchored" width="85%" data-fig-align="center" data-fig-pos="H">
+<div id="fig-correlations-obj-w6" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H" width="85%" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-correlations-obj-w6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="paper_files/figure-html/fig-correlations-obj-w6-1.png" id="fig-correlations-obj-w6" class="img-fluid quarto-figure quarto-figure-center anchored figure-img" style="width:85.0%" data-fig-pos="H">
@@ -1381,7 +1390,7 @@ Table&nbsp;5: Trayectoria de ingreso y preferencias de justicia de mercado (índ
 </figcaption>
 <div aria-describedby="tbl-ingreso-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="texreg do-not-create-environment cell caption-top table table-sm table-striped small">
+<table class="texreg cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">&nbsp;</th>
@@ -1738,7 +1747,7 @@ Table&nbsp;6: Sin ideología política: trayectoria de ingreso y preferencias de
 </figcaption>
 <div aria-describedby="tbl-ingreso-1-noideo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="texreg do-not-create-environment cell caption-top table table-sm table-striped small">
+<table class="texreg cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">&nbsp;</th>
@@ -2065,7 +2074,7 @@ Table&nbsp;7: Trayectoria de ingreso × estatus subjetivo (índice MJP), con pen
 </figcaption>
 <div aria-describedby="tbl-ingreso-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="texreg do-not-create-environment cell caption-top table table-sm table-striped small">
+<table class="texreg cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">&nbsp;</th>
@@ -2732,7 +2741,7 @@ Table&nbsp;8: Sin ideología política: trayectoria de ingreso × estatus subjet
 </figcaption>
 <div aria-describedby="tbl-ingreso-2-noideo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="texreg do-not-create-environment cell caption-top table table-sm table-striped small">
+<table class="texreg cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">&nbsp;</th>
@@ -3380,7 +3389,7 @@ Table&nbsp;9: Trayectoria de ingreso y preferencias de justicia de mercado (índ
 </figcaption>
 <div aria-describedby="tbl-ingreso-mov-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="texreg do-not-create-environment cell caption-top table table-sm table-striped small">
+<table class="texreg cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">&nbsp;</th>
@@ -3633,7 +3642,7 @@ Table&nbsp;10: Sin ideología política: trayectoria de ingreso y preferencias d
 </figcaption>
 <div aria-describedby="tbl-ingreso-mov-noideo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="texreg do-not-create-environment cell caption-top table table-sm table-striped small">
+<table class="texreg cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">&nbsp;</th>
@@ -3862,7 +3871,7 @@ Table&nbsp;11: Trayectoria de ingreso × movilidad subjetiva hijos - origen (ín
 </figcaption>
 <div aria-describedby="tbl-ingreso-mov-int-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="texreg do-not-create-environment cell caption-top table table-sm table-striped small">
+<table class="texreg cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">&nbsp;</th>
@@ -4135,7 +4144,7 @@ Table&nbsp;12: Sin ideología política: trayectoria de ingreso × movilidad sub
 </figcaption>
 <div aria-describedby="tbl-ingreso-mov-int-noideo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="texreg do-not-create-environment cell caption-top table table-sm table-striped small">
+<table class="texreg cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">&nbsp;</th>
@@ -4437,29 +4446,14 @@ Castillo, J. C., Miranda, D., &amp; Madero-Cabib, I. (2013). Todos somos de clas
 <div id="ref-chen_subjective_2018" class="csl-entry" role="listitem">
 Chen, Y., &amp; Williams, M. (2018). Subjective <span>Social Status</span> in <span>Transitioning China</span>: <span>Trends</span> and <span>Determinants</span>. <em>Social Science Quarterly</em>, <em>99</em>(1), 406–422. <a href="https://doi.org/10.1111/ssqu.12401">https://doi.org/10.1111/ssqu.12401</a>
 </div>
-<div id="ref-choi_individuals_2021" class="csl-entry" role="listitem">
-Choi, G. (2021). Individuals’ socioeconomic position, inequality perceptions, and redistributive preferences in OECD countries. <em>The Journal of Economic Inequality</em>, <em>19</em>(2), 239–264. <a href="https://doi.org/10.1007/s10888-020-09471-6">https://doi.org/10.1007/s10888-020-09471-6</a>
-</div>
 <div id="ref-cojocaru_prospects_2014" class="csl-entry" role="listitem">
 Cojocaru, A. (2014). Prospects of upward mobility and preferences for redistribution: Evidence from the life in transition survey. <em>European Journal of Political Economy</em>, <em>34</em>, 300–314. <a href="https://doi.org/10.1016/j.ejpoleco.2014.03.003">https://doi.org/10.1016/j.ejpoleco.2014.03.003</a>
-</div>
-<div id="ref-condon_economic_2020" class="csl-entry" role="listitem">
-Condon, M., &amp; Wichowsky, A. (2020). <em>The economic other: Inequality in the american political imagination</em>. Chicago London: The University of Chicago Press. <a href="https://doi.org/10.7208/9780226691909">https://doi.org/10.7208/9780226691909</a>
 </div>
 <div id="ref-cruces_biased_2013" class="csl-entry" role="listitem">
 Cruces, G., Pérez Truglia, R., &amp; Tetaz, M. (2013). Biased perceptions of income distribution and preferences for redistribution: <span>Evidence</span> from a survey experiment. <em>Journal of Public Economics</em>, <em>98</em>, 100–112. <a href="https://doi.org/10.1016/j.jpubeco.2012.10.009">https://doi.org/10.1016/j.jpubeco.2012.10.009</a>
 </div>
-<div id="ref-cruces_Biased_2013" class="csl-entry" role="listitem">
-Cruces, G., Perez-Truglia, R., &amp; Tetaz, M. (2013). Biased perceptions of income distribution and preferences for redistribution: Evidence from a survey experiment. <em>Journal of Public Economics</em>, <em>98</em>, 100–112. <a href="https://doi.org/10.1016/j.jpubeco.2012.10.009">https://doi.org/10.1016/j.jpubeco.2012.10.009</a>
-</div>
-<div id="ref-duman_subjective_2019" class="csl-entry" role="listitem">
-Duman, A. (2019). Subjective social class and individual preferences for redistribution: Cross-country empirical analysis. <em>International Journal of Social Economics</em>, <em>47</em>(2), 173–189. <a href="https://doi.org/10.1108/IJSE-06-2019-0377">https://doi.org/10.1108/IJSE-06-2019-0377</a>
-</div>
 <div id="ref-duman_subjective_2020" class="csl-entry" role="listitem">
 Duman, A. (2020). Subjective social class and individual preferences for redistribution: <span>Cross</span>-country empirical analysis. <em>International Journal of Social Economics</em>, <em>47</em>(2), 173–189. <a href="https://doi.org/10.1108/IJSE-06-2019-0377">https://doi.org/10.1108/IJSE-06-2019-0377</a>
-</div>
-<div id="ref-evans_conditional_2022" class="csl-entry" role="listitem">
-Evans, G., Stubager, R., &amp; Langsæther, P. E. (2022). The conditional politics of class identity: Class origins, identity and political attitudes in comparative perspective. <em>West European Politics</em>, <em>45</em>(6), 1178–1205. <a href="https://doi.org/10.1080/01402382.2022.2039980">https://doi.org/10.1080/01402382.2022.2039980</a>
 </div>
 <div id="ref-evans_subjective_2004" class="csl-entry" role="listitem">
 Evans, M. D. R., &amp; Kelley, J. (2004). Subjective <span>Social Location</span>: <span>Data From</span> 21 <span>Nations</span>. <em>International Journal of Public Opinion Research</em>, <em>16</em>(1), 3–38. <a href="https://doi.org/10.1093/ijpor/16.1.3">https://doi.org/10.1093/ijpor/16.1.3</a>
@@ -4487,9 +4481,6 @@ Hiltner, S., &amp; Cech, E. A. (2024). The view from above and below: Subjective
 </div>
 <div id="ref-huang_subjective_2021" class="csl-entry" role="listitem">
 Huang, X. (2021). Subjective <span>Class Identification</span> in <span>Australia</span>: <span>Do Social Networks Matter</span>? <em>The Sociological Quarterly</em>. <a href="https://doi.org/10.1080/00380253.2021.1997668">https://doi.org/10.1080/00380253.2021.1997668</a>
-</div>
-<div id="ref-hvidberg_social_2023" class="csl-entry" role="listitem">
-Hvidberg, K. B., Kreiner, C. T., &amp; Stantcheva, S. (2023). Social positions and fairness views on inequality. <em>Review of Economic Studies</em>, <em>90</em>(6), 3083–3118. <a href="https://doi.org/10.1093/restud/rdad019">https://doi.org/10.1093/restud/rdad019</a>
 </div>
 <div id="ref-immergut_it_2020" class="csl-entry" role="listitem">
 Immergut, E. M., &amp; Schneider, S. M. (2020). Is it unfair for the affluent to be able to purchase <span>“better”</span> healthcare? Existential standards and institutional norms in healthcare attitudes across 28 countries. <em>Social Science &amp; Medicine</em>, <em>267</em>, 113146. <a href="https://doi.org/10.1016/j.socscimed.2020.113146">https://doi.org/10.1016/j.socscimed.2020.113146</a>

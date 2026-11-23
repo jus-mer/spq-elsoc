@@ -43,6 +43,11 @@ author:
     email: tomas.urzua@ug.uchile.cl
     affiliations:
       - ref: 1
+  - name: René Canales Sellés
+    orcid: 0009-0002-4299-2725
+    email: rcanales@uni-bremen.de
+    affiliations:
+      - ref: 2
 affiliations: 
   - id: 1
     name: Departament of Sociology, University of Chile
