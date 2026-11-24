@@ -689,7 +689,18 @@ elsoc_long_2016_2023 <- elsoc_long_2016_2023 %>%
       as.integer(inc_destino) > as.integer(inc_origen) ~ "Upward",
       as.integer(inc_destino) < as.integer(inc_origen) ~ "Downward",
       TRUE                                             ~ "Stable"),
-    dir_ingreso = factor(dir_ingreso, levels = c("Stable", "Upward", "Downward"))) %>%
+    dir_ingreso = factor(dir_ingreso, levels = c("Stable", "Upward", "Downward")),
+
+    # Direction (Upward / Downward) but keeping the three stable groups apart
+    # (5 categories): traj_ingreso with the 6 mobility cells collapsed
+    traj_ingreso_rec = case_when(
+      is.na(traj_ingreso)         ~ NA_character_,
+      dir_ingreso == "Upward"     ~ "Upward",
+      dir_ingreso == "Downward"   ~ "Downward",
+      TRUE                        ~ as.character(traj_ingreso)),
+    traj_ingreso_rec = factor(traj_ingreso_rec,
+                              levels = c("Stable low", "Stable middle", "Stable top",
+                                         "Upward", "Downward"))) %>%
   select(-dec_origen, -dec_destino)
 
 elsoc_long_2016_2023$inc_origen <-
@@ -704,13 +715,18 @@ elsoc_long_2016_2023$traj_ingreso <-
 elsoc_long_2016_2023$dir_ingreso <-
   sjlabelled::set_label(elsoc_long_2016_2023$dir_ingreso,
                         label = "Income mobility direction 2016-2023")
+elsoc_long_2016_2023$traj_ingreso_rec <-
+  sjlabelled::set_label(elsoc_long_2016_2023$traj_ingreso_rec,
+                        label = "Income mobility trajectory 2016-2023 (collapsed: stable low/middle/top, upward, downward)")
 
 # One row per respondent
 person_inc <- dplyr::distinct(elsoc_long_2016_2023, idencuesta, inc_origen,
-                              inc_destino, traj_ingreso, dir_ingreso)
+                              inc_destino, traj_ingreso, dir_ingreso,
+                              traj_ingreso_rec)
 table(person_inc$inc_origen, person_inc$inc_destino, useNA = "ifany")
 table(person_inc$traj_ingreso, useNA = "ifany")
 table(person_inc$dir_ingreso, useNA = "ifany")
+table(person_inc$traj_ingreso, person_inc$traj_ingreso_rec, useNA = "ifany")
 ```
 
 ```{r}
@@ -753,7 +769,8 @@ df_study1_long <- elsoc_long_2016_2023 %>%
          inc_origen,
          inc_destino,
          traj_ingreso,
-         dir_ingreso)
+         dir_ingreso,
+         traj_ingreso_rec)
 
 vars_invariantes <- c("age", "aget",
                       "sex",
